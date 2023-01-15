@@ -1,0 +1,9 @@
+.page.uploadCSVPage .CSVInputField {
+  margin: 20px;
+  width: calc(100% - 20px * 2);
+  height: calc(100vh - 50px * 2);
+  
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 50px;
+}

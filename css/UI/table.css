@@ -2,18 +2,14 @@
 table.UITable {
 	border-collapse: collapse;
 }
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
+.UITable > tr.tableRow:nth-child(even) { 
+	background-color: #dddddd;
 }
 
-td, th {
+.UITable > .tableRow > .rowElement {
   border: 1px solid #dddddd;
   text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
+  font-size: 12px;
+  overflow: auto;
+  white-space: nowrap;
 }
