@@ -43,11 +43,11 @@ new class TransactionListViewerPage extends Page {
 	open(_transactions) {
 		for (let transaction of _transactions)
 		{
-			let typeInput = createElement('select', 'typeSelector');
+			let typeInput = new DropDown({customClass: 'typeSelector'});
 			// transaction.typeCode,
 			let row = new UITableRow({valueElements: [
 				transaction.date,
-				typeInput,
+				typeInput.HTML,
 				transaction.targetName,
 				transaction.deltaMoney,
 				transaction.description

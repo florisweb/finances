@@ -1,0 +1,63 @@
+
+.UIDropDownWrapper {
+
+}
+
+.UIDropDownWrapper .dropDownButton {
+  position: relative;
+  display: flex;
+  
+  width: auto;
+  height: 35px;
+  padding: 7.5px;
+
+  font-size: 14px;
+  background: #fff;
+  box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
+  border: 1px solid #eee;
+}
+
+  .UIDropDownWrapper .dropDownButton .dropDownIcon {
+    position: relative;
+    height: 14px;
+    width: auto;
+    opacity: .5;
+    margin: 3px;
+    transition: transform .3s;
+  }
+  .UIDropDownWrapper:not(.optionPanelOpen) .dropDownButton .dropDownIcon {
+    transform: rotateZ(-90deg);
+  }
+
+  .UIDropDownWrapper .dropDownButton .contentHolder { 
+    position: relative;
+    margin-left: 5px;
+    height: 20px;
+    line-height: 20px;
+    width: auto;
+    overflow: hidden;
+  }
+
+
+.UIDropDownWrapper .optionPanel {
+  position: absolute;
+  padding: 20px;
+  margin: 20px;
+  box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .05);
+  border: 1px solid #eee;
+
+  z-index: 1000;
+  background: #fff;
+
+  transition: opacity .3s, margin-top .3s;
+}
+
+.UIDropDownWrapper:not(.optionPanelOpen) .optionPanel {
+  pointer-events: none;
+  opacity: 0;
+  margin-top: 10px;
+}
+
+
+
+
