@@ -91,419 +91,57 @@
 			}
 
 
+
+
+
+
+			#mainContent {
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 100vw;
+				height: 100vh;
+				overflow: auto;
+				border: 1px solid red;
+			}
+
+			#mainContent > .page {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				min-height: 100vh;
+				height: auto;
+
+				padding: 30px;
+
+				border: 1px solid blue;
+
+				transition: opacity .3s;
+			}
+
+			#mainContent > .page.hide { 
+				opacity: 0;
+				pointer-events: none;
+			}
+
 		</style>
 	</head>
 	<body>
-		<input type='file' id='fileInput' accept='text/csv'>
-		<div id='progressHolder'>
-			<div id='progressBar'></div>
-			<div class='progressText'>0/0</div>
+		<div id='mainContent'>
+			<div class='page'>1</div>
+			<div class='page hide'>2</div>
+			<div class='page hide'>3</div>
+			<div class='page hide'>4</div>
 		</div>
 
-		<div id='transactionTypeSelector' class='panel'>
-			<div class='moneyHolder'></div>
-			<div class='dateHolder'></div>
-			<div class='targetNameHolder'></div>
-			<div class='descriptionHolder'></div>
-			<div class='typeHolder'></div>
-		</div>
-
-		<div class='panel button backButton' onclick='TransactionManager.prevTransaction();'>❮ Previous</div>
-		<div class='panel button nextButton' onclick='TransactionManager.nextTransaction();'>Next ❯</div>
-
-
-		<script>
-
-			// Types
-			const Types = {
-				kamer: 1,
-				kleding: 2,
-				studie: 3,
-				eten: 4,
-				verenigingen: 5,
-				verzekeringen: 6,
-				overig: 7,
-				werkEnOverigeInkomsten: 8,
-				ouderVergoeding: 9,
-				uitgaanPresentjesEnVervoer: 10,
-				corridor: 11,
-				telefoonEnNonHobbyTech: 12,
-			};
-
-
-
-
-
-
-
-
-			let $ = function () {return document.querySelectorAll(...arguments)}
-
-			
-			const HTML = {
-				input: fileInput,
-				progress: {
-					holder: progressHolder,
-					bar: progressBar,
-					text: $('#progressHolder .progressText')[0]
-				}
-			}	
-
-
-
-
-
-
-
-
-
-
-
-
-			const inputRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', null, null, null, null, 'description', 'xCode'];
-			const outputRowKeys = ['date', 'typeCode', 'targetIBAN', 'targetName', 'deltaMoney', 'description'];
-
-			let data = [];
-			
-
-			
-
-			class transactionManager {
-				curPointerIndex = 0;
-				#transactions = [];
-				transactions = [];
-				CSVReader = new CSVFileManager(inputRowKeys);
-
-
-				constructor() {
-					HTML.input.addEventListener('change', (_e) => this.#onFileSelect(_e));
-				}
-				async #onFileSelect(e) {
-					const input = e.target
-				  	if (!input) throw new Error('null input')
-				  	const [first] = input.files
-					this.#transactions = await this.CSVReader.load(first);
-					this.transactions = this.#transactions;
-
-
-					let autoTypedTransactions = [];
-					let nonTypedTransactions = [];
-					for (let transaction of this.#transactions)
-					{
-						let type = this.autoDetermineType(transaction);
-						if (type === false) 
-						{
-							nonTypedTransactions.push(transaction)
-							continue;
-						}
-						transaction.typeCode = type;
-						autoTypedTransactions.push(transaction);
-					}
-					this.curPointerIndex = autoTypedTransactions.length - 1;
-					
-					this.#transactions = autoTypedTransactions.concat(nonTypedTransactions);
-					await this.nextTransaction();					
-				}
-
-
-				async nextTransaction() {
-					this.curPointerIndex++;
-					if (this.curPointerIndex >= this.#transactions.length - 1) 
-					{
-						this.#transactions.sort((a, b) => new Date().fromString(a[0]) > new Date().fromString(b[0]))
-						return downloadCSV(this.CSVReader.toCSV(outputRowKeys));
-					}
-					return this.showTransaction(this.#transactions[this.curPointerIndex]);
-				}
-				async prevTransaction() {
-					this.curPointerIndex--;
-					if (this.curPointerIndex <= 0) return;
-					return this.showTransaction(this.#transactions[this.curPointerIndex]);
-				}
-
-				async showTransaction(_transaction) {
-					setTextToElement(HTML.progress.text, this.curPointerIndex + '/' + (this.#transactions.length - 2));
-					HTML.progress.bar.style.width = this.curPointerIndex / (this.#transactions.length - 2) * 100 + '%';
-					_transaction.typeCode = await TypeSelector.askForType(_transaction);
-				}	
-
-
-			
-
-				#formatInput(_inputRow, _currentTemplate, _targetTemplate) {
-					let outputRow = [];
-					for (let key of _targetTemplate)
-					{
-						let keyIndex = _currentTemplate.findIndex((_key) => _key === key);
-						let value = _inputRow[keyIndex];
-						outputRow.push(value);
-					}
-					return outputRow;
-				}
-
-				
-
-
-				autoDetermineType(_transaction) {
-					let description = _transaction.description ? _transaction.description : '';
-					let targetName = _transaction.targetName ? _transaction.targetName : '';
-
-					if (description.includes('Rente over positief saldo')) return Types.werkEnOverigeInkomsten;
-					if (targetName.includes('Persoonality')) return Types.werkEnOverigeInkomsten;
-
-
-					if (description.includes('OV-chipkaart')) return Types.uitgaanPresentjesEnVervoer;
-					if (description.includes('Lexkesveer')) return Types.uitgaanPresentjesEnVervoer;
-
-					
-					if (description.includes('Jumbo')) return Types.eten;
-					if (description.includes('Goudreinet Wageningen')) return Types.eten;
-					if (description.includes('Spar Citystore')) return Types.eten;
-					if (description.includes('Broodbakkerij')) return Types.eten;
-					if (description.includes('Bakker Bart')) return Types.eten;
-					if (description.includes('Bakkerij')) return Types.eten;
-
-
-
-					if (targetName.includes('proefschriftmaken')) return Types.studie;
-					if (targetName.includes('Studystore')) return Types.studie;
-					if (targetName.includes('STICHTING DERDENGELDEN BUCKAROO')) return Types.studie;
-					if (description.includes('BRUNA') || targetName.includes('Bruna')) return Types.studie;
-
-
-
-					if (targetName.includes('Fp Muziekprodukties')) return Types.verenigingen;
-					if (targetName.includes('KENKON')) return Types.verenigingen;
-					
-					
-
-					if (description.includes('Lebara')) return Types.telefoonEnNonHobbyTech;
-
-
-					if (targetName.includes('GAMMA')) return Types.kamer;
-					if (targetName.includes('Idealis') && description.includes('Periode:')) return Types.kamer;
-
-
-
-					if (targetName.includes('Centraal Beheer')) return Types.verzekeringen;					
-					if (description.includes('VOORSCHOT ZORGTOESLAG')) return Types.verzekeringen;
-					if (targetName.includes('Zilveren Kruis Zorgverzekeringen')) return Types.verzekeringen;
-
-
-					if (description.includes('maandelijkse leef- en studievergoeding (uitwonend)')) return Types.ouderVergoeding;
-					
-					if (description.includes('Corridor 15B')) return Types.corridor;
-					if (description.includes('HOEVESTEIN 239 15B')) return Types.corridor;
-					
-						
-					return false;
-				}
-			}
-		
-
-
-
-
-
-
-			class typeSelector {
-				HTML = {
-					holder: transactionTypeSelector,
-					moneyHolder: $('#transactionTypeSelector .moneyHolder')[0],
-					dateHolder: $('#transactionTypeSelector .dateHolder')[0],
-					targetNameHolder: $('#transactionTypeSelector .targetNameHolder')[0],
-					descriptionHolder: $('#transactionTypeSelector .descriptionHolder')[0],
-					typeHolder: $('#transactionTypeSelector .typeHolder')[0],
-				}
-
-
-				#resolver;
-				#errorer;
-				constructor() {
-					for (let type in Types)
-					{
-						this.HTML.typeHolder.append(this.#renderTypeButton(type));
-					}
-				}
-
-
-				askForType(_transaction) {
-					setTextToElement(this.HTML.moneyHolder, '€' + _transaction.deltaMoney);
-					setTextToElement(this.HTML.dateHolder, 'Date: ' + _transaction.date);
-					setTextToElement(this.HTML.targetNameHolder, 'Target: ' + _transaction.targetName + ' (' + _transaction.targetIBAN + ')');
-					setTextToElement(this.HTML.descriptionHolder, 'Description: ' + _transaction.description);
-
-					return new Promise((resolve, error) => {this.#resolver = resolve; this.#errorer = error})
-				}
-
-				#renderTypeButton(_type) {
-					let button = createElement('div', 'button panel tagButton');
-					setTextToElement(button, _type);
-					button.onclick = () => this.selectType(Types[_type]);
-					return button;
-				}
-				
-				selectType(_typeIndex) {
-					if (!this.#resolver) return;
-					this.#resolver(_typeIndex);
-					TransactionManager.nextTransaction();
-				}
-				
-			}
-
-
-			
-
-			function createElement(_tag, _class) {
-				let element = document.createElement(_tag);
-				element.className = _class;
-				return element;
-			}
-
-		
-			function setTextToElement(element, text) {
-				element.innerHTML = "";
-				let a = document.createElement('a');
-				a.text = text;
-				element.append(a);
-			}
-			
-
-
-			function randomize(values) {
-			    let index = values.length,  randomIndex;
-			  
-			    // While there remain elements to shuffle.
-			    while (index != 0) {
-			  
-			      // Pick a remaining element.
-			      randomIndex = Math.floor(Math.random() * index);
-			      index--;
-			  
-			      // And swap it with the current element.
-			      [values[index], values[randomIndex]] = [
-			        values[randomIndex], values[index]];
-			    }
-			  
-			    return values;
-			  }
-			  
-
-
-
-
-
-
-
-
-			function downloadCSV(_string) {
-				var c = document.createElement("a");
-				c.download = "output.csv";
-
-				var t = new Blob([_string], {
-					type: "text/csv"
-				});
-				c.href = window.URL.createObjectURL(t);
-				c.click();
-			}
-
-			Date.prototype.fromString = function(_str) {
-				if (typeof _str != "string" || !_str) return _str;
-				let dateTime = _str.split(" ");	
-				let dateParts = dateTime[0].split("-");
-				let date = new Date(parseInt(dateParts[1]) + "/" + parseInt(dateParts[0]) + "/" + parseInt(dateParts[2]));
-				// this.setMonth(parseInt(dateParts[1]) - 1);
-
-				if (!dateTime[1]) return date;
-				let timeParts = dateTime[1].split(":");
-				date.setHours(timeParts[0]);
-				date.setMinutes(timeParts[1]);
-				
-				return date;
-			}
-
-
-
-
-
-
-
-
-
-
-
-			class CSVFileManager {
-				#CSVTemplate = [];
-				rows = [];
-
-				constructor(_CSVTemplate = []) {
-					this.#CSVTemplate = _CSVTemplate;
-				}
-
-				async load(_file) {
-					return new Promise((resolve, error) => {
-						if (!_file) return error();
-
-						const reader = new FileReader();
-					  	reader.onload = async () => {
-					    	const text = reader.result;
-					    	let rows = text.split('\n');
-					    	this.rows = rows.map((string) => new CSVRow(string.split(','), this.#CSVTemplate));
-					    	resolve(this.rows);
-					  	}
-					  
-					  	reader.readAsText(_file)
-					});
-				}
-
-				toCSV(_template = this.#CSVTemplate) {
-					let rows = this.rows.map((_row) => _row.toCSV(_template));
-					return rows.join('\n');
-				}
-			}
-
-
-
-			class CSVRow {
-				#CSVTemplate = [];
-				constructor(_valueArr, _CSVTemplate = []) {
-					this.#CSVTemplate = _CSVTemplate;
-					for (let i = 0; i < _CSVTemplate.length; i++)
-					{
-						this[_CSVTemplate[i]] = _valueArr[i];
-					}
-				}
-
-
-				toCSV(_template = this.#CSVTemplate) {
-					let output = [];
-					for (let i = 0; i < _template.length; i++)
-					{
-						output[i] = this[_template[i]];
-					}
-					return output;
-				}
-			}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			const TypeSelector = new typeSelector();
-			const TransactionManager = new transactionManager();
-
-
-		</script>
+		<script src='js/CSV.js'></script>
+		<script src='js/types.js'></script>
+		<script src='js/page.js'></script>
+		<script src='js/app.js'></script>
 	</body>
 </html>
+
+
+
 
