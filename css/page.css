@@ -7,3 +7,11 @@
   text-align: center;
   padding: 50px;
 }
+
+
+.page.transactionListViewerPage .UITableWrapper.transactionTable {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}

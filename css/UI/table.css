@@ -1,13 +1,25 @@
 
-table.UITable {
+.UITableWrapper {
+}
+
+.UITableWrapper > table.UITable {
 	border-collapse: collapse;
 }
+
+
+
+.UITable > tr.tableRow {
+  border-bottom: 1px solid #ddd;
+}
 .UITable > tr.tableRow:nth-child(even) { 
-	background-color: #dddddd;
+/*	background-color: #dddddd;*/
 }
 
 .UITable > .tableRow > .rowElement {
-  border: 1px solid #dddddd;
+  position: relative;
+  padding: 10px;
+/*  border: 1px solid #dddddd;*/
+
   text-align: left;
   font-size: 12px;
   overflow: auto;

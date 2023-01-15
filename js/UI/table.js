@@ -3,14 +3,16 @@
 class UITable {
 	#HTML = {};
 	rows = [];
-	constructor({keys = []}) {
-		this.#HTML.self = createElement('table', 'UITable');
+	constructor({keys = [], customClass}) {
+		this.#HTML.table = createElement('table', 'UITable');
+		this.#HTML.self = createElement('div', 'UITableWrapper ' + (customClass ? customClass : ''));
+		this.#HTML.self.append(this.#HTML.table);
 		this.addRow(new UITableRow({valueElements: keys, isHeader: true}));
 	}
 
 	addRow(_row, _index = this.rows.length) {
 		this.rows[_index] = _row;
-		this.#HTML.self.append(_row.HTML);
+		this.#HTML.table.append(_row.HTML);
 	}
 
 	get HTML() {		

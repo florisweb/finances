@@ -32,7 +32,10 @@ new class TransactionListViewerPage extends Page {
 	table;
 	constructor() {
 		super({pageIndex: 0});
-		this.table = new UITable({keys: ['Date', 'Type', 'targetIBAN', 'targetName', 'deltaMoney', 'Description']});
+		this.table = new UITable({
+			keys: ['Date', 'Type', 'targetName', 'deltaMoney', 'Description'], 
+			customClass: 'transactionTable'
+		});
 		this.pageHTML.append(this.table.HTML);
 
 	}
@@ -40,10 +43,11 @@ new class TransactionListViewerPage extends Page {
 	open(_transactions) {
 		for (let transaction of _transactions)
 		{
+			let typeInput = createElement('select', 'typeSelector');
+			// transaction.typeCode,
 			let row = new UITableRow({valueElements: [
 				transaction.date,
-				transaction.typeCode,
-				transaction.targetIBAN,
+				typeInput,
 				transaction.targetName,
 				transaction.deltaMoney,
 				transaction.description
