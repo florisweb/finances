@@ -8,14 +8,13 @@
 
   padding: 30px;
 
-  border: 1px solid blue;
-
-  transition: opacity .3s;
+  transition: opacity .3s, margin-top .3s;
 }
 
 #mainContent > .page.hide { 
   opacity: 0;
   pointer-events: none;
+  margin-top: 30px;
 }
 
 
