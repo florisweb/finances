@@ -12,16 +12,18 @@
   border-bottom: 1px solid #ddd;
 }
 .UITable > tr.tableRow:nth-child(even) { 
-/*	background-color: #dddddd;*/
 }
 
 .UITable > .tableRow > .rowElement {
   position: relative;
-  padding: 10px;
-/*  border: 1px solid #dddddd;*/
+  padding: 5px 10px;
 
   text-align: left;
   font-size: 12px;
   overflow: auto;
   white-space: nowrap;
+}
+
+.UITable > .tableRow > .rowElement {
+  line-height: 25px;
 }

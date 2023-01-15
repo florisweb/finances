@@ -1,3 +1,28 @@
+#mainContent > .page {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+
+  padding: 30px;
+
+  border: 1px solid blue;
+
+  transition: opacity .3s;
+}
+
+#mainContent > .page.hide { 
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+
+
+
 .page.uploadCSVPage .CSVInputField {
   margin: 20px;
   width: calc(100% - 20px * 2);
@@ -15,3 +40,10 @@
   height: auto;
   overflow: hidden;
 }
+
+.transactionListViewerPage .transactionTable  .UITable .rowElement:nth-child(5) {
+  white-space: normal;
+}
+
+
+
