@@ -7,10 +7,10 @@ const TagManager = new class {
 			filter: (t) => t.targetName.includes('GAMMA') || (t.targetName.includes('Idealis') && t.description.includes('Periode:'))
 		}),
 		new TransactionTag({id: 2, name: 'kleding', 					color: new Color('rgb(222, 131, 68)'),
-			filter: (t) => t.targetName.includes('Modeschoenen')
+			filter: (t) => t.description.includes('Modeschoenen') || t.description.includes('Good Looking') || t.targetName.includes('C&A')
 		}),
 		new TransactionTag({id: 3, name: 'studie', 						color: new Color('rgb(245, 194, 66)'), 
-			filter: (t) => t.targetName.includes('proefschriftmaken') || t.targetName.includes('Studystore') || t.targetName.includes('Bruna') || t.description.includes('BRUNA')
+			filter: (t) => t.targetName.includes('proefschriftmaken') || t.targetName.includes('Studystore') || t.targetName.includes('Bruna') || t.description.includes('BRUNA') || t.targetName.includes('Wageningen Universiteit') || t.targetName.includes('SURFspot')
 		}),
 		new TransactionTag({id: 4, name: 'eten', 						color: new Color('rgb(126, 171, 85)'),
 			filter: (t) => t.description.includes('Jumbo') || t.description.includes('Goudreinet') || t.description.includes('Spar') || t.description.includes('Brood') || t.description.includes('Bakker') || t.description.includes('Ekoplaza') || t.description.includes('Bosveld') || t.description.includes('Gino') || t.description.includes('ALBERT HEIJN') || t.description.includes('Natuurwinkel') || t.description.includes('Coop') || t.description.includes('Lidl')
@@ -19,7 +19,7 @@ const TagManager = new class {
 			filter: (t) => t.targetName.includes('Muziekprodukties') || t.targetName.includes('KENKON') || t.targetName.includes('BUDO KAI TORA TORA')
 		}),
 		new TransactionTag({id: 6, name: 'verzekeringen', 				color: new Color('rgb(136, 150, 174)'),
-			filter: (t) => t.targetName.includes('Centraal Beheer') || t.targetName.includes('Zilveren Kruis Zorgverzekeringen') || t.description.includes('VOORSCHOT ZORGTOESLAG')
+			filter: (t) => t.targetName.includes('Centraal Beheer') || t.targetName.includes('Zilveren Kruis Zorgverzekeringen') || t.description.includes('VOORSCHOT ZORGTOESLAG') || t.targetName.includes('INFOMEDICS')
 		}),
 		new TransactionTag({id: 7, name: 'overig', 						color: new Color('rgb(158, 205, 251)')}),
 		new TransactionTag({id: 8, name: 'werkEnOverigeInkomsten',  	color: new Color('rgb(117, 251, 106)'), 

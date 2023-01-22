@@ -140,7 +140,7 @@ new class TagOverviewPage extends Page {
 	table;
 	constructor() {
 		super({pageIndex: 3});
-		let keys = ['Month'];
+		let keys = ['Month', 'Sum'];
 		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
 
 		this.table = new UITable({
@@ -153,7 +153,7 @@ new class TagOverviewPage extends Page {
 	open() {
 		if (!DataManager.transactions.length) return;
 		this.table.clear();
-		
+
 		let tagData = [];
 		for (let i = 1; i < TagManager.tags.length; i++)
 		{
@@ -170,9 +170,10 @@ new class TagOverviewPage extends Page {
 		{
 			let nextMonth = curDate.copy().moveMonth(1);
 			let value = [
-				curDate.getMonths()[curDate.getMonth()].name + ' ' + curDate.getFullYear()
+				curDate.getMonths()[curDate.getMonth()].name + ' ' + curDate.getFullYear(),
+				createElement('strong')
 			];
-			
+			let totalSum = 0;
 			for (let tagSet of tagData)
 			{
 				let moneySum = 0;
@@ -184,8 +185,10 @@ new class TagOverviewPage extends Page {
 					moneySum += parseFloat(transaction.deltaMoney);
 				}
 				value.push(Math.round(moneySum * 100) / 100);
+				totalSum += moneySum;
 			}
 				
+			setTextToElement(value[1], Math.round(totalSum * 100) / 100);
 			let row = new UITableRow({valueElements: value});
 
 			this.table.addRow(row);

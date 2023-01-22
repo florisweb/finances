@@ -37,7 +37,6 @@ class UITableRow {
 	constructor({valueElements = [], isHeader = false}) {
 		this.#valueElements = valueElements;
 		this.isHeader = isHeader;
-
 	}
 
 	get HTML() {	
