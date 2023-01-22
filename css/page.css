@@ -33,6 +33,18 @@
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 .page.transactionListViewerPage .UITableWrapper.transactionTable {
   position: relative;
   width: 100%;
@@ -44,6 +56,17 @@
 .transactionListViewerPage .transactionTable  .UITable .rowElement:nth-child(5) {
   white-space: normal;
 }
+
+
+.page.transactionListViewerPage .UITableWrapper.transactionTable .dateHolder {
+  padding-left: 10px;
+  border-left: 3px solid #333;
+}
+.page.transactionListViewerPage .UITableWrapper.transactionTable .dateHolder.tagAutoDetected {
+  border-left: 3px solid #f00;
+}
+
+
 
 
 

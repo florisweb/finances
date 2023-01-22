@@ -50,8 +50,12 @@ new class TransactionListViewerPage extends Page {
 			typeInput.selectOption(transaction.typeCode);
 
 			// transaction.typeCode,
+			let date = createElement('div', 'dateHolder');
+			setTextToElement(date, transaction.date);
+			if (transaction.tagAutoDetected) date.classList.add('tagAutoDetected');
+
 			let row = new UITableRow({valueElements: [
-				transaction.date,
+				date,
 				typeInput.HTML,
 				transaction.targetName,
 				transaction.deltaMoney,
@@ -72,7 +76,6 @@ new class MonthOverViewPage extends Page {
 	constructor() {
 		super({pageIndex: 1});
 	}
-
 }
 
 
@@ -109,6 +112,7 @@ new class UploadCSVPage extends Page {
 				continue;
 			}
 			transaction.typeCode = type;
+			transaction.tagAutoDetected = true;
 			autoTypedTransactions.push(transaction);
 		}
 		
