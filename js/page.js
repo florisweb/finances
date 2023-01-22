@@ -48,6 +48,7 @@ new class TransactionListViewerPage extends Page {
 			let typeInput = new DropDown({customClass: 'typeSelector'});
 			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
 			typeInput.selectOption(transaction.typeCode);
+			typeInput.onInput = (_value) => {transaction.typeCode = _value; DataManager.saveTransactions()}
 
 			// transaction.typeCode,
 			let date = createElement('div', 'dateHolder');
@@ -117,10 +118,10 @@ new class UploadCSVPage extends Page {
 		}
 		
 		transactions = autoTypedTransactions.concat(nonTypedTransactions);
-		console.log(autoTypedTransactions);
+		transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date))
 
-
-		App.transactionListViewerPage.open(transactions);
+		DataManager.setTransactions(transactions);
+		App.transactionListViewerPage.open(DataManager.transactions);
 	}
 }
 

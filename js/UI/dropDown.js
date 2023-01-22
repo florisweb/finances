@@ -72,7 +72,7 @@ class DropDown {
 
 			this.close();
 			if (_autoSelect) return;
-			return this.onInput(option);
+			return this.onInput(option.value);
 		}
 	}
 

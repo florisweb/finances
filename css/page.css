@@ -7,6 +7,7 @@
   height: auto;
 
   padding: 30px;
+  padding-top: 0;
 
   transition: opacity .3s, margin-top .3s;
 }
@@ -17,19 +18,54 @@
   margin-top: 30px;
 }
 
+#mainContent > .page > .pageHeader {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  padding-bottom: 10px;
+}
+
+#mainContent > .page > .pageHeader .titleHolder {
+  position: relative;
+  height: 30px;
+  line-height: 30px;
+  font-size: 16px;
+  color: #222;
+  font-style: italic;
+  display: inline;
+}
+
+#mainContent > .page > .pageHeader .titleHolder::after {
+  position: absolute;
+  left: 0;
+  top: 25px;
+  content: '';
+  width: 100px;
+  height: 3px;
+  background: #daf;
+}
+
+
+#mainContent > .page > .pageHeader .button {
+  margin: 0;
+  margin-left: 10px;
+  float: right;
+}
 
 
 
 
 
+/* === CSVPage === */
 .page.uploadCSVPage .CSVInputField {
   margin: 20px;
   width: calc(100% - 20px * 2);
-  height: calc(100vh - 50px * 2);
+  height: calc(100vh - 50px * 2 - 50px - 200px);
   
   border: 1px solid #ddd;
   text-align: center;
   padding: 50px;
+  border: 1px solid #daf;
 }
 
 
@@ -43,12 +79,12 @@
 
 
 
-
+/* === TransactionListViewerPage === */
 
 .page.transactionListViewerPage .UITableWrapper.transactionTable {
   position: relative;
   width: 100%;
-  height: calc(100vh - 30px);
+  height: calc(100vh - 60px);
   overflow: hidden;
 }
 

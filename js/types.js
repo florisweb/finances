@@ -9,6 +9,17 @@ class Transaction {
 	constructor(_params) {
 		Object.assign(this, _params);
 	}
+
+	export() {
+		return {
+			date: this.date, 
+			typeCode: this.typeCode, 
+			targetIBAN: this.targetIBAN,
+			targetName: this.targetName,
+			deltaMoney: this.deltaMoney,
+			description: this.description
+		}
+	}
 }
 
 class TransactionTag {
@@ -29,7 +40,7 @@ class TransactionTag {
 			<div class='tagIndicator'></div>
 			<div class='tagNameHolder'></div>
 		`;
-		element.children[0].style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .2).RGBA;
+		element.children[0].style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA;
 		element.children[0].style.borderColor = this.color.hex;
 
 		setTextToElement(element.children[1], this.name);

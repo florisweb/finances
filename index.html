@@ -3,80 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title></title>
+		<title>Finances</title>
 
-
-		<style>
-			
-
-			#progressHolder {
-				position: fixed;
-				left: 0;
-				top: 0;
-				width: 100vw;
-				height: 20px;
-			}
-			#progressHolder #progressBar { 
-				position: relative;
-				background: #00e;
-				height: 5px;
-				transition: width .3s;
-			}
-			#progressHolder .progressText { 
-				text-align: center;
-				width: 100%;
-				font-size: 12px;
-			
-			}
-
-			#transactionTypeSelector {
-				
-			}
-			#transactionTypeSelector .typeHolder {
-				position: relative;
-				margin-top: 10px;
-				width: 100%;
-				display: flex;
-				overflow: auto;
-				padding: 20px 0;
-			}
-			#transactionTypeSelector .typeHolder .tagButton {
-				border: 1px solid #eee;
-				padding: 10px 15px;
-				margin: 5px;
-				box-shadow: none;
-			}
-
-
-
-			.panel {
-				padding: 20px;
-				margin: 20px;
-				box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .05);
-				border: 1px solid #eee;
-			}
-
-			.button.panel {
-				position: relative;
-				display: inline-block;
-				margin: 10px;
-				width: auto;
-				font-size: 14px;
-				padding: 15px;
-				background: #fff;
-				
-				transition: box-shadow .3s;
-			}
-			.button.panel:hover {
-				box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .1);
-			}
-			.button.panel.nextButton {
-				z-index: 10;
-				margin-left: 0;
-			}
-
-
-		</style>
 
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<link rel="stylesheet" type="text/css" href="css/page.css">
@@ -86,11 +14,28 @@
 	</head>
 	<body>
 		<div id='mainContent'>
-			<div class='page hide transactionListViewerPage'></div>
+			<div class='page hide transactionListViewerPage'>
+				<div class="pageHeader">
+					<div class="titleHolder">Transactions</div>
+					
+					<div class='button' onclick='DataManager.saveTransactions(); DataManager.downloadCSV()'>
+						Download CSV
+					</div>
+					<div class='button' onclick='App.uploadCSVPage.open()'>
+						Upload CSV
+					</div>
+				</div>
+			</div>
 			<div class='page hide'>
 			</div>
 			<div class='page hide uploadCSVPage'>
+				<div class="pageHeader">
+					<div class="titleHolder">Upload CSV</div>
+				</div>
 				<input type='file' class='CSVInputField' accept='text/csv'>
+				<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
+					Transactions
+				</div>
 			</div>
 			<div class='page hide'>4</div>
 		</div>
@@ -103,6 +48,8 @@
 		<script src='js/color.js'></script>
 		<script src='js/types.js'></script>
 		<script src='js/tagManager.js'></script>
+
+		<script src='js/dataManager.js'></script>
 		<script src='js/page.js'></script>
 		<script src='js/app.js'></script>
 	</body>

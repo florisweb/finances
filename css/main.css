@@ -18,3 +18,25 @@ html {
   height: 100vh;
   overflow: auto;
 }
+
+
+.button {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+  width: auto;
+  font-size: 14px;
+  padding: 10px 15px;
+  background: #fff;
+  
+  transition: box-shadow .3s;
+
+  background: #daf;
+  color: #fff;
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+.button:hover {
+  box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
+}
