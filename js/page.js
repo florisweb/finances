@@ -42,11 +42,12 @@ new class TransactionListViewerPage extends Page {
 	}
 
 	open(_transactions) {
-		let rows = []
+		let rows = [];
 		for (let transaction of _transactions)
 		{
 			let typeInput = new DropDown({customClass: 'typeSelector'});
 			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+			typeInput.selectOption(transaction.typeCode);
 
 			// transaction.typeCode,
 			let row = new UITableRow({valueElements: [
@@ -96,6 +97,25 @@ new class UploadCSVPage extends Page {
 	  	const [first] = input.files
 		let rows = await this.CSVReader.load(first);
 		let transactions = rows.map(row => new Transaction(row));
+
+		let autoTypedTransactions = [];
+		let nonTypedTransactions = [];
+		for (let transaction of transactions)
+		{
+			let type = TagManager.autoDetectTransactionTag(transaction);
+			if (type === false) 
+			{
+				nonTypedTransactions.push(transaction)
+				continue;
+			}
+			transaction.typeCode = type;
+			autoTypedTransactions.push(transaction);
+		}
+		
+		transactions = autoTypedTransactions.concat(nonTypedTransactions);
+		console.log(autoTypedTransactions);
+
+
 		App.transactionListViewerPage.open(transactions);
 	}
 }

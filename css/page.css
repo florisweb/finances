@@ -36,9 +36,10 @@
 .page.transactionListViewerPage .UITableWrapper.transactionTable {
   position: relative;
   width: 100%;
-  height: auto;
+  height: calc(100vh - 30px);
   overflow: hidden;
 }
+
 
 .transactionListViewerPage .transactionTable  .UITable .rowElement:nth-child(5) {
   white-space: normal;

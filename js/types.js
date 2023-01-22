@@ -2,10 +2,10 @@
 class Transaction {
 	date;
 	typeCode;
-	targetIBAN;
-	targetName;
+	targetIBAN = '';
+	targetName = '';
 	deltaMoney;
-	description;
+	description = '';
 	constructor(_params) {
 		Object.assign(this, _params);
 	}
@@ -15,10 +15,12 @@ class TransactionTag {
 	name;
 	color;
 	id;
-	constructor({name, color, id}) {
+	#filter;
+	constructor({name, color, id, filter}) {
 		this.name = name;
 		this.color = color;
 		this.id = id;
+		this.#filter = filter;
 	}
 
 	render() {
@@ -32,5 +34,12 @@ class TransactionTag {
 
 		setTextToElement(element.children[1], this.name);
 		return element;
+	}
+
+	transactionFitsTag(_transaction) {
+		if (typeof this.#filter !== 'function') return false;
+		try {
+			return this.#filter(_transaction);
+		} catch (e) {return false}
 	}
 }

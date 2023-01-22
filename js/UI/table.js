@@ -25,12 +25,22 @@ class UITable {
 
 class UITableRow {
 	#HTML = {};
+	#valueElements;
+	isHeader = false;
 	constructor({valueElements = [], isHeader = false}) {
+		this.#valueElements = valueElements;
+		this.isHeader = isHeader;
+
+	}
+
+	get HTML() {	
+		if (this.#HTML.self) return this.#HTML.self;
+		
 		this.#HTML.self = createElement('tr', 'tableRow');
 		
-		for (let valueEl of valueElements)
+		for (let valueEl of this.#valueElements)
 		{
-			let element = createElement(isHeader ? 'th' : 'td', 'rowElement ' + (isHeader ? 'isHeader' : ''));
+			let element = createElement(this.isHeader ? 'th' : 'td', 'rowElement ' + (this.isHeader ? 'isHeader' : ''));
 
 			if (typeof valueEl === 'string' || typeof valueEl === 'number') 
 			{
@@ -39,9 +49,6 @@ class UITableRow {
 
 			this.#HTML.self.append(element);
 		}
-	}
-
-	get HTML() {		
 		return this.#HTML.self;
 	}
 }

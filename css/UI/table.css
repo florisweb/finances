@@ -2,10 +2,13 @@
 
 
 .UITableWrapper.infiniteScroll {
-  max-height: 90vh;
+  max-height: 100vh; 
   overflow: auto !important;
 
   --scrollMargin: 1000px;
+}
+.UITableWrapper.infiniteScroll::-webkit-scrollbar {
+  display: none;
 }
 
 
