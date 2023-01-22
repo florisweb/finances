@@ -4,16 +4,23 @@
 class UITable {
 	_HTML = {};
 	rows = [];
+	#keys = [];
 	constructor({keys = [], customClass}) {
 		this._HTML.table = createElement('table', 'UITable');
 		this._HTML.self = createElement('div', 'UITableWrapper ' + (customClass ? customClass : ''));
 		this._HTML.self.append(this._HTML.table);
-		this.addRow(new UITableRow({valueElements: keys, isHeader: true}));
+		this.#keys = keys;
+		this.clear();
 	}
 
 	addRow(_row, _index = this.rows.length) {
 		this.rows[_index] = _row;
 		this._HTML.table.append(_row.HTML);
+	}
+	clear() {
+		this.rows = [];
+		this._HTML.table.innerHTML = '';
+		this.addRow(new UITableRow({valueElements: this.#keys, isHeader: true}));
 	}
 
 	get HTML() {		
