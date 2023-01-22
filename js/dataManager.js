@@ -11,6 +11,17 @@ const DataManager = new class {
 		this.saveTransactions();
 	}
 
+	getByTag(_tagId) {
+		let found = [];
+		for (let transaction of this.transactions)
+		{
+			if (transaction.typeCode !== _tagId) continue;
+			found.push(transaction);
+		}
+		return found;
+	}
+
+
 	saveTransactions() {
 		localStorage.transactions = JSON.stringify(this.transactions.map(t => t.export()));
 	}

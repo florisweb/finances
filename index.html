@@ -17,13 +17,16 @@
 			<div class='page hide transactionListViewerPage'>
 				<div class="pageHeader">
 					<div class="titleHolder">Transactions</div>
-					
 					<div class='button' onclick='DataManager.saveTransactions(); DataManager.downloadCSV()'>
 						Download CSV
+					</div>
+					<div class='button' onclick='App.tagOverviewPage.open()'>
+						Tags
 					</div>
 					<div class='button' onclick='App.uploadCSVPage.open()'>
 						Upload CSV
 					</div>
+
 				</div>
 			</div>
 			<div class='page hide'>
@@ -37,10 +40,18 @@
 					Transactions
 				</div>
 			</div>
-			<div class='page hide'>4</div>
+			<div class='page hide tagOverviewPage'>
+				<div class="pageHeader">
+					<div class="titleHolder">Tag Overview</div>
+					<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
+						Transactions
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<script src='js/polyfill.js'></script>
+		<script src='js/time.js'></script>
 		<script src='js/UI/table.js'></script>
 		<script src='js/UI/dropDown.js'></script>
 
