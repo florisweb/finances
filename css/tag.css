@@ -1,0 +1,30 @@
+
+
+.UIDropDownWrapper .optionPanel > .option .tag {
+  margin: 10px 0;
+}
+
+
+.tag {
+  display: flex;
+  height: 20px;
+  width: auto;
+}
+.tag .tagIndicator {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 100%;
+  margin: 2px;
+  margin-left: 0;
+  border: 1px solid #888;
+}
+
+.tag .tagNameHolder {
+  position: relative;
+  height: 20px;
+  line-height: 20px;
+  font-size: 13px;
+  color: #444;
+  margin-left: 5px;
+}

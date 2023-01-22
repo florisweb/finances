@@ -41,9 +41,14 @@ new class TransactionListViewerPage extends Page {
 	}
 
 	open(_transactions) {
-		for (let transaction of _transactions)
+		let displayTransactions = _transactions.splice(0, 30);
+		_transactions = [...displayTransactions, ..._transactions];
+		
+		for (let transaction of displayTransactions)
 		{
 			let typeInput = new DropDown({customClass: 'typeSelector'});
+			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+
 			// transaction.typeCode,
 			let row = new UITableRow({valueElements: [
 				transaction.date,

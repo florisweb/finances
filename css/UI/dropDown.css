@@ -11,22 +11,28 @@
   height: 35px;
   padding: 7.5px;
 
-  font-size: 14px;
+  font-size: 12px;
   background: #fff;
   box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
   border: 1px solid #eee;
+
+  cursor: pointer;
 }
 
   .UIDropDownWrapper .dropDownButton .dropDownIcon {
     position: relative;
-    height: 14px;
+    height: 12px;
     width: auto;
     opacity: .5;
-    margin: 3px;
+    margin: 4px;
     transition: transform .3s;
-  }
-  .UIDropDownWrapper:not(.optionPanelOpen) .dropDownButton .dropDownIcon {
     transform: rotateZ(-90deg);
+  }
+  .UIDropDownWrapper.optionPanelOpen .dropDownButton .dropDownIcon {
+    transform: rotateZ(0);
+  }
+  .UIDropDownWrapper.optionPanelOpen.openAbove .dropDownButton .dropDownIcon {
+    transform: rotateZ(-180deg);
   }
 
   .UIDropDownWrapper .dropDownButton .contentHolder { 
@@ -41,8 +47,11 @@
 
 .UIDropDownWrapper .optionPanel {
   position: absolute;
-  padding: 20px;
-  margin: 20px;
+  min-width: 120px;
+  height: auto;
+
+  padding: 5px 20px;
+
   box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .05);
   border: 1px solid #eee;
 
@@ -50,14 +59,28 @@
   background: #fff;
 
   transition: opacity .3s, margin-top .3s;
+
+  margin-top: 0;
+  overflow: auto;
 }
 
 .UIDropDownWrapper:not(.optionPanelOpen) .optionPanel {
   pointer-events: none;
   opacity: 0;
-  margin-top: 10px;
+  margin-top: -20px;
+}
+.UIDropDownWrapper:not(.optionPanelOpen).openAbove .optionPanel {
+  margin-top: 20px;
+}
+
+.UIDropDownWrapper.openAbove .optionPanel {
+  transform: translateY(calc(-100% - 35px));
 }
 
 
+
+.UIDropDownWrapper .optionPanel .option {
+  cursor: pointer;
+}
 
 

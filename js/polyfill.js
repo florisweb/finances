@@ -13,3 +13,10 @@ function setTextToElement(element, text) {
 	a.text = text;
 	element.append(a);
 }
+
+
+function wait(_dt) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, _dt);
+	});
+}
