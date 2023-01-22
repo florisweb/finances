@@ -32,19 +32,18 @@ new class TransactionListViewerPage extends Page {
 	table;
 	constructor() {
 		super({pageIndex: 0});
-		this.table = new UITable({
+		this.table = new InfiniteScrollUITable({
 			keys: ['Date', 'Type', 'targetName', 'deltaMoney', 'Description'], 
-			customClass: 'transactionTable'
+			customClass: 'transactionTable',
+			badgeSize: 10,
 		});
 		this.pageHTML.append(this.table.HTML);
 
 	}
 
 	open(_transactions) {
-		let displayTransactions = _transactions.splice(0, 30);
-		_transactions = [...displayTransactions, ..._transactions];
-		
-		for (let transaction of displayTransactions)
+		let rows = []
+		for (let transaction of _transactions)
 		{
 			let typeInput = new DropDown({customClass: 'typeSelector'});
 			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
@@ -57,8 +56,10 @@ new class TransactionListViewerPage extends Page {
 				transaction.deltaMoney,
 				transaction.description
 			]})
-			this.table.addRow(row)
+			rows.push(row);
 		}
+
+		this.table.setData(rows);
 
 		super.open();
 	}

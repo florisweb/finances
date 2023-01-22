@@ -19,7 +19,6 @@ class DropDown {
 		`;
 
 		this.#HTML.button.addEventListener('click', () => {
-			console.log('click', this.isOpen, window.t = this);
 			if (this.isOpen) return this.close();
 			return this.open();
 		});
@@ -62,7 +61,6 @@ class DropDown {
 		for (let option of this.options)
 		{
 			if (_value !== option.value) continue;
-			console.log(_value, option, option.value);
 			this.value = _value;
 
 			this.#HTML.button.children[1].innerHTML = '';
@@ -85,7 +83,6 @@ class DropDown {
 
 		let topSpaceLeft = box.top - panelHeight;
 		let bottomSpaceLeft = window.innerHeight - (box.top + panelHeight);
-		console.log(box.top, panelHeight, window.innerHeight, topSpaceLeft, bottomSpaceLeft);
 
 		let biggestSpace = Math.max(topSpaceLeft, bottomSpaceLeft);
 		this.#HTML.optionPanel.style.maxHeight = (panelHeight + biggestSpace) + 'px';

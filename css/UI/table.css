@@ -1,6 +1,13 @@
 
-.UITableWrapper {
+
+
+.UITableWrapper.infiniteScroll {
+  max-height: 90vh;
+  overflow: auto !important;
+
+  --scrollMargin: 1000px;
 }
+
 
 .UITableWrapper > table.UITable {
 	border-collapse: collapse;
@@ -25,4 +32,12 @@
 
 .UITable > .tableRow > .rowElement {
   line-height: 25px;
+}
+
+
+.UITableWrapper.infiniteScroll .UITable > .tableRow:first-child {
+  border-top: var(--scrollMargin) solid transparent;
+}
+.UITableWrapper.infiniteScroll .UITable > .tableRow:last-child {
+  border-bottom: var(--scrollMargin) solid transparent;
 }
