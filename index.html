@@ -13,6 +13,29 @@
 		<link rel="stylesheet" type="text/css" href="css/tag.css">
 	</head>
 	<body>
+		<div id='sideBar'>
+			<div class="item appLogo">
+				<div class='appLogo'>
+					FinanceManager
+				</div>
+			</div>
+
+			<div class="item">
+				<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
+					Transactions
+				</div>
+			</div>
+			<div class="item">
+				<div class='button' onclick='App.tagOverviewPage.open()'>
+					Tags
+				</div>
+			</div>
+			<div class="item">
+				<div class='button' onclick='App.uploadCSVPage.open()'>
+					Upload CSV
+				</div>	
+			</div>
+		</div>
 		<div id='mainContent'>
 			<div class='page hide transactionListViewerPage'>
 				<div class="pageHeader">
@@ -20,13 +43,6 @@
 					<div class='button' onclick='DataManager.saveTransactions(); DataManager.downloadCSV()'>
 						Download CSV
 					</div>
-					<div class='button' onclick='App.tagOverviewPage.open()'>
-						Tags
-					</div>
-					<div class='button' onclick='App.uploadCSVPage.open()'>
-						Upload CSV
-					</div>
-
 				</div>
 			</div>
 			<div class='page hide'>
@@ -36,9 +52,6 @@
 					<div class="titleHolder">Upload CSV</div>
 				</div>
 				<input type='file' class='CSVInputField' accept='text/csv'>
-				<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
-					Transactions
-				</div>
 			</div>
 			<div class='page hide tagOverviewPage'>
 				<div class="pageHeader">
@@ -54,6 +67,7 @@
 		<script src='js/time.js'></script>
 		<script src='js/UI/table.js'></script>
 		<script src='js/UI/dropDown.js'></script>
+		<!-- <script src='js/UI/graph.js'></script> -->
 
 		<script src='js/CSV.js'></script>
 		<script src='js/color.js'></script>

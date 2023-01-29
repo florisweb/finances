@@ -7,6 +7,7 @@ const App = new class {
 		setTimeout(() => this.setup(), 1);
 	}
 	setup() {
-		this.uploadCSVPage.open()
+		this.uploadCSVPage.open();
+		if (DataManager.transactions.length) this.transactionListViewerPage.open(DataManager.transactions);
 	}
 }

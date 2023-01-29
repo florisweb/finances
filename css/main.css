@@ -3,18 +3,83 @@ html {
   position: fixed;
   width: 100vw;
 }
+body {
+  margin: 0;
+  padding: 0;
+}
 
 * {
   box-sizing: border-box;
   font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 
+:root {
+  --sideBarWidth: 300px;
+}
 
-#mainContent {
-  position: fixed;
+
+#sideBar {
+  position: absolute;
   left: 0;
   top: 0;
-  width: 100vw;
+  height: 100vh;
+  width: calc(var(--sideBarWidth));
+
+  padding: 20px;
+  border-right: 2px dashed #daf;
+}
+  
+  #sideBar .item {
+    margin-bottom: 20px;
+  }
+  
+  #sideBar .item.appLogo {
+    margin-bottom: 40px;
+  }
+  #sideBar .item .appLogo {
+    color: #daf; 
+    font-size: 20px; 
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+  #sideBar .item > .appLogo::after {
+    position: absolute;
+    left: 25px;
+    top: 45px;
+    content: '';
+    width: 100px;
+    height: 3px;
+    background: #daf;
+  }
+
+  #sideBar .item .button {
+    margin: 0;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#mainContent {
+  position: absolute;
+  left: var(--sideBarWidth);
+  top: 0;
+  width: calc(100vw - var(--sideBarWidth));
   height: 100vh;
   overflow: auto;
 }
