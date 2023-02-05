@@ -92,7 +92,6 @@ body {
   width: auto;
   font-size: 14px;
   padding: 10px 15px;
-  background: #fff;
   
   transition: box-shadow .3s;
 
@@ -104,4 +103,21 @@ body {
 }
 .button:hover {
   box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
+}
+
+
+
+
+
+
+.textHolder {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+  width: auto;
+  font-size: 14px;
+  padding: 10px 0px;
+  color: #666;
+  
+  text-transform: uppercase;
 }

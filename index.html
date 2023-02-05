@@ -27,9 +27,16 @@
 			</div>
 			<div class="item">
 				<div class='button' onclick='App.tagOverviewPage.open()'>
+					Tag Overview
+				</div>
+			</div>
+			<div class="item">
+				<div class='button' onclick='App.tagManagementPage.open()'>
 					Tags
 				</div>
 			</div>
+
+			<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 			<div class="item">
 				<div class='button' onclick='App.uploadCSVPage.open()'>
 					Upload CSV
@@ -52,13 +59,22 @@
 					<div class="titleHolder">Upload CSV</div>
 				</div>
 				<input type='file' class='CSVInputField' accept='text/csv'>
+				<div class='button' onclick='DataManager.clearTransactions(); App.uploadCSVPage.open()'>
+					Clear Data
+				</div>
+				<div class='transactionCountHolder textHolder'>
+					Transactions: 0
+				</div>
 			</div>
 			<div class='page hide tagOverviewPage'>
 				<div class="pageHeader">
 					<div class="titleHolder">Tag Overview</div>
-					<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
-						Transactions
-					</div>
+				</div>
+			</div>
+
+			<div class='page hide tagOverviewPage'>
+				<div class="pageHeader">
+					<div class="titleHolder">Tag Manager</div>
 				</div>
 			</div>
 		</div>

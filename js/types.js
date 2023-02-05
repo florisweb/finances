@@ -10,6 +10,11 @@ class Transaction {
 		Object.assign(this, _params);
 	}
 
+	get identifier() {
+		return this.date + this.deltaMoney + this.targetIBAN + this.description;
+	}
+
+
 	export() {
 		return {
 			date: this.date, 
@@ -54,3 +59,21 @@ class TransactionTag {
 		} catch (e) {return false}
 	}
 }
+
+
+class SavingsTransactionTag extends TransactionTag {
+	isSavingsTag = true;
+	#startValue = 0;
+	get startValue() {
+		return this.#startValue;
+	}
+	constructor({name, color, id, filter, startValue = 0}) {
+		super({name: name, color: color, id: id, filter: filter});
+		this.#startValue = startValue;
+	}
+}
+
+
+
+
+

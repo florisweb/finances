@@ -84,7 +84,13 @@ new class UploadCSVPage extends Page {
 	constructor() {
 		super({pageIndex: 2});
 		this.#HTML.inputField = this.pageHTML.querySelector('input.CSVInputField');
+		this.#HTML.transactionCountHolder = this.pageHTML.querySelector('.transactionCountHolder');
 		this.#HTML.inputField.addEventListener('change', (_e) => this.#onFileSelect(_e));
+	}
+
+	open() {
+		super.open();
+		setTextToElement(this.#HTML.transactionCountHolder, "Transactions: " + DataManager.transactions.length);
 	}
 	
 
@@ -113,7 +119,7 @@ new class UploadCSVPage extends Page {
 		transactions = autoTypedTransactions.concat(nonTypedTransactions);
 		transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date))
 
-		DataManager.setTransactions(transactions);
+		DataManager.addTransactions(transactions);
 		App.transactionListViewerPage.open(DataManager.transactions);
 	}
 }
@@ -140,6 +146,74 @@ new class TagOverviewPage extends Page {
 	table;
 	constructor() {
 		super({pageIndex: 3});
+		let keys = ['Month', 'Sum'];
+		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
+
+		this.table = new UITable({
+			keys: keys,
+			customClass: 'tagOverviewTable',
+		});
+		this.pageHTML.append(this.table.HTML);
+	}
+
+	open() {
+		if (!DataManager.transactions.length) return;
+		this.table.clear();
+
+		let tagData = [];
+		for (let i = 1; i < TagManager.tags.length; i++)
+		{
+			tagData.push(DataManager.getByTag(TagManager.tags[i].id));
+		}
+
+		DataManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
+		let timeString = DataManager.transactions[0].date;
+		if (!timeString) timeString = DataManager.transactions[1].date;
+		let curDate = new Date().fromString(timeString);
+		curDate.setDate(0);
+
+		while (curDate.getDateInDays(true) < new Date().getDateInDays(true))
+		{
+			let nextMonth = curDate.copy().moveMonth(1);
+			let value = [
+				curDate.getMonths()[curDate.getMonth()].name + ' ' + curDate.getFullYear(),
+				createElement('strong')
+			];
+			let totalSum = 0;
+			for (let tagSet of tagData)
+			{
+				let moneySum = 0;
+				for (let transaction of tagSet)
+				{
+					let date = new Date().fromString(transaction.date);
+					if (!date) continue;
+					if (!date.dateIsBetween(curDate, nextMonth)) continue;
+					moneySum += parseFloat(transaction.deltaMoney);
+				}
+				value.push(Math.round(moneySum * 100) / 100);
+				totalSum += moneySum;
+			}
+				
+			setTextToElement(value[1], Math.round(totalSum * 100) / 100);
+			let row = new UITableRow({valueElements: value});
+
+			this.table.addRow(row);
+			curDate.moveMonth(1);
+		}
+
+		super.open();
+	}
+}
+
+
+
+
+
+
+new class TagManagementPage extends Page {
+	table;
+	constructor() {
+		super({pageIndex: 4});
 		let keys = ['Month', 'Sum'];
 		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
 

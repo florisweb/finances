@@ -6,8 +6,25 @@ const DataManager = new class {
 		this.#loadTransactions();
 	}
 
+	clearTransactions() {
+		this.setTransactions([]);
+	}
 	setTransactions(_transactions) {
-		this.transactions = _transactions;
+		this.transactions = [];
+		for (let ts of _transactions) {
+			if (!ts.date || ts.targetIBAN === undefined) continue;
+			this.transactions.push(ts);
+		}
+		this.saveTransactions();
+	}
+
+	addTransactions(_transactions) {
+		for (let ts of _transactions) 
+		{
+			if (!ts.date || ts.targetIBAN === undefined) continue;
+			if (typeof this.transactions.find((_ts) => _ts.identifier === ts.identifier) === 'number') continue;
+			this.transactions.push(ts);
+		}
 		this.saveTransactions();
 	}
 
