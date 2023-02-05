@@ -12,23 +12,24 @@ class UITable {
 		this._HTML.self.append(this._HTML.table);
 		this.#keys = keys;
 		this.clear();
+		window.addEventListener('resize', () => this._updateUIHeaderTableSize());
 	}
 
 	setHeader(_row) {
 		this._HTML.headerTable.innerHTML = '';
-		console.log(_row.HTML);
 		this._HTML.headerTable.append(_row.HTML);
 		this._updateUIHeaderTableSize();
 	}
 	addRow(_row) {
 		this._HTML.table.append(_row.HTML);
+		this._updateUIHeaderTableSize();
 	}
 	clear() {
 		this._HTML.table.innerHTML = '';
 		this.setHeader(new UIHeaderRow({valueElements: this.#keys}));
 	}
 
-	_updateUIHeaderTableSize() {
+	async _updateUIHeaderTableSize() {
 		let headerParts = this._HTML.headerTable.children[0].children;
 		if (!this._HTML.table.children.length) return;
 		let rowParts = this._HTML.table.children[0].children;
@@ -37,7 +38,12 @@ class UITable {
 		for (let i = 0; i < headerParts.length; i++)
 		{
 			if (!rowParts[i]) continue;
-			headerParts[i].style.width = rowParts[i].offsetWidth + 'px';
+			headerParts[i].style.width = '';
+			rowParts[i].style.width = '';
+
+			let maxWidth = Math.max(headerParts[i].offsetWidth, rowParts[i].offsetWidth);
+			headerParts[i].style.width = maxWidth + 'px';
+			rowParts[i].style.width = maxWidth + 'px';
 		}
 	}
 
@@ -173,38 +179,37 @@ class InfiniteScrollUITable extends UITable {
 
 	
 	async #onScroll() {
-		this._updateUIHeaderTableSize();
 		const scrollMargin = 1000;
 
-		for (let i = 0; i < 5; i++)
+		let tableHeight = this._HTML.table.offsetHeight;
+		let distanceFromTop = this.HTML.scrollTop - scrollMargin;
+		if (this.#curDataIndex === 0 && distanceFromTop < 0)
 		{
-			await wait(0);
-			let tableHeight = this._HTML.table.offsetHeight;
-			let distanceFromTop = this.HTML.scrollTop - scrollMargin;
-			if (this.#curDataIndex === 0 && distanceFromTop < 0)
-			{
-				this.HTML.scrollTop -= distanceFromTop;
-				continue;
-			}
-
-			let scrollPosAtBottomTable = tableHeight - this.HTML.scrollTop;
-			let distanceFromBottom = scrollPosAtBottomTable - this.HTML.offsetHeight - scrollMargin;
-
-			if (this.#curDataIndex > this.#data.length - this.#visibleItems - 2 && distanceFromBottom < 0)
-			{
-				this.HTML.scrollTop += distanceFromBottom;
-				continue;
-			}
-
-
-			if (this.#curDataIndex > 0 && distanceFromTop < 0)
-			{
-				this.#addRowBefore();
-			} else if (this.#curDataIndex <= this.#data.length - this.#visibleItems - 2 && distanceFromBottom < 0)
-			{
-				this.#addRowAfter();
-			} 
+			this.HTML.scrollTop -= distanceFromTop;
+			return;
 		}
+
+
+		let scrollPosAtBottomTable = tableHeight - this.HTML.scrollTop;
+		let distanceFromBottom = scrollPosAtBottomTable - this.HTML.offsetHeight - scrollMargin;
+
+		if (this.#curDataIndex > this.#data.length - this.#visibleItems - 2 && distanceFromBottom < 0)
+		{
+			this.HTML.scrollTop += distanceFromBottom;
+			return;
+		}
+
+		this._updateUIHeaderTableSize();
+
+		if (this.#curDataIndex > 0 && distanceFromTop < 0)
+		{
+			this.#addRowBefore();
+			wait(0).then(() => this.#onScroll());
+		} else if (this.#curDataIndex <= this.#data.length - this.#visibleItems - 2 && distanceFromBottom < 0)
+		{
+			this.#addRowAfter();
+			wait(0).then(() => this.#onScroll());
+		} 
 	}
 
 	#addRowBefore() {

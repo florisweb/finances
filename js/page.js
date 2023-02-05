@@ -202,6 +202,7 @@ new class TagOverviewPage extends Page {
 		super({pageIndex: 3});
 		let keys = ['Month', 'Sum'];
 		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
+		keys.push('Non Assigned');
 
 		this.table = new UITable({
 			keys: keys,
@@ -214,18 +215,52 @@ new class TagOverviewPage extends Page {
 		if (!DataManager.transactions.length) return;
 		this.table.clear();
 
+		// Get data per tag
 		let tagData = [];
 		for (let i = 1; i < TagManager.tags.length; i++)
 		{
 			tagData.push(DataManager.getByTag(TagManager.tags[i].id));
 		}
+		tagData.push(DataManager.getByTag(undefined)); // Also add the non assigned transactions
 
+		
+		// Get first transactions's date
 		DataManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
 		let timeString = DataManager.transactions[0].date;
 		if (!timeString) timeString = DataManager.transactions[1].date;
 		let curDate = new Date().fromString(timeString);
-		curDate.setDate(0);
+		curDate.setDate(1);
 
+		let assignedTS = [];
+
+		// Calc transaction sum per tag
+		let tagDataPerMonth = [];
+		let moneyPerTag = [0];
+
+		for (let i = 0; i < tagData.length; i++)
+		{
+			let transactions = tagData[i];
+			let months = {};
+			let totalSum = 0;
+
+			for (let ts of transactions)
+			{
+				let date = new Date().fromString(ts.date);
+
+				let dateKey = date.getMonth() + '|' + date.getFullYear();
+				if (!months[dateKey]) months[dateKey] = 0;
+				months[dateKey] += parseFloat(ts.deltaMoney);
+				totalSum += parseFloat(ts.deltaMoney);
+				assignedTS.push(ts);
+			}
+
+			tagDataPerMonth[i] = months;
+			moneyPerTag.push(totalSum);
+			moneyPerTag[0] += totalSum;
+		}
+
+
+		// Render table
 		while (curDate.getDateInDays(true) < new Date().getDateInDays(true))
 		{
 			let nextMonth = curDate.copy().moveMonth(1);
@@ -233,28 +268,29 @@ new class TagOverviewPage extends Page {
 				curDate.getMonths()[curDate.getMonth()].name + ' ' + curDate.getFullYear(),
 				createElement('strong')
 			];
+			
+			let dateKey = curDate.getMonth() + '|' + curDate.getFullYear();
+
+
 			let totalSum = 0;
-			for (let tagSet of tagData)
+			for (let tag of tagDataPerMonth)
 			{
-				let moneySum = 0;
-				for (let transaction of tagSet)
-				{
-					let date = new Date().fromString(transaction.date);
-					if (!date) continue;
-					if (!date.dateIsBetween(curDate, nextMonth)) continue;
-					moneySum += parseFloat(transaction.deltaMoney);
-				}
-				value.push(Math.round(moneySum * 100) / 100);
-				totalSum += moneySum;
+				let monthSum = tag[dateKey];
+				if (!monthSum) monthSum = 0;
+				value.push(Math.round(monthSum * 100) / 100);
+				totalSum += monthSum;
 			}
-				
 			setTextToElement(value[1], Math.round(totalSum * 100) / 100);
 			let row = new UITableRow({valueElements: value});
-
 			this.table.addRow(row);
 			curDate.moveMonth(1);
 		}
 
+
+
+		// Add per tag sum:		
+		let row = new UITableRow({valueElements: ['- Sum', ...moneyPerTag.map(m => Math.round(m * 100) / 100)]});
+		this.table.addRow(row);
 		super.open();
 	}
 }

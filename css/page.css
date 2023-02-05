@@ -106,3 +106,15 @@
 
 
 
+
+
+/* === TagOverviewPage === */
+
+.page.tagOverviewPage .UITableWrapper.tagOverviewTable {
+  width: 200vw;
+}
+
+
+
+
+

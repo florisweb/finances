@@ -32,7 +32,7 @@ const DataManager = new class {
 		let found = [];
 		for (let transaction of this.transactions)
 		{
-			if (transaction.typeCode !== _tagId) continue;
+			if (transaction.typeCode !== _tagId && !(_tagId === undefined && transaction.typeCode === 0)) continue;
 			found.push(transaction);
 		}
 		return found;
