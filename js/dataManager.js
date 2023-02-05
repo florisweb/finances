@@ -22,7 +22,7 @@ const DataManager = new class {
 		for (let ts of _transactions) 
 		{
 			if (!ts.date || ts.targetIBAN === undefined) continue;
-			if (typeof this.transactions.find((_ts) => _ts.identifier === ts.identifier) === 'number') continue;
+			if (this.transactions.find((_ts) => _ts.identifier === ts.identifier) !== undefined) continue;
 			this.transactions.push(ts);
 		}
 		this.saveTransactions();
