@@ -33,13 +33,19 @@ new class TransactionListViewerPage extends Page {
 	#transactions = [];
 	constructor() {
 		super({pageIndex: 0});
+
 		this.table = new InfiniteScrollUITable({
-			keys: ['Date', 'Type', 'targetName', 'deltaMoney', 'Description'], 
+			keys: [
+				new UISortableHeaderItem({title: 'Date', sortFunction: (topSort) => this.sortByDate(topSort)}), 
+				new UISortableHeaderItem({title: 'Type', sortFunction: (topSort) => this.sortByType(topSort)}), 
+				'Target Name', 
+				'Money', 
+				'Description'
+			], 
 			customClass: 'transactionTable',
 			badgeSize: 10,
 		});
 		this.pageHTML.append(this.table.HTML);
-
 	}
 
 	open(_transactions) {
@@ -88,6 +94,26 @@ new class TransactionListViewerPage extends Page {
 		}
 		console.log(transactions);
 		this.#updateTable(transactions);
+	}
+
+
+	
+	sortByDate(_topSort) {
+		this.#transactions.sort((a, b) => {
+			if (_topSort) return new Date().fromString(a.date) < new Date().fromString(b.date);
+			return new Date().fromString(a.date) > new Date().fromString(b.date)
+		});
+		this.#updateTable();	
+	}
+	sortByType(_topSort) {
+		this.#transactions.sort((a, b) => {
+			let aTypeCode = a.typeCode === undefined ? -1 : a.typeCode;
+			let bTypeCode = b.typeCode === undefined ? -1 : b.typeCode;
+			if (_topSort) return aTypeCode < bTypeCode;
+			return aTypeCode > bTypeCode;
+		});
+		console.log(this.#transactions);
+		this.#updateTable();	
 	}
 	
 }

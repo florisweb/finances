@@ -3,7 +3,6 @@
 
 class UITable {
 	_HTML = {};
-	rows = [];
 	#keys = [];
 	constructor({keys = [], customClass}) {
 		this._HTML.headerTable = createElement('table', 'UITable UIHeaderTable');
@@ -17,18 +16,16 @@ class UITable {
 
 	setHeader(_row) {
 		this._HTML.headerTable.innerHTML = '';
+		console.log(_row.HTML);
 		this._HTML.headerTable.append(_row.HTML);
 		this._updateUIHeaderTableSize();
 	}
-	addRow(_row, _index = this.rows.length) {
-		if (_row.isHeader) return this.setHeader(_row);
-		this.rows[_index] = _row;
+	addRow(_row) {
 		this._HTML.table.append(_row.HTML);
 	}
 	clear() {
-		this.rows = [];
 		this._HTML.table.innerHTML = '';
-		this.addRow(new UITableRow({valueElements: this.#keys, isHeader: true}));
+		this.setHeader(new UIHeaderRow({valueElements: this.#keys}));
 	}
 
 	_updateUIHeaderTableSize() {
@@ -39,6 +36,7 @@ class UITable {
 
 		for (let i = 0; i < headerParts.length; i++)
 		{
+			if (!rowParts[i]) continue;
 			headerParts[i].style.width = rowParts[i].offsetWidth + 'px';
 		}
 	}
@@ -53,29 +51,92 @@ class UITable {
 class UITableRow {
 	#HTML = {};
 	#valueElements;
-	isHeader = false;
-	constructor({valueElements = [], isHeader = false}) {
+
+	constructor({valueElements = []}) {
 		this.#valueElements = valueElements;
-		this.isHeader = isHeader;
 	}
 
 	get HTML() {	
 		if (this.#HTML.self) return this.#HTML.self;
 		
 		this.#HTML.self = createElement('tr', 'tableRow');
-		
 		for (let valueEl of this.#valueElements)
 		{
-			let element = createElement(this.isHeader ? 'th' : 'td', 'rowElement ' + (this.isHeader ? 'isHeader' : ''));
-
-			if (typeof valueEl === 'string' || typeof valueEl === 'number') 
-			{
-				setTextToElement(element, valueEl);
-			} else element.append(valueEl);
-
-			this.#HTML.self.append(element);
+			this.#HTML.self.append(this._renderRowItem(valueEl));
 		}
 		return this.#HTML.self;
+	}
+
+	_renderRowItem(_valueEl) {
+		let element = createElement('td', 'rowElement');
+		if (typeof _valueEl === 'string' || typeof _valueEl === 'number') 
+		{
+			setTextToElement(element, _valueEl);
+		} else element.append(_valueEl);
+		return element;
+	}
+}
+
+class UIHeaderRow extends UITableRow {
+	isHeader = true;
+	#sortableHeaderItems = [];
+
+	_renderRowItem(_valueEl) {
+		let element = createElement('th', 'rowElement isHeader');
+
+		if (_valueEl instanceof UISortableHeaderItem)
+		{
+			this.#sortableHeaderItems.push(_valueEl);
+			_valueEl.setHeaderRow(this);
+			element.append(_valueEl.HTML);
+		} else if (typeof _valueEl === 'string' || typeof _valueEl === 'number') 
+		{
+			setTextToElement(element, _valueEl);
+		} else element.append(_valueEl);
+
+		return element;
+	}
+
+
+	_onSort(_headerItem) {
+		for (let HI of this.#sortableHeaderItems)
+		{
+			if (HI === _headerItem) continue;
+			HI.onOtherSortingMethodSelect();
+		}
+	}
+}
+
+
+
+
+class UISortableHeaderItem {
+	#HTML;
+	#title = '---';
+	#headerRow;
+	constructor({title, sortFunction}) {
+		this.#title = title;
+		this.#HTML = createElement('div', 'UISortableHeaderItem');
+		setTextToElement(this.#HTML, this.#title);
+		let topSort = false;
+
+		this.#HTML.onclick = () => {
+			topSort = !topSort;
+			sortFunction(topSort);
+			setTextToElement(this.#HTML, (topSort ? '▲ ' : '▼ ') + this.#title);
+			if (this.#headerRow) this.#headerRow._onSort(this);
+		}
+	}
+	onOtherSortingMethodSelect() {
+		setTextToElement(this.#HTML, this.#title);
+	}
+
+	get HTML() {
+		return this.#HTML;
+	}
+
+	setHeaderRow(_headerRow) {
+		this.#headerRow = _headerRow;
 	}
 }
 
@@ -111,13 +172,13 @@ class InfiniteScrollUITable extends UITable {
 	}
 
 	
-	#onScroll() {
+	async #onScroll() {
 		this._updateUIHeaderTableSize();
 		const scrollMargin = 1000;
 
-
 		for (let i = 0; i < 5; i++)
 		{
+			await wait(0);
 			let tableHeight = this._HTML.table.offsetHeight;
 			let distanceFromTop = this.HTML.scrollTop - scrollMargin;
 			if (this.#curDataIndex === 0 && distanceFromTop < 0)
