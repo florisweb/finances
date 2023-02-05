@@ -39,7 +39,7 @@ new class TransactionListViewerPage extends Page {
 				new UISortableHeaderItem({title: 'Date', sortFunction: (topSort) => this.sortByDate(topSort)}), 
 				new UISortableHeaderItem({title: 'Type', sortFunction: (topSort) => this.sortByType(topSort)}), 
 				'Target Name', 
-				'Money', 
+				new UISortableHeaderItem({title: 'Money', sortFunction: (topSort) => this.sortByMoney(topSort)}), 
 				'Description'
 			], 
 			customClass: 'transactionTable',
@@ -112,7 +112,14 @@ new class TransactionListViewerPage extends Page {
 			if (_topSort) return aTypeCode < bTypeCode;
 			return aTypeCode > bTypeCode;
 		});
-		console.log(this.#transactions);
+		this.#updateTable();	
+	}
+
+	sortByMoney(_topSort) {
+		this.#transactions.sort((a, b) => {
+			if (_topSort) return parseFloat(a.deltaMoney) < parseFloat(b.deltaMoney);
+			return parseFloat(a.deltaMoney) > parseFloat(b.deltaMoney);
+		});
 		this.#updateTable();	
 	}
 	
