@@ -231,7 +231,10 @@ new class TagOverviewPage extends Page {
 		let curDate = new Date().fromString(timeString);
 		curDate.setDate(1);
 
-		let assignedTS = [];
+
+		let lastDateTimeString = DataManager.transactions[DataManager.transactions.length - 1].date;
+		let lastDate = new Date().fromString(lastDateTimeString);
+		lastDate.setDate(1);
 
 		// Calc transaction sum per tag
 		let tagDataPerMonth = [];
@@ -251,7 +254,6 @@ new class TagOverviewPage extends Page {
 				if (!months[dateKey]) months[dateKey] = 0;
 				months[dateKey] += parseFloat(ts.deltaMoney);
 				totalSum += parseFloat(ts.deltaMoney);
-				assignedTS.push(ts);
 			}
 
 			tagDataPerMonth[i] = months;
@@ -261,7 +263,7 @@ new class TagOverviewPage extends Page {
 
 
 		// Render table
-		while (curDate.getDateInDays(true) < new Date().getDateInDays(true))
+		while (curDate.getDateInDays(true) <= lastDate.getDateInDays(true))
 		{
 			let nextMonth = curDate.copy().moveMonth(1);
 			let value = [
