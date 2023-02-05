@@ -30,6 +30,7 @@ class Page {
 
 new class TransactionListViewerPage extends Page {
 	table;
+	#transactions = [];
 	constructor() {
 		super({pageIndex: 0});
 		this.table = new InfiniteScrollUITable({
@@ -42,6 +43,13 @@ new class TransactionListViewerPage extends Page {
 	}
 
 	open(_transactions) {
+		this.#transactions = _transactions;
+		this.#updateTable();
+
+		super.open();
+	}
+
+	#updateTable(_transactions = this.#transactions) {
 		let rows = [];
 		for (let transaction of _transactions)
 		{
@@ -50,7 +58,6 @@ new class TransactionListViewerPage extends Page {
 			typeInput.selectOption(transaction.typeCode);
 			typeInput.onInput = (_value) => {transaction.typeCode = _value; DataManager.saveTransactions()}
 
-			// transaction.typeCode,
 			let date = createElement('div', 'dateHolder');
 			setTextToElement(date, transaction.date);
 			if (transaction.tagAutoDetected) date.classList.add('tagAutoDetected');
@@ -66,9 +73,23 @@ new class TransactionListViewerPage extends Page {
 		}
 
 		this.table.setData(rows);
-
-		super.open();
 	}
+
+	clearFilters() {
+		this.#updateTable();		
+	}
+
+	filterNonAssigned() {
+		let transactions = [];
+		for (let ts of this.#transactions)
+		{
+			if (typeof ts.typeCode === 'number') continue;
+			transactions.push(ts);
+		}
+		console.log(transactions);
+		this.#updateTable(transactions);
+	}
+	
 }
 
 

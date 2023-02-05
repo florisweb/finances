@@ -38,9 +38,16 @@
 }
 
 
-.UITableWrapper.infiniteScroll .UITable > .tableRow:first-child {
+.UITableWrapper.infiniteScroll .UITable.UIHeaderTable {
+  position: sticky;
+  top: 0px;
+  background: #fff;
+  z-index: 10;
+}
+
+.UITableWrapper.infiniteScroll .UITable:not(.UIHeaderTable) > .tableRow:first-child {
   border-top: var(--scrollMargin) solid transparent;
 }
-.UITableWrapper.infiniteScroll .UITable > .tableRow:last-child {
+.UITableWrapper.infiniteScroll .UITable:not(.UIHeaderTable) > .tableRow:last-child {
   border-bottom: var(--scrollMargin) solid transparent;
 }

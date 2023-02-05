@@ -6,14 +6,22 @@ class UITable {
 	rows = [];
 	#keys = [];
 	constructor({keys = [], customClass}) {
+		this._HTML.headerTable = createElement('table', 'UITable UIHeaderTable');
 		this._HTML.table = createElement('table', 'UITable');
 		this._HTML.self = createElement('div', 'UITableWrapper ' + (customClass ? customClass : ''));
+		this._HTML.self.append(this._HTML.headerTable);
 		this._HTML.self.append(this._HTML.table);
 		this.#keys = keys;
 		this.clear();
 	}
 
+	setHeader(_row) {
+		this._HTML.headerTable.innerHTML = '';
+		this._HTML.headerTable.append(_row.HTML);
+		this._updateUIHeaderTableSize();
+	}
 	addRow(_row, _index = this.rows.length) {
+		if (_row.isHeader) return this.setHeader(_row);
 		this.rows[_index] = _row;
 		this._HTML.table.append(_row.HTML);
 	}
@@ -21,6 +29,18 @@ class UITable {
 		this.rows = [];
 		this._HTML.table.innerHTML = '';
 		this.addRow(new UITableRow({valueElements: this.#keys, isHeader: true}));
+	}
+
+	_updateUIHeaderTableSize() {
+		let headerParts = this._HTML.headerTable.children[0].children;
+		if (!this._HTML.table.children.length) return;
+		let rowParts = this._HTML.table.children[0].children;
+		if (!headerParts.length || !rowParts.length) return;
+
+		for (let i = 0; i < headerParts.length; i++)
+		{
+			headerParts[i].style.width = rowParts[i].offsetWidth + 'px';
+		}
 	}
 
 	get HTML() {		
@@ -81,6 +101,7 @@ class InfiniteScrollUITable extends UITable {
 
 	setData(_data) {
 		this.#data = _data;
+		this._HTML.table.innerHTML = '';
 		for (let i = 0; i < this.#visibleItems; i++)
 		{
 			if (!this.#data[i]) continue;
@@ -91,7 +112,9 @@ class InfiniteScrollUITable extends UITable {
 
 	
 	#onScroll() {
+		this._updateUIHeaderTableSize();
 		const scrollMargin = 1000;
+
 
 		for (let i = 0; i < 5; i++)
 		{
