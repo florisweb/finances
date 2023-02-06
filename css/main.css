@@ -121,3 +121,30 @@ body {
   
   text-transform: uppercase;
 }
+
+
+
+
+.inputField {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+  width: auto;
+  height: 37px;
+  padding: 10px 15px;
+  
+
+  line-height: 37px;
+  font-size: 14px;
+  border: 2px solid #daf;
+  color: #a7b;
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+.inputField::placeholder { 
+  color: #a7b;
+  opacity: 1; /* Firefox */
+}
+
+

@@ -29,10 +29,14 @@ class Page {
 
 
 new class TransactionListViewerPage extends Page {
+	HTML = {};
 	table;
 	#transactions = [];
 	constructor() {
 		super({pageIndex: 0});
+		
+		this.HTML.searchField = document.querySelector('.page.transactionListViewerPage .searchField');
+		this.HTML.searchField.addEventListener('input', () => this.search(this.HTML.searchField.value))
 
 		this.table = new InfiniteScrollUITable({
 			keys: [
@@ -122,7 +126,46 @@ new class TransactionListViewerPage extends Page {
 		});
 		this.#updateTable();	
 	}
-	
+
+	search(_query) {
+		this.#transactions.sort((a, b) => this.#getTransactionScoreByQuery(a, _query) < this.#getTransactionScoreByQuery(b, _query));
+		let subSet = Object.assign([], this.#transactions).splice(0, 50);
+		this.#updateTable(subSet);
+		this.table.setPointer(0);
+	}
+
+	#getTransactionScoreByQuery(_transaction, _query) {
+		let tag = TagManager.getTagById(_transaction.typeCode);
+
+		let scoreDesc = this.stringSimilarity(_transaction.description, _query);
+		let scoreTarget = this.stringSimilarity(_transaction.targetName, _query);
+		let scoreTag = tag ? this.stringSimilarity(tag.name, _query) : 0;
+		return scoreDesc * 5 + scoreTarget + scoreTag;
+		
+	}
+
+	stringSimilarity(_string, _query) {
+		return similarity(_string, _query);
+
+		// let scores = [];
+		// for (let i = 0; i < _query.length + 1; i++)
+		// {
+		// 	let curSubString = _query.substr(0, i);
+		// 	let curItemTitle = _string.substr(0, i);
+		// 	let score = similarity(curSubString, curItemTitle) - Math.abs(i - _query.length) * .1;
+		// 	let item = {
+		// 		str: curSubString,
+		// 		score: i == 0 ? 0 : score,
+		// 	}
+		// 	scores.push(item);
+		// }
+
+		// if (scores.length < 1) return 0;
+		// return scores.sort(function(a, b){
+	    //  	return b.score - a.score;
+	    // })[0].score;
+	}
+
 }
 
 

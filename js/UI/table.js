@@ -176,6 +176,9 @@ class InfiniteScrollUITable extends UITable {
 		}
 		this.#onScroll();
 	}
+	setPointer(_index) {
+		this.#curDataIndex = _index;
+	}
 
 	
 	async #onScroll() {

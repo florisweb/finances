@@ -46,7 +46,8 @@
 }
 
 
-#mainContent > .page > .pageHeader .button {
+#mainContent > .page > .pageHeader .button, 
+#mainContent > .page > .pageHeader .inputField {
   margin: 0;
   margin-left: 10px;
   float: right;

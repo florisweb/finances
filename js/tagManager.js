@@ -39,6 +39,10 @@ const TagManager = new class {
 		new TransactionTag({id: 7, name: 'Overig', 						color: new Color('rgb(158, 205, 251)')}),
 	];
 
+	getTagById(_id) {
+		return this.tags.find((tag) => tag.id === _id);
+	}
+
 
 	autoDetectTransactionTag(_transaction) {
 		for (let tag of this.tags)
