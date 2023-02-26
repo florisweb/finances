@@ -346,66 +346,73 @@ new class TagOverviewPage extends Page {
 
 
 new class TagManagementPage extends Page {
+	HTML = {};
 	table;
 	constructor() {
 		super({pageIndex: 4});
-		let keys = ['Month', 'Sum'];
-		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
+		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
 
-		this.table = new UITable({
-			keys: keys,
-			customClass: 'tagOverviewTable',
-		});
-		this.pageHTML.append(this.table.HTML);
 	}
 
 	open() {
-		if (!DataManager.transactions.length) return;
-		this.table.clear();
-
-		let tagData = [];
-		for (let i = 1; i < TagManager.tags.length; i++)
-		{
-			tagData.push(DataManager.getByTag(TagManager.tags[i].id));
-		}
-
-		DataManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
-		let timeString = DataManager.transactions[0].date;
-		if (!timeString) timeString = DataManager.transactions[1].date;
-		let curDate = new Date().fromString(timeString);
-		curDate.setDate(0);
-
-		while (curDate.getDateInDays(true) < new Date().getDateInDays(true))
-		{
-			let nextMonth = curDate.copy().moveMonth(1);
-			let value = [
-				curDate.getMonths()[curDate.getMonth()].name + ' ' + curDate.getFullYear(),
-				createElement('strong')
-			];
-			let totalSum = 0;
-			for (let tagSet of tagData)
-			{
-				let moneySum = 0;
-				for (let transaction of tagSet)
-				{
-					let date = new Date().fromString(transaction.date);
-					if (!date) continue;
-					if (!date.dateIsBetween(curDate, nextMonth)) continue;
-					moneySum += parseFloat(transaction.deltaMoney);
-				}
-				value.push(Math.round(moneySum * 100) / 100);
-				totalSum += moneySum;
-			}
-				
-			setTextToElement(value[1], Math.round(totalSum * 100) / 100);
-			let row = new UITableRow({valueElements: value});
-
-			this.table.addRow(row);
-			curDate.moveMonth(1);
-		}
-
 		super.open();
+		this.render();
+	}
+
+
+	render() {
+		this.HTML.tagListHolder.innerHTML = '';
+		for (let tag of TagManager.tags)
+		{
+			let tagItem = new ManagementPageTag(tag);
+			this.HTML.tagListHolder.append(tagItem.render());
+		}
+
+
+		let tagItem = new AddManagementPageTag();
+		this.HTML.tagListHolder.append(tagItem.render());
+	}
+
+}
+
+class ManagementPageTag extends TransactionTag {
+	constructor({name, color, id, filter}) {
+		super({name: name, color: color, id: id, filter: filter});
+	}
+
+	render() {
+		let element = createElement('div', 'tagPanel');
+		element.innerHTML = `
+			<div class='tagTitleHolder'></div>
+			<div class='savingInfoHolder'></div>
+		`;
+
+		element.style.borderBottomColor = this.color.hex;
+
+		element.children[0].append(super.render());
+		setTextToElement(element.children[1], "Savings: €20.30");
+
+		return element;
 	}
 }
 
+class AddManagementPageTag extends ManagementPageTag {
+	constructor() {
+		super({name: '', color: new Color('#ccc')});
+	}
+
+	render() {
+		let html = super.render();
+		html.classList.add('addTagPanel');
+		html.innerHTML = `
+			<div class='tagTitleHolder'>
+				<div class='tag'>
+					<div class="tagIndicator">+</div>
+					<div class="tagNameHolder">Add Tag</div>
+				</div>
+			</div>
+		`;
+		return html;
+	}
+}
 

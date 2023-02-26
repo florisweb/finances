@@ -41,15 +41,18 @@ class TransactionTag {
 
 	render() {
 		let element = createElement('div', 'tag');
-		element.innerHTML = `
-			<div class='tagIndicator'></div>
-			<div class='tagNameHolder'></div>
-		`;
-		element.children[0].style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA;
-		element.children[0].style.borderColor = this.color.hex;
-
-		setTextToElement(element.children[1], this.name);
+		element.append(this.renderIndicator());
+		let titleHolder = createElement('div', 'tagNameHolder');
+		setTextToElement(titleHolder, this.name);
+		element.append(titleHolder);
+		
 		return element;
+	}
+	renderIndicator() {
+		let indicator = createElement('div', 'tagIndicator');
+		indicator.style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA;
+		indicator.style.borderColor = this.color.hex;
+		return indicator;
 	}
 
 	transactionFitsTag(_transaction) {
