@@ -7,6 +7,7 @@ class Transaction {
 	deltaMoney;
 	description = '';
 	constructor(_params) {
+		_params.deltaMoney = parseFloat(_params.deltaMoney);
 		Object.assign(this, _params);
 	}
 
@@ -61,6 +62,18 @@ class TransactionTag {
 			return this.#filter(_transaction);
 		} catch (e) {return false}
 	}
+
+	get transactions() {
+		return DataManager.getByTag(this.id);
+	}
+
+	get totalExpenses() {
+		let sum = 0;
+		let transactions = this.transactions;
+		for (let transaction of transactions) sum += transaction.deltaMoney;
+		return sum;
+	}
+
 }
 
 

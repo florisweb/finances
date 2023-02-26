@@ -390,8 +390,8 @@ class ManagementPageTag extends TransactionTag {
 		element.style.borderBottomColor = this.color.hex;
 
 		element.children[0].append(super.render());
-		setTextToElement(element.children[1], "Savings: €20.30");
-
+		let money = Math.round(this.totalExpenses * 100) / 100;
+		setTextToElement(element.children[1], "Savings: " + formatMoneyString(money));
 		return element;
 	}
 }
