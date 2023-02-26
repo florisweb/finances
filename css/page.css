@@ -122,11 +122,9 @@
 
 /* === TagManagementPage === */
 
-
 .page.tagManagementPage .tagListHolder {
   position: relative;
   margin: 20px;
-
 
 
   display: grid;
@@ -143,7 +141,27 @@
   border: 1px solid #eee;
   border-bottom: 3px solid red;
   box-shadow: 5px 5px 20px 10px rgba(0, 0, 0, .03);
+
+  opacity: 0;
+  margin-top: 20px;
+  animation: panelFadeIn .45s;
+  animation-fill-mode: forwards;
 }
+
+
+@keyframes panelFadeIn {
+  0% {
+    opacity: 0;
+    margin-top: 10px;
+  }
+  100% {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+
+
 
 .page.tagManagementPage .tagListHolder .tagPanel:nth-child(3n) {
   border-right: none;

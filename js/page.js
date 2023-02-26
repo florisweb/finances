@@ -76,7 +76,7 @@ new class TransactionListViewerPage extends Page {
 				date,
 				typeInput.HTML,
 				transaction.targetName,
-				transaction.deltaMoney,
+				formatMoneyString(transaction.deltaMoney),
 				transaction.description
 			]})
 			rows.push(row);
@@ -322,19 +322,28 @@ new class TagOverviewPage extends Page {
 			{
 				let monthSum = tag[dateKey];
 				if (!monthSum) monthSum = 0;
-				value.push(Math.round(monthSum * 100) / 100);
+				value.push(monthSum);
 				totalSum += monthSum;
 			}
 			setTextToElement(value[1], Math.round(totalSum * 100) / 100);
-			let row = new UITableRow({valueElements: value});
+
+			let row = new UITableRow({valueElements: formatValues(value)});
 			this.table.addRow(row);
 			curDate.moveMonth(1);
 		}
 
 
+		function formatValues(_values) {
+			let values = [_values[0], _values[1], ..._values.splice(2, Infinity).map((v) => {
+				if (v === 0) return '-';
+				return formatMoneyString(v, false);
+			})];
+			return values;
+		}
 
-		// Add per tag sum:		
-		let row = new UITableRow({valueElements: ['- Sum', ...moneyPerTag.map(m => Math.round(m * 100) / 100)]});
+
+		// Add per tag sum:
+		let row = new UITableRow({valueElements: ['- Sum', ...moneyPerTag.map(m => formatMoneyString(m, false))]});
 		this.table.addRow(row);
 		super.open();
 	}
@@ -362,15 +371,21 @@ new class TagManagementPage extends Page {
 
 	render() {
 		this.HTML.tagListHolder.innerHTML = '';
+		let items = 0;
 		for (let tag of TagManager.tags)
 		{
 			let tagItem = new ManagementPageTag(tag);
-			this.HTML.tagListHolder.append(tagItem.render());
+			let html = tagItem.render();
+			html.style.animationDelay = (items * .01) + 's';
+			this.HTML.tagListHolder.append(html);
+			items++;
 		}
 
 
 		let tagItem = new AddManagementPageTag();
-		this.HTML.tagListHolder.append(tagItem.render());
+		let html = tagItem.render();
+		html.style.animationDelay = (items * .01) + 's';
+		this.HTML.tagListHolder.append(html);
 	}
 
 }
@@ -382,37 +397,69 @@ class ManagementPageTag extends TransactionTag {
 
 	render() {
 		let element = createElement('div', 'tagPanel');
+		element.onclick = () => App.tagPage.open(this);
 		element.innerHTML = `
 			<div class='tagTitleHolder'></div>
 			<div class='savingInfoHolder'></div>
 		`;
 
 		element.style.borderBottomColor = this.color.hex;
-
 		element.children[0].append(super.render());
+
+
 		let money = Math.round(this.totalExpenses * 100) / 100;
 		setTextToElement(element.children[1], "Savings: " + formatMoneyString(money));
 		return element;
 	}
 }
 
-class AddManagementPageTag extends ManagementPageTag {
-	constructor() {
-		super({name: '', color: new Color('#ccc')});
+	class AddManagementPageTag extends ManagementPageTag {
+		constructor() {
+			super({name: '', color: new Color('#ccc')});
+		}
+
+		render() {
+			let html = super.render();
+			html.classList.add('addTagPanel');
+			html.innerHTML = `
+				<div class='tagTitleHolder'>
+					<div class='tag'>
+						<div class="tagIndicator">+</div>
+						<div class="tagNameHolder">Add Tag</div>
+					</div>
+				</div>
+			`;
+			return html;
+		}
 	}
+
+
+
+
+
+
+
+
+new class TagPage extends Page {
+	HTML = {};
+	table;
+	constructor() {
+		super({pageIndex: 5});
+		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
+		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
+	}
+
+	open(_tag) {
+		if (!_tag) return;
+		super.open();
+		setTextToElement(this.HTML.pageTitleHolder, _tag.name);
+		this.render();
+	}
+
 
 	render() {
-		let html = super.render();
-		html.classList.add('addTagPanel');
-		html.innerHTML = `
-			<div class='tagTitleHolder'>
-				<div class='tag'>
-					<div class="tagIndicator">+</div>
-					<div class="tagNameHolder">Add Tag</div>
-				</div>
-			</div>
-		`;
-		return html;
-	}
-}
+		this.HTML.tagListHolder.innerHTML = '';
 
+	}
+
+}
