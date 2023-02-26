@@ -7,6 +7,11 @@ function Vector(x, y) {
 		this.value[1] += _vector.value[1];
 		return this;
 	}
+	this.subtract = function(_vector) {
+		this.value[0] -= _vector.value[0];
+		this.value[1] -= _vector.value[1];
+		return this;
+	}
 	this.dotProduct = function(_vector) {
 		return 	this.value[0] * _vector.value[0] + 
 				this.value[1] * _vector.value[1];

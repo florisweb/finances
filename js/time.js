@@ -75,6 +75,36 @@ Date.prototype.getDateInDays = function(_addYears) {
 	return totalDays;
 }
 
+Date.prototype.setDateFromDays = function(_days, _yearsAdded) {
+	let days = _days;
+	if (_yearsAdded)
+	{
+		let year = 1970;
+		while (days > 365)
+		{
+			let newDate = new Date();
+			newDate.setYear(year);
+			days -= 365 + (newDate.isLeapYear() ? 1 : 0);
+			year++;
+		}
+		this.setYear(year);
+	} else this.setYear(new Date().getYear()); 
+
+
+	let monthList = this.getMonths();
+	let monthDays = days;
+	let month = 0;
+	while (monthDays > monthList[month].length)
+	{
+		month++;
+		monthDays -= monthList[month].length;
+	}
+	this.setMonth(month);
+	this.setDate(monthDays);
+
+	return this;
+}
+
 Date.prototype.getYearLength = function() {
 	let monthList = this.getMonths();
 	let totalDays = 0;

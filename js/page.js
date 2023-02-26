@@ -448,7 +448,7 @@ new class TagPage extends Page {
 		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
 		this.HTML.tagContentHolder = $('.tagPage .tagContentHolder')[0];
 
-		this.expensesGraph = new UILineGraph({title: 'Expenses'});
+		this.expensesGraph = new UILineGraph({title: 'Income'});
 		this.expensesGraph.HTML.classList.add('expensesGraph');
 		this.HTML.tagContentHolder.append(this.expensesGraph.HTML);
 	}
@@ -459,22 +459,51 @@ new class TagPage extends Page {
 		setTextToElement(this.HTML.pageTitleHolder, _tag.name);
 
 		let transactions = _tag.transactions;
-		let data = [];
-		let summedMoney = 0;
+		let expensesMap = new Map();
+		let incomeMap = new Map();
 		for (let t of transactions)
 		{
-			summedMoney += t.deltaMoney;
-			data.push(new Vector(new Date().setDateFromStr(t.date).getDateInDays(true), summedMoney));
+			let date = new Date().setDateFromStr(t.date);
+			let id = '1-' + date.getMonth() + '-' + date.getFullYear();
+				
+			if (t.deltaMoney < 0)
+			{
+				let output = expensesMap.get(id);
+				if (!output) output = 0;
+				output += -t.deltaMoney;
+				expensesMap.set(id, output);
+			} else {
+				let output = incomeMap.get(id);
+				if (!output) output = 0;
+				output += t.deltaMoney;
+				incomeMap.set(id, output);
+			}
+		}
+
+		let expenses = [];
+		for (let [date, money] of expensesMap)
+		{
+			expenses.push(new Vector(new Date().setDateFromStr(date).getTime(), money));	
+		}
+		let incomes = [];
+		for (let [date, money] of incomeMap)
+		{
+			incomes.push(new Vector(new Date().setDateFromStr(date).getTime(), money));	
 		}
 
 
 		this.expensesGraph.setData([
 			new LineGraphLineData({
 				label: 'Expenses', 
-				color: _tag.color,
-				data: data
+				color: new Color('#f00'),
+				data: expenses
+			}),
+			new LineGraphLineData({
+				label: 'Income', 
+				color: new Color('#0f0'),
+				data: incomes
 			})
-		]); 
+		]);
 	
 
 		this.render();
