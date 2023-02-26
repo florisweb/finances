@@ -67,7 +67,7 @@ class UILineGraph extends UIBaseGraph {
 	#xDomain = new Vector(0, 0); // min, max
 	#yDomain = new Vector(0, 0);
 	_canvasSize = new Vector(500, 500);
-	#labelMargin = new Vector(30, 20);
+	#labelMargin = new Vector(40, 20);
 	
 	constructor(_input) {
 		super(_input);
@@ -106,6 +106,8 @@ class UILineGraph extends UIBaseGraph {
 		this._ctx.strokeStyle = _line.color.hex;
 		this._ctx.strokeWidth = 2;
 		this._ctx.beginPath();
+
+		_line.data.sort((a, b) => a.value[0] > b.value[0]);
 	
 		let prevCoord = this.#pointToCanvasCoord(_line.data[0]);
 		for (let p = 1; p < _line.data.length; p++)
@@ -140,12 +142,17 @@ class UILineGraph extends UIBaseGraph {
 		this._ctx.fillStyle = axisColor;
 		this._ctx.fillRect(topLeftCoord.value[0], 0, axisThickness, dy);
 		
-		const yLabelCount = pxdy / 30;
-		for (let l = 0; l < yLabelCount; l++)
+		const yLabelCount = pxdy / 50;
+		let stepSize = dy / yLabelCount;
+		let stepOrder = 0.25 * 10**(String(stepSize).split('.')[0].length);
+
+
+		// let 
+		let yValue = this.#yDomain.value[0];
+		while (yValue < this.#yDomain.value[1])
 		{
-			let perc = l / yLabelCount;
-			let yValue = Math.round(dy * (1 - perc) + this.#yDomain.value[0]);
-			let yCoord = perc * pxdy;
+			yValue += stepOrder;
+			let yCoord = pxdy - (yValue - this.#yDomain.value[0]) / dy * pxdy;
 
 			this._ctx.textBaseline = 'middle';
 			this._ctx.textAlign = 'right';
@@ -182,7 +189,7 @@ class UILineGraph extends UIBaseGraph {
 			this._ctx.textAlign = 'center';
 
 			let pxX = perc * pxdx + this.#labelMargin.value[0];
-			let x = Math.round(dx * (1 - perc) + this.#xDomain.value[0]);
+			let x = Math.round(dx * perc + this.#xDomain.value[0]);
 			let label = x;
 			if (x > 10000000) 
 			{

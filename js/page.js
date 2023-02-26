@@ -492,6 +492,7 @@ new class TagPage extends Page {
 		}
 
 
+
 		this.expensesGraph.setData([
 			new LineGraphLineData({
 				label: 'Expenses', 
