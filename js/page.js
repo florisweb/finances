@@ -446,19 +446,44 @@ new class TagPage extends Page {
 	constructor() {
 		super({pageIndex: 5});
 		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
-		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
+		this.HTML.tagContentHolder = $('.tagPage .tagContentHolder')[0];
+
+		this.expensesGraph = new UILineGraph({title: 'Expenses'});
+		this.expensesGraph.HTML.classList.add('expensesGraph');
+		this.HTML.tagContentHolder.append(this.expensesGraph.HTML);
 	}
 
 	open(_tag) {
 		if (!_tag) return;
 		super.open();
 		setTextToElement(this.HTML.pageTitleHolder, _tag.name);
+
+		let transactions = _tag.transactions;
+		let data = [];
+		let summedMoney = 0;
+		for (let t of transactions)
+		{
+			summedMoney += t.deltaMoney;
+			data.push(new Vector(new Date().setDateFromStr(t.date).getDateInDays(true), summedMoney));
+		}
+
+
+		this.expensesGraph.setData([
+			new LineGraphLineData({
+				label: 'Expenses', 
+				color: _tag.color,
+				data: data
+			})
+		]); 
+	
+
 		this.render();
 	}
 
 
 	render() {
-		this.HTML.tagListHolder.innerHTML = '';
+		this.expensesGraph.render()
+		// this.HTML.tagListHolder.innerHTML = '';
 
 	}
 

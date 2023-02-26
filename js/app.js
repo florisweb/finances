@@ -8,6 +8,8 @@ const App = new class {
 	}
 	setup() {
 		this.uploadCSVPage.open();
-		if (DataManager.transactions.length) this.transactionListViewerPage.open(DataManager.transactions);
+		// if (DataManager.transactions.length) this.transactionListViewerPage.open(DataManager.transactions);
+		if (DataManager.transactions.length) this.tagManagementPage.open();
+
 	}
 }
