@@ -361,6 +361,11 @@ new class TagManagementPage extends Page {
 		super({pageIndex: 4});
 		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
 
+		this.createTagPopup = new Popup({
+			content: [
+				new UITitle({title: 'Create Tag'})
+			]
+		});
 	}
 
 	open() {
@@ -497,12 +502,14 @@ new class TagPage extends Page {
 			new LineGraphLineData({
 				label: 'Expenses', 
 				color: new Color('#f00'),
-				data: expenses
+				data: expenses,
+				doNotInterpolate: true,
 			}),
 			new LineGraphLineData({
 				label: 'Income', 
 				color: new Color('#0f0'),
-				data: incomes
+				data: incomes,
+				doNotInterpolate: true,
 			})
 		]);
 	

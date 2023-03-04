@@ -113,13 +113,22 @@ class UILineGraph extends UIBaseGraph {
 		for (let p = 1; p < _line.data.length; p++)
 		{
 			let coord = this.#pointToCanvasCoord(_line.data[p]);
+
 			this._ctx.moveTo(prevCoord.value[0], prevCoord.value[1]);
+			if (_line.doNotInterpolate)
+			{
+				this._ctx.lineTo(coord.value[0], prevCoord.value[1]);
+				this._ctx.moveTo(coord.value[0], prevCoord.value[1]);
+			}
 			this._ctx.lineTo(coord.value[0], coord.value[1]);
 			prevCoord = coord;
 		}
 		this._ctx.closePath();
 		this._ctx.stroke();
 	}
+
+
+
 
 
 	#renderAxis() {
@@ -181,7 +190,7 @@ class UILineGraph extends UIBaseGraph {
 		this._ctx.fillStyle = axisColor;
 		this._ctx.fillRect(middleLeftCoord.value[0], middleLeftCoord.value[1], pxdx, axisThickness);
 
-		const xLabelCount = pxdx / 80;
+		const xLabelCount = pxdx / 50;
 		for (let l = 0; l < xLabelCount; l++)
 		{
 			let perc = l / xLabelCount;
@@ -280,9 +289,12 @@ class LineGraphLineData {
 	label = '';
 	data;
 	color = new Color('#f00');
-	constructor({label, data, color}) {
+	doNotInterpolate = false;
+
+	constructor({label, data, color, doNotInterpolate}) {
 		this.label = label;
 		this.data = data;
 		this.color = color;
+		this.doNotInterpolate = doNotInterpolate;
 	}
 }
