@@ -1,6 +1,14 @@
 
 
 const TagManager = new class {
+	availableColors = [
+		{color: new Color('rgba(0, 0, 0, 0)'), name: 'test 1'},
+		{color: new Color('rgb(106, 153, 208)'), name: 'test 2'},
+		{color: new Color('rgb(222, 131, 68)'), name: 'test 3'},
+		{color: new Color('rgb(245, 194, 66)'), name: 'test 4'},
+	];
+
+
 	tags = [
 		new TransactionTag({id: 0, name: '---', 						color: new Color('rgba(0, 0, 0, 0)')}),
 		new TransactionTag({id: 1, name: 'Kamer', 						color: new Color('rgb(106, 153, 208)'), 
@@ -21,6 +29,7 @@ const TagManager = new class {
 		new TransactionTag({id: 6, name: 'Verzekeringen', 				color: new Color('rgb(136, 150, 174)'),
 			filter: (t) => t.targetName.includes('Centraal Beheer') || t.targetName.includes('Zilveren Kruis Zorgverzekeringen') || t.description.includes('VOORSCHOT ZORGTOESLAG') || t.targetName.includes('INFOMEDICS')
 		}),
+		new TransactionTag({id: 7, name: 'Overig', 						color: new Color('rgb(158, 205, 251)')}),
 		new TransactionTag({id: 8, name: 'WerkEnOverigeInkomsten',  	color: new Color('rgb(117, 251, 106)'), 
 			filter: (t) => t.targetName.includes('Persoonality') || t.description.includes('Rente over positief saldo') || t.targetName.includes('DUO Hoofdrekening') || t.description.includes('CREDITRENTE')
 		}),
@@ -36,11 +45,20 @@ const TagManager = new class {
 		new SavingsTransactionTag({id: 12, name: 'TelefoonEnNonHobbyTech', 	color: new Color('rgb(128, 128, 128)'),
 			filter: (t) => t.description.includes('Lebara') || t.targetName.includes('Lebara')
 		}),
-		new TransactionTag({id: 7, name: 'Overig', 						color: new Color('rgb(158, 205, 251)')}),
 	];
+
+
+	addTag(_tag) {
+		this.tags.push(_tag);
+	}
 
 	getTagById(_id) {
 		return this.tags.find((tag) => tag.id === _id);
+	}
+
+	getNewTagId() {
+		this.tags.sort((a, b) => a.id > b.id);
+		return this.tags[this.tags.length - 1].id + 1;
 	}
 
 

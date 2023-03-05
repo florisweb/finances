@@ -354,20 +354,29 @@ new class TagOverviewPage extends Page {
 
 
 
-new class TagManagementPage extends Page {
-	HTML = {};
-	table;
+
+
+
+
+
+
+class TagManagementPage_createTagPopup extends Popup {
+	#openPromiseResolver;
+	#HTML = {};
 	constructor() {
-		super({pageIndex: 4});
-		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
+		let input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
+		let dropDown = new DropDown({});
 
+		for (let colorOption of TagManager.availableColors)
+		{
+			let visualTag = new TransactionTag({color: colorOption.color, name: colorOption.name});
+			dropDown.addOption({
+				contentHTML: visualTag.render(), 
+				value: colorOption.color
+			});
+		}
 
-		const input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
-		const dropDown = new DropDown({});
-
-
-
-		this.createTagPopup = new Popup({
+		super({
 			content: [
 				new UITitle({title: 'Create Tag'}),
 				new UIVerticalSpacer({height: 20}),
@@ -376,11 +385,45 @@ new class TagManagementPage extends Page {
 				dropDown,
 				new UIVerticalSpacer({height: 80}),
 				new UIHorizontalSegment({content: [
-					new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => console.log('create')}),
-					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.createTagPopup.close()}),
+					new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => this.createTag()}),
+					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.close()}),
 				]})
 			]
-		});
+		})
+		this.#HTML.input = input;
+		this.#HTML.dropDown = dropDown;
+	}
+
+
+
+	createTag() {
+		let tag = new TransactionTag({id: TagManager.getNewTagId(), name: this.#HTML.input.value, color: this.#HTML.dropDown.value});
+		this.#openPromiseResolver(tag);
+		return this.close();
+	}
+
+	open() {
+		super.open();
+		this.#HTML.input.value = null;
+		return new Promise((resolver) => this.#openPromiseResolver = resolver);
+	}
+
+	close() {
+		super.close();
+		this.#openPromiseResolver(false);
+	}
+}
+
+
+new class TagManagementPage extends Page {
+	HTML = {};
+	table;
+	constructor() {
+		super({pageIndex: 4});
+		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
+
+
+		this.createTagPopup = new TagManagementPage_createTagPopup();
 	}
 
 	open() {
@@ -407,8 +450,13 @@ new class TagManagementPage extends Page {
 		html.style.animationDelay = (items * .01) + 's';
 		this.HTML.tagListHolder.append(html);
 	}
-
 }
+
+
+
+
+
+
 
 class ManagementPageTag extends TransactionTag {
 	constructor({name, color, id, filter}) {
@@ -449,7 +497,12 @@ class ManagementPageTag extends TransactionTag {
 					</div>
 				</div>
 			`;
-			html.onclick = () => App.tagManagementPage.createTagPopup.open();
+			html.onclick = async () => {
+				let tag = await App.tagManagementPage.createTagPopup.open();
+				if (!tag) return;
+				TagManager.addTag(tag);
+				App.tagManagementPage.open();
+			}
 			return html;
 		}
 	}

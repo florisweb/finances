@@ -4,7 +4,7 @@ class Popup {
 	#HTML = {};
 
 	get isOpen() {
-		return this.#HTML.self.classList.contains('optionPanelOpen');
+		return !this.#HTML.holder.classList.contains('hide');
 	}
 
 
@@ -43,14 +43,12 @@ class Popup {
 		return this.#HTML.holder;
 	}
 
-	async open() {
-		this.#HTML.holder.classList.remove('hide');
-		
+	open() {
+		this.#HTML.holder.classList.remove('hide');	
 	}
 
 	close() {
 		this.#HTML.holder.classList.add('hide');
-		
 	}
 }
 
