@@ -67,6 +67,7 @@ class TagManagementPage_createTagPopup extends Popup {
 		this.#HTML.addButton.setText('Add');
 		super.open();
 		this.#HTML.input.value = null;
+		this.#HTML.input.focus();
 		return new Promise((resolver) => this.#openPromiseResolver = resolver);
 	}
 
@@ -77,6 +78,7 @@ class TagManagementPage_createTagPopup extends Popup {
 		super.open();
 		this.#curEditTag = _tag;
 		this.#HTML.input.value = _tag.name;
+		this.#HTML.input.focus();
 
 		this.#HTML.dropDown.selectOption(_tag.color, true, (a, b) => a.hex === b.hex);
 

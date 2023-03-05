@@ -54,6 +54,9 @@ class UIInput {
 	setTitle(_title) {
 		setTextToElement(this.#HTML.self, _title);
 	}
+	focus() {
+		this.#HTML.self.focus();
+	}
 
 	get HTML() {		
 		return this.#HTML.self;

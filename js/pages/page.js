@@ -383,14 +383,17 @@ new class TagPage extends Page {
 		this.HTML.tagContentHolder.append(this.expensesGraph.HTML);
 
 
-		this.HTML.removeButton = new UIButton({text: 'Remove', customClass: 'alignRight removeButton',  filled: true,  onclick: () => console.log('remove')});
+		this.HTML.removeButton = new UIButton({text: 'Remove', customClass: 'alignRight removeButton',  filled: true,  onclick: async () => {
+			await TagManager.removeTag(this.#curTag);
+			App.tagManagementPage.open();
+		}});
 		this.HTML.editButton = new UIButton({text: 'Edit', customClass: 'alignRight', filled: true, onclick: async () => {
 			let tag = await App.tagManagementPage.createTagPopup.openEdit(this.#curTag);
 			if (!tag) return;
 			await TagManager.addTag(tag);
 			this.open(tag);
 		}});
-		
+
 		this.HTML.pageHeader.append(this.HTML.removeButton.HTML);
 		this.HTML.pageHeader.append(this.HTML.editButton.HTML);
 	}

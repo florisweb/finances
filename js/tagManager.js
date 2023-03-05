@@ -130,6 +130,12 @@ const TagManager = new class extends DataManager {
 		} else this.data.push(_tag);
 		return this.writeData();
 	}
+	removeTag(_tag) {
+		let index = this.data.findIndex((_t) => _t.id === _tag.id);
+		if (index === -1) return;
+		this.data.splice(index, 1);
+		return this.writeData();
+	}
 
 	getTagById(_id) {
 		return this.data.find((tag) => tag.id === _id);
