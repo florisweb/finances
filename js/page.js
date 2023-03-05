@@ -361,9 +361,24 @@ new class TagManagementPage extends Page {
 		super({pageIndex: 4});
 		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
 
+
+		const input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
+		const dropDown = new DropDown({});
+
+
+
 		this.createTagPopup = new Popup({
 			content: [
-				new UITitle({title: 'Create Tag'})
+				new UITitle({title: 'Create Tag'}),
+				new UIVerticalSpacer({height: 20}),
+				input,
+				new UIVerticalSpacer({height: 20}),
+				dropDown,
+				new UIVerticalSpacer({height: 80}),
+				new UIHorizontalSegment({content: [
+					new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => console.log('create')}),
+					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.createTagPopup.close()}),
+				]})
 			]
 		});
 	}
@@ -434,6 +449,7 @@ class ManagementPageTag extends TransactionTag {
 					</div>
 				</div>
 			`;
+			html.onclick = () => App.tagManagementPage.createTagPopup.open();
 			return html;
 		}
 	}
