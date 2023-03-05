@@ -250,3 +250,8 @@
 }
 
 
+.page.tagPage .pageHeader .UIButton.removeButton {
+  margin-left: 20px;
+  margin-right: -10px;
+}
+

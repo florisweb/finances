@@ -57,10 +57,10 @@ class DropDown {
 	}
 
 
-	selectOption(_value, _autoSelect = false) {
+	selectOption(_value, _autoSelect = false, _customComparer) {
 		for (let option of this.options)
 		{
-			if (_value !== option.value) continue;
+			if (_value !== option.value && (!_customComparer || !_customComparer(_value, option.value))) continue;
 			this.value = _value;
 
 			this.#HTML.button.children[1].innerHTML = '';

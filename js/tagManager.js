@@ -123,7 +123,11 @@ const TagManager = new class extends DataManager {
 
 
 	addTag(_tag) {
-		this.data.push(_tag);
+		let index = this.data.findIndex((_t) => _t.id === _tag.id);
+		if (index !== -1) 
+		{
+			this.data[index] = _tag;
+		} else this.data.push(_tag);
 		return this.writeData();
 	}
 

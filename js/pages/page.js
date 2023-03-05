@@ -371,18 +371,33 @@ new class TagOverviewPage extends Page {
 new class TagPage extends Page {
 	HTML = {};
 	table;
+	#curTag;
 	constructor() {
 		super({pageIndex: 5});
+		this.HTML.pageHeader = $('.tagPage .pageHeader')[0];
 		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
 		this.HTML.tagContentHolder = $('.tagPage .tagContentHolder')[0];
 
 		this.expensesGraph = new UILineGraph({title: 'Income'});
 		this.expensesGraph.HTML.classList.add('expensesGraph');
 		this.HTML.tagContentHolder.append(this.expensesGraph.HTML);
+
+
+		this.HTML.removeButton = new UIButton({text: 'Remove', customClass: 'alignRight removeButton',  filled: true,  onclick: () => console.log('remove')});
+		this.HTML.editButton = new UIButton({text: 'Edit', customClass: 'alignRight', filled: true, onclick: async () => {
+			let tag = await App.tagManagementPage.createTagPopup.openEdit(this.#curTag);
+			if (!tag) return;
+			await TagManager.addTag(tag);
+			this.open(tag);
+		}});
+		
+		this.HTML.pageHeader.append(this.HTML.removeButton.HTML);
+		this.HTML.pageHeader.append(this.HTML.editButton.HTML);
 	}
 
 	open(_tag) {
 		if (!_tag) return;
+		this.#curTag = _tag;
 		super.open();
 		setTextToElement(this.HTML.pageTitleHolder, _tag.name);
 

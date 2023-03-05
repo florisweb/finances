@@ -6,9 +6,13 @@
 class TagManagementPage_createTagPopup extends Popup {
 	#openPromiseResolver;
 	#HTML = {};
+	#curEditTag = false;
 	constructor() {
+		let titleHolder = new UITitle({title: 'Create Tag'});
 		let input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
 		let dropDown = new DropDown({});
+		let addButton = new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => this.createTag()});
+
 
 		for (let colorOption of TagManager.availableColors)
 		{
@@ -21,40 +25,67 @@ class TagManagementPage_createTagPopup extends Popup {
 
 		super({
 			content: [
-				new UITitle({title: 'Create Tag'}),
+				titleHolder,
 				new UIVerticalSpacer({height: 20}),
 				input,
 				new UIVerticalSpacer({height: 20}),
 				dropDown,
 				new UIVerticalSpacer({height: 80}),
 				new UIHorizontalSegment({content: [
-					new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => this.createTag()}),
-					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.close()}),
+					addButton,
+					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.close()})
 				]})
 			],
 			customClass: "createTagPopup"
 		})
 		this.#HTML.input = input;
 		this.#HTML.dropDown = dropDown;
+		this.#HTML.titleHolder = titleHolder;
+		this.#HTML.addButton = addButton;
 	}
 
 
 
 	createTag() {
 		if (this.#HTML.input.value.length < 3) return alert('Please choose a longer name');
+
+		if (this.#curEditTag)
+		{
+			this.#curEditTag.name = this.#HTML.input.value;
+			this.#curEditTag.color = this.#HTML.dropDown.value
+			this.#openPromiseResolver(this.#curEditTag);
+			return this.close();
+		}
+
 		let tag = new TransactionTag({id: TagManager.getNewTagId(), name: this.#HTML.input.value, color: this.#HTML.dropDown.value});
 		this.#openPromiseResolver(tag);
 		return this.close();
 	}
 
 	open() {
+		this.#HTML.titleHolder.setTitle('Create Tag');
+		this.#HTML.addButton.setText('Add');
 		super.open();
 		this.#HTML.input.value = null;
 		return new Promise((resolver) => this.#openPromiseResolver = resolver);
 	}
 
+	openEdit(_tag) {
+		this.#HTML.titleHolder.setTitle('Edit Tag');
+		this.#HTML.addButton.setText('Save');
+
+		super.open();
+		this.#curEditTag = _tag;
+		this.#HTML.input.value = _tag.name;
+
+		this.#HTML.dropDown.selectOption(_tag.color, true, (a, b) => a.hex === b.hex);
+
+		return new Promise((resolver) => this.#openPromiseResolver = resolver);
+	}
+
 	close() {
 		super.close();
+		this.#curEditTag = false;
 		this.#HTML.dropDown.close();
 		this.#openPromiseResolver(false);
 	}

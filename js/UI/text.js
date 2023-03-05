@@ -71,7 +71,7 @@ class UIButton {
 	constructor({text, onclick, filled, customClass}) {
 		this.#HTML.self = createElement('div', 'UIButton');
 		if (filled) this.#HTML.self.classList.add('filled');
-		if (customClass) this.#HTML.self.classList.add(customClass);
+		if (customClass) this.#HTML.self.className += ' ' + customClass;
 		this.setText(text);
 		if (onclick) this.#HTML.self.onclick = onclick;
 	}
