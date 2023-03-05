@@ -8,11 +8,9 @@ const App = new class {
 	}
 	async setup() {
 		await LocalDB.setup();
-		await DataManager.setup();
+		await TransactionManager.setup();
 
 		this.uploadCSVPage.open();
-		// if (DataManager.transactions.length) this.transactionListViewerPage.open(DataManager.transactions);
-		if (DataManager.transactions.length) this.tagManagementPage.open();
-
+		if (TransactionManager.data.length) this.tagManagementPage.open();
 	}
 }

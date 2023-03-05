@@ -66,7 +66,7 @@ new class TransactionListViewerPage extends Page {
 			let typeInput = new DropDown({customClass: 'typeSelector'});
 			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
 			typeInput.selectOption(transaction.typeCode);
-			typeInput.onInput = (_value) => {transaction.typeCode = _value; DataManager.saveTransactions()}
+			typeInput.onInput = (_value) => {transaction.typeCode = _value; TransactionManager.writeData()}
 
 			let date = createElement('div', 'dateHolder');
 			setTextToElement(date, transaction.date);
@@ -187,7 +187,7 @@ new class UploadCSVPage extends Page {
 
 	open() {
 		super.open();
-		setTextToElement(this.#HTML.transactionCountHolder, "Transactions: " + DataManager.transactions.length);
+		setTextToElement(this.#HTML.transactionCountHolder, "Transactions: " + TransactionManager.data.length);
 	}
 	
 
@@ -216,8 +216,8 @@ new class UploadCSVPage extends Page {
 		transactions = autoTypedTransactions.concat(nonTypedTransactions);
 		transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date))
 
-		DataManager.addTransactions(transactions);
-		App.transactionListViewerPage.open(DataManager.transactions);
+		TransactionManager.addTransactions(transactions);
+		App.transactionListViewerPage.open(TransactionManager.data);
 	}
 }
 
@@ -255,27 +255,27 @@ new class TagOverviewPage extends Page {
 	}
 
 	open() {
-		if (!DataManager.transactions.length) return;
+		if (!TransactionManager.data.length) return;
 		this.table.clear();
 
 		// Get data per tag
 		let tagData = [];
 		for (let i = 1; i < TagManager.tags.length; i++)
 		{
-			tagData.push(DataManager.getByTag(TagManager.tags[i].id));
+			tagData.push(TransactionManager.getByTag(TagManager.tags[i].id));
 		}
-		tagData.push(DataManager.getByTag(undefined)); // Also add the non assigned transactions
+		tagData.push(TransactionManager.getByTag(undefined)); // Also add the non assigned transactions
 
 		
 		// Get first transactions's date
-		DataManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
-		let timeString = DataManager.transactions[0].date;
-		if (!timeString) timeString = DataManager.transactions[1].date;
+		TransactionManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
+		let timeString = TransactionManager.data[0].date;
+		if (!timeString) timeString = TransactionManager.data[1].date;
 		let curDate = new Date().fromString(timeString);
 		curDate.setDate(1);
 
 
-		let lastDateTimeString = DataManager.transactions[DataManager.transactions.length - 1].date;
+		let lastDateTimeString = TransactionManager.data[TransactionManager.data.length - 1].date;
 		let lastDate = new Date().fromString(lastDateTimeString);
 		lastDate.setDate(1);
 

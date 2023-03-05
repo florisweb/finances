@@ -2,10 +2,20 @@
 
 const TagManager = new class {
 	availableColors = [
-		{color: new Color('rgba(0, 0, 0, 0)'), name: 'test 1'},
-		{color: new Color('rgb(106, 153, 208)'), name: 'test 2'},
-		{color: new Color('rgb(222, 131, 68)'), name: 'test 3'},
-		{color: new Color('rgb(245, 194, 66)'), name: 'test 4'},
+		{color: new Color('rgba(0, 0, 0, 0)'), name: '---'},
+		{color: new Color('rgb(222, 131, 68)'), name: 'Red'},
+		{color: new Color('rgb(245, 194, 66)'), name: 'Orange'},
+		{color: new Color('rgb(245, 230, 66)'), name: 'Yellow'},
+		{color: new Color('rgb(104, 52, 154)'), name: 'Purple'},
+		{color: new Color('rgb(136, 150, 174)'), name: 'Blueish Gray'},
+		{color: new Color('rgb(106, 153, 208)'), name: 'Blue'},
+		{color: new Color('rgb(158, 205, 251)'), name: 'Light Blue'},
+		{color: new Color('rgb(126, 171, 85)'), name: 'Moss Green'},
+		{color: new Color('rgb(117, 251, 106)'), name: 'Green'},
+		{color: new Color('rgb(117, 251, 189)'), name: 'Aqua'},
+		{color: new Color('rgb(230, 50, 247)'), name: 'Pink'},
+		{color: new Color('rgb(219, 225, 240)'), name: 'Light Gray'},
+		{color: new Color('rgb(128, 128, 128)'), name: 'Dark Gray'},
 	];
 
 

@@ -1,36 +1,74 @@
 
-const DataManager = new class {
-	transactions = [];
+class DataManager {
+	type;
+	#typeClass;
+	_data = [];
+
+	get data() {
+		return this._data;
+	}
+
+	set data(_data) {
+		this._data = _data;
+		this.writeData();
+	}
+
+	constructor({type, typeClass}) {
+		this.type = type;
+		this.#typeClass = typeClass;
+	}
 
 	async setup() {
-		await this.#loadTransactions();
+		let response = await LocalDB.getData(this.type);
+		if (!response) return console.warn('An error accured while loading ', this.type, response);
+		this._data = response.map(t => new this.#typeClass(t));
 	}
 
-	clearTransactions() {
-		return this.setTransactions([]);
+
+	async writeData() {
+		return LocalDB.setData(this.type, this.data.map(t => t.export()));
 	}
+
+	async clear() {
+		this._data = [];
+		return this.writeData();
+	}
+}
+
+
+
+
+
+
+const TransactionManager = new class extends DataManager {
+	constructor() {
+		super({type: "transactions", typeClass: Transaction});
+	}
+
+
 	setTransactions(_transactions) {
-		this.transactions = [];
+		this._data = [];
 		for (let ts of _transactions) {
 			if (!ts.date || ts.targetIBAN === undefined) continue;
-			this.transactions.push(ts);
+			this._data.push(ts);
 		}
-		return this.saveTransactions();
+
+		return this.writeData();
 	}
 
 	addTransactions(_transactions) {
 		for (let ts of _transactions) 
 		{
 			if (!ts.date || ts.targetIBAN === undefined) continue;
-			if (this.transactions.find((_ts) => _ts.identifier === ts.identifier) !== undefined) continue;
-			this.transactions.push(ts);
+			if (this.data.find((_ts) => _ts.identifier === ts.identifier) !== undefined) continue;
+			this._data.push(ts);
 		}
-		return this.saveTransactions();
+		return this.writeData();
 	}
 
 	getByTag(_tagId) {
 		let found = [];
-		for (let transaction of this.transactions)
+		for (let transaction of this.data)
 		{
 			if (transaction.typeCode !== _tagId && !(_tagId === undefined && transaction.typeCode === 0)) continue;
 			found.push(transaction);
@@ -38,20 +76,6 @@ const DataManager = new class {
 		return found;
 	}
 
-
-	saveTransactions() {
-		return LocalDB.setData('transactions', this.transactions.map(t => t.export()));
-	}
-
-	async #loadTransactions() {
-		try {
-			let response = await LocalDB.getData('transactions');
-			if (!response) return;
-			this.transactions = response.map(t => new Transaction(t));
-		} catch (e) {
-			console.warn('DataManager, importError:', e);
-		};
-	}
 
 	downloadCSV() {
 		let data = [];
@@ -70,4 +94,3 @@ const DataManager = new class {
 		downloadCSV(data.join('\n'));
 	}
 }
-

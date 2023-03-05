@@ -24,7 +24,7 @@
 			</div>
 
 			<div class="item">
-				<div class='button' onclick='App.transactionListViewerPage.open(DataManager.transactions);'>
+				<div class='button' onclick='App.transactionListViewerPage.open(TransactionManager.data);'>
 					Transactions
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 					<div class="titleHolder">Transactions</div>
 					<input class='inputField searchField' placeholder='Search...'>
 
-					<div class='button' onclick='DataManager.saveTransactions(); DataManager.downloadCSV()'>
+					<div class='button' onclick='TransactionManager.downloadCSV()'>
 						Download CSV
 					</div>
 				</div>
@@ -64,7 +64,7 @@
 					<div class="titleHolder">Upload CSV</div>
 				</div>
 				<input type='file' class='CSVInputField' accept='text/csv'>
-				<div class='button' onclick='DataManager.clearTransactions(); App.uploadCSVPage.open()'>
+				<div class='button' onclick='TransactionManager.clear(); App.uploadCSVPage.open()'>
 					Clear Data
 				</div>
 				<div class='transactionCountHolder textHolder'>

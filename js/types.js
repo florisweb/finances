@@ -64,7 +64,7 @@ class TransactionTag {
 	}
 
 	get transactions() {
-		return DataManager.getByTag(this.id);
+		return TransactionManager.getByTag(this.id);
 	}
 
 	get totalExpenses() {
