@@ -226,6 +226,17 @@
 
 
 
+.UIPopupHolder.createTagPopup .dropDownButton {
+  display: inline-flex;
+  padding-right: 15px;
+}
+
+
+.UIPopupHolder.createTagPopup .UIInputHolder {
+  width: 100%;
+}
+
+
 
 
 

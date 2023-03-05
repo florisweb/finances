@@ -8,8 +8,9 @@ class Popup {
 	}
 
 
-	constructor({content = []}) {
+	constructor({content = [], customClass}) {
 		this.#HTML.holder = createElement('div', 'UIPopupHolder hide');
+		if (customClass) this.#HTML.holder.classList.add(customClass);
 		this.#HTML.popup = createElement('div', 'popup');
 		this.#HTML.holder.append(this.#HTML.popup);
 
