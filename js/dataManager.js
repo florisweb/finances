@@ -2,12 +2,12 @@
 const DataManager = new class {
 	transactions = [];
 
-	constructor() {
-		this.#loadTransactions();
+	async setup() {
+		await this.#loadTransactions();
 	}
 
 	clearTransactions() {
-		this.setTransactions([]);
+		return this.setTransactions([]);
 	}
 	setTransactions(_transactions) {
 		this.transactions = [];
@@ -15,7 +15,7 @@ const DataManager = new class {
 			if (!ts.date || ts.targetIBAN === undefined) continue;
 			this.transactions.push(ts);
 		}
-		this.saveTransactions();
+		return this.saveTransactions();
 	}
 
 	addTransactions(_transactions) {
@@ -25,7 +25,7 @@ const DataManager = new class {
 			if (this.transactions.find((_ts) => _ts.identifier === ts.identifier) !== undefined) continue;
 			this.transactions.push(ts);
 		}
-		this.saveTransactions();
+		return this.saveTransactions();
 	}
 
 	getByTag(_tagId) {
@@ -40,12 +40,14 @@ const DataManager = new class {
 
 
 	saveTransactions() {
-		localStorage.transactions = JSON.stringify(this.transactions.map(t => t.export()));
+		return LocalDB.setData('transactions', this.transactions.map(t => t.export()));
 	}
 
-	#loadTransactions() {
+	async #loadTransactions() {
 		try {
-			this.transactions = JSON.parse(localStorage.transactions).map(t => new Transaction(t));
+			let response = await LocalDB.getData('transactions');
+			if (!response) return;
+			this.transactions = response.map(t => new Transaction(t));
 		} catch (e) {
 			console.warn('DataManager, importError:', e);
 		};
