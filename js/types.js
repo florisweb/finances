@@ -28,6 +28,8 @@ class Transaction {
 	}
 }
 
+
+
 class TransactionTag {
 	name;
 	color;
@@ -35,9 +37,9 @@ class TransactionTag {
 	#filter;
 	constructor({name, color, id, filter}) {
 		this.name = name;
-		this.color = color;
+		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id;
-		this.#filter = filter;
+		this.#filter = new TagFilter(filter);
 	}
 
 	render() {
@@ -57,10 +59,8 @@ class TransactionTag {
 	}
 
 	transactionFitsTag(_transaction) {
-		if (typeof this.#filter !== 'function') return false;
-		try {
-			return this.#filter(_transaction);
-		} catch (e) {return false}
+		if (!this.#filter) return false;
+		return this.#filter.evaluate(_transaction);
 	}
 
 	get transactions() {
@@ -72,6 +72,15 @@ class TransactionTag {
 		let transactions = this.transactions;
 		for (let transaction of transactions) sum += transaction.deltaMoney;
 		return sum;
+	}
+
+	export() {
+		return {
+			name: this.name,
+			color: this.color.hex,
+			id: this.id,
+			filter: this.#filter.export()
+		}
 	}
 
 }
@@ -88,6 +97,85 @@ class SavingsTransactionTag extends TransactionTag {
 		this.#startValue = startValue;
 	}
 }
+
+
+
+/* TagFilter
+	[
+		a,
+		OR
+		b
+		OR
+		c,
+	]
+
+	a = [
+		x AND y
+	]
+	x = Property action comperator
+	Property = description | targetName
+	action = == | < | > | contains
+*/
+
+class TagFilter {
+	#filter = [];
+	constructor(_filter = []) {
+		this.#filter = _filter;
+	}
+
+
+	evaluate(_transaction) {
+		for (let ORStatement of this.#filter) 
+		{
+			let foundWrongStatement = false;
+			for (let ANDStatement of ORStatement)
+			{
+				if (foundWrongStatement) break;
+
+				let targetType 	= ANDStatement[0];
+				let comperator 	= ANDStatement[1];
+				let comparee 	= ANDStatement[2];
+				let target = '';
+				switch (targetType)
+				{
+					case "targetName": target = _transaction.targetName; break;
+					case "description": target = _transaction.description; break;
+					default: foundWrongStatement = true; break;
+				}
+
+				switch (comperator)
+				{
+					case "includes": 
+						foundWrongStatement = !target.includes(comparee);
+					break;
+
+					case "==": 
+						foundWrongStatement = !(target == comparee);
+					break;
+					case ">":
+						foundWrongStatement = !(target > comparee);
+					break;
+					case "<": 
+						foundWrongStatement = !(target < comparee);
+					break;
+					default: foundWrongStatement = true; break;
+				}
+			}
+
+			if (!foundWrongStatement) return true;
+		}
+		return false;
+
+	}
+
+	export() {
+		return this.#filter;
+	}
+}
+					
+					
+
+
 
 
 

@@ -55,6 +55,7 @@ class TagManagementPage_createTagPopup extends Popup {
 
 	close() {
 		super.close();
+		this.#HTML.dropDown.close();
 		this.#openPromiseResolver(false);
 	}
 }
@@ -89,7 +90,7 @@ new class TagManagementPage extends Page {
 	render() {
 		this.HTML.tagListHolder.innerHTML = '';
 		let items = 0;
-		for (let tag of TagManager.tags)
+		for (let tag of TagManager.data)
 		{
 			let tagItem = new ManagementPageTag(tag);
 			let html = tagItem.render();

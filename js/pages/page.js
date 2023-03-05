@@ -64,7 +64,7 @@ new class TransactionListViewerPage extends Page {
 		for (let transaction of _transactions)
 		{
 			let typeInput = new DropDown({customClass: 'typeSelector'});
-			for (let tag of TagManager.tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+			for (let tag of TagManager.data) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
 			typeInput.selectOption(transaction.typeCode);
 			typeInput.onInput = (_value) => {transaction.typeCode = _value; TransactionManager.writeData()}
 
@@ -244,7 +244,7 @@ new class TagOverviewPage extends Page {
 	constructor() {
 		super({pageIndex: 3});
 		let keys = ['Month', 'Sum'];
-		for (let i = 1; i < TagManager.tags.length; i++) keys.push(TagManager.tags[i].name);
+		for (let i = 1; i < TagManager.data.length; i++) keys.push(TagManager.data[i].name);
 		keys.push('Non Assigned');
 
 		this.table = new UITable({
@@ -260,9 +260,9 @@ new class TagOverviewPage extends Page {
 
 		// Get data per tag
 		let tagData = [];
-		for (let i = 1; i < TagManager.tags.length; i++)
+		for (let i = 1; i < TagManager.data.length; i++)
 		{
-			tagData.push(TransactionManager.getByTag(TagManager.tags[i].id));
+			tagData.push(TransactionManager.getByTag(TagManager.data[i].id));
 		}
 		tagData.push(TransactionManager.getByTag(undefined)); // Also add the non assigned transactions
 

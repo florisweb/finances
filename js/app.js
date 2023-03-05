@@ -9,7 +9,8 @@ const App = new class {
 	async setup() {
 		await LocalDB.setup();
 		await TransactionManager.setup();
-
+		await TagManager.setup();
+		
 		this.uploadCSVPage.open();
 		if (TransactionManager.data.length) this.tagManagementPage.open();
 	}
