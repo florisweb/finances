@@ -64,7 +64,9 @@ new class TransactionListViewerPage extends Page {
 		for (let transaction of _transactions)
 		{
 			let typeInput = new DropDown({customClass: 'typeSelector'});
-			for (let tag of TagManager.data) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+			let tags = [new TransactionTag({id: 0, name: '---', color: new Color('rgba(0, 0, 0, 0)')}), ...TagManager.data];
+			for (let tag of tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+
 			typeInput.selectOption(transaction.typeCode);
 			typeInput.onInput = (_value) => {transaction.typeCode = _value; TransactionManager.writeData()}
 
@@ -243,12 +245,9 @@ new class TagOverviewPage extends Page {
 	table;
 	constructor() {
 		super({pageIndex: 3});
-		let keys = ['Month', 'Sum'];
-		for (let i = 1; i < TagManager.data.length; i++) keys.push(TagManager.data[i].name);
-		keys.push('Non Assigned');
-
+		
 		this.table = new UITable({
-			keys: keys,
+			keys: [],
 			customClass: 'tagOverviewTable',
 		});
 		this.pageHTML.append(this.table.HTML);
@@ -256,7 +255,13 @@ new class TagOverviewPage extends Page {
 
 	open() {
 		if (!TransactionManager.data.length) return;
+		
 		this.table.clear();
+		let keys = ['Month', 'Sum'];
+		for (let i = 1; i < TagManager.data.length; i++) keys.push(TagManager.data[i].name);
+		keys.push('Non Assigned');
+		this.table.setKeys(keys);
+
 
 		// Get data per tag
 		let tagData = [];
@@ -268,7 +273,7 @@ new class TagOverviewPage extends Page {
 
 		
 		// Get first transactions's date
-		TransactionManager.transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
+		TransactionManager.data.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date));
 		let timeString = TransactionManager.data[0].date;
 		if (!timeString) timeString = TransactionManager.data[1].date;
 		let curDate = new Date().fromString(timeString);

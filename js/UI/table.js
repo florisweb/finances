@@ -11,6 +11,7 @@ class UITable {
 		this._HTML.self.append(this._HTML.headerTable);
 		this._HTML.self.append(this._HTML.table);
 		this.#keys = keys;
+		this.setKeys(keys);
 		this.clear();
 		window.addEventListener('resize', () => this._updateUIHeaderTableSize());
 	}
@@ -26,6 +27,11 @@ class UITable {
 	}
 	clear() {
 		this._HTML.table.innerHTML = '';
+		this.setKeys(this.#keys);
+	}
+
+	setKeys(_keys) {
+		this.#keys = _keys;
 		this.setHeader(new UIHeaderRow({valueElements: this.#keys}));
 	}
 

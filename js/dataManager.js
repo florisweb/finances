@@ -79,7 +79,7 @@ const TransactionManager = new class extends DataManager {
 
 	downloadCSV() {
 		let data = [];
-		for (let transaction of this.transactions) 
+		for (let transaction of this.data) 
 		{
 			data.push([
 				transaction.date,
