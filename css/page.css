@@ -255,3 +255,31 @@
   margin-right: -10px;
 }
 
+
+
+
+
+
+
+
+
+
+
+/* === Budget Page === */
+
+.page.budgetManagementPage .UITableWrapper {
+  margin-left: 20px;
+  width: calc(100vw - var(--sideBarWidth) - 200px);
+  min-width: 400px;
+}
+
+.page.budgetManagementPage .UITableWrapper .UITable {
+  width: 100%;
+}
+
+
+.page.budgetManagementPage .UITableWrapper .UITable .UIInputHolder {
+  width: 80px;
+  margin-right: 200px;
+  box-shadow: none;
+}

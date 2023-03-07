@@ -34,11 +34,14 @@ class TransactionTag {
 	name;
 	color;
 	id;
+	expensesBudget = {}; 
+
 	#filter;
-	constructor({name, color, id, filter}) {
+	constructor({name, color, id, filter, expensesBudget = {}}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id;
+		this.expensesBudget = expensesBudget;
 		this.#filter = new TagFilter(filter);
 	}
 
@@ -63,6 +66,31 @@ class TransactionTag {
 		return this.#filter.evaluate(_transaction);
 	}
 
+	
+	setExpensesBudget(_budget) {
+		let curMonthCode = new Date().getMonth() + '/' + new Date().getFullYear();
+		this.expensesBudget[curMonthCode] = _budget;
+	}
+
+	get currentExpensesBudget() {
+		let months = Object.keys(this.expensesBudget);
+		let lastDate = new Date();
+		lastDate.setYear(1970);
+		let curBudget = 0;
+		for (let monthPair of months)
+		{
+			let parts = monthPair.split('/');
+			let date = new Date();
+			date.setMonth(parseInt(parts[0]));
+			date.setFullYear(parseInt(parts[1]));
+			if (date.getTime() < lastDate.getTime()) continue;
+			lastDate = date;
+			curBudget = this.expensesBudget[monthPair];
+		}
+		return curBudget;
+	}
+
+
 	get transactions() {
 		return TransactionManager.getByTag(this.id);
 	}
@@ -79,11 +107,12 @@ class TransactionTag {
 			name: this.name,
 			color: this.color.hex,
 			id: this.id,
-			filter: this.#filter.export()
+			filter: this.#filter.export(),
+			expensesBudget: this.expensesBudget,
 		}
 	}
-
 }
+
 
 
 class SavingsTransactionTag extends TransactionTag {
@@ -92,8 +121,8 @@ class SavingsTransactionTag extends TransactionTag {
 	get startValue() {
 		return this.#startValue;
 	}
-	constructor({name, color, id, filter, startValue = 0}) {
-		super({name: name, color: color, id: id, filter: filter});
+	constructor({name, color, id, filter, expensesBudget, startValue = 0}) {
+		super({name: name, color: color, id: id, filter: filter, expensesBudget: expensesBudget});
 		this.#startValue = startValue;
 	}
 

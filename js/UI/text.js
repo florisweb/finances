@@ -63,11 +63,12 @@ class UIInput {
 		this.#HTML.self.value = _value;
 	}
 
-	constructor({placeholder = '', customClass, onChange}) {
+	constructor({placeholder = '', customClass, onChange, onInput}) {
 		this.#HTML.self = createElement('input', 'UIInputHolder');
 		if (customClass) this.#HTML.self.classList.add(customClass);
 		this.#HTML.self.setAttribute('placeholder', placeholder)
 		if (onChange) this.#HTML.self.addEventListener('change', (_e) => onChange(this.value, _e));
+		if (onInput) this.#HTML.self.addEventListener('input', (_e) => onInput(this.value, _e));
 	}
 
 	setTitle(_title) {
@@ -165,6 +166,7 @@ class UICheckbox {
 		`;
 
 		this.#HTML.checkbox = this.#HTML.self.children[0];
+		if (onChange) this.#HTML.checkbox.addEventListener('change', () => onChange());
 		this.#HTML.label = this.#HTML.self.children[1];
 
 		this.setText(text);
