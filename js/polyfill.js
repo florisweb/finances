@@ -114,3 +114,8 @@ function formatMoneyString(_money, _addEuroSign = true) {
 	return '€' + moneyString;
 }
 
+
+
+function newId() {
+	return String(Math.round(Math.random() * 1000000000000));
+}

@@ -11,6 +11,7 @@ class TagManagementPage_createTagPopup extends Popup {
 		let titleHolder = new UITitle({title: 'Create Tag'});
 		let input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
 		let dropDown = new DropDown({});
+		let checkBox = new UICheckbox({text: 'Is Savings tag'});
 		let addButton = new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => this.createTag()});
 
 
@@ -30,6 +31,9 @@ class TagManagementPage_createTagPopup extends Popup {
 				input,
 				new UIVerticalSpacer({height: 20}),
 				dropDown,
+				new UIVerticalSpacer({height: 10}),
+				checkBox,
+
 				new UIVerticalSpacer({height: 80}),
 				new UIHorizontalSegment({content: [
 					addButton,
@@ -42,6 +46,7 @@ class TagManagementPage_createTagPopup extends Popup {
 		this.#HTML.dropDown = dropDown;
 		this.#HTML.titleHolder = titleHolder;
 		this.#HTML.addButton = addButton;
+		this.#HTML.checkBox = checkBox;
 	}
 
 
@@ -53,11 +58,13 @@ class TagManagementPage_createTagPopup extends Popup {
 		{
 			this.#curEditTag.name = this.#HTML.input.value;
 			this.#curEditTag.color = this.#HTML.dropDown.value
+			this.#curEditTag.isSavingsTag = this.#HTML.checkBox.checked;
 			this.#openPromiseResolver(this.#curEditTag);
 			return this.close();
 		}
 
-		let tag = new TransactionTag({id: TagManager.getNewTagId(), name: this.#HTML.input.value, color: this.#HTML.dropDown.value});
+		let constructor = this.#HTML.checkBox.checked ? SavingsTransactionTag : TransactionTag;
+		let tag = new constructor({id: TagManager.getNewTagId(), name: this.#HTML.input.value, color: this.#HTML.dropDown.value});
 		this.#openPromiseResolver(tag);
 		return this.close();
 	}
@@ -77,6 +84,7 @@ class TagManagementPage_createTagPopup extends Popup {
 
 		super.open();
 		this.#curEditTag = _tag;
+		this.#HTML.checkBox.checked = _tag.isSavingsTag;
 		this.#HTML.input.value = _tag.name;
 		this.#HTML.input.focus();
 

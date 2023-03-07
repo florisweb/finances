@@ -118,7 +118,10 @@ const TagManager = new class extends DataManager {
 
 
 	constructor() {
-		super({type: "tags", typeClass: TransactionTag});
+		super({type: "tags", typeClass: function (_tag) {
+			if (_tag.isSavingsTag) return new SavingsTransactionTag(...arguments);
+			return new TransactionTag(...arguments);
+		}});
 	}
 
 

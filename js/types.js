@@ -96,6 +96,13 @@ class SavingsTransactionTag extends TransactionTag {
 		super({name: name, color: color, id: id, filter: filter});
 		this.#startValue = startValue;
 	}
+
+	export() {
+		let data = super.export();
+		data.isSavingsTag = true;
+		data.startValue = this.#startValue;
+		return data;
+	}
 }
 
 

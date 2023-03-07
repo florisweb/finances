@@ -1,4 +1,4 @@
-
+w
 .alignRight {
   float: right;
 }
@@ -23,6 +23,76 @@
   height: 3px;
   background: #daf;
 }
+
+
+
+.UIText {
+  font-size: 16px;
+  color: #444;
+}
+
+
+
+.UICheckboxHolder {
+  position: relative;
+  width: auto;
+  height: 30px;
+}
+  .UICheckboxHolder label {
+    font-size: 14px;
+    color: #96b;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 8px;
+  }
+
+  .UICheckboxHolder input[type="checkbox"] {
+    visibility: hidden;
+  }
+
+  .UICheckboxHolder label::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 14px;
+    height: 14px;
+    margin: 6px;
+
+    content: '-';
+    color: transparent;
+    display: inline-block;
+
+    border: 2px solid #daf;
+    border-radius: 20px;
+  }
+
+   .UICheckboxHolder label::before {
+    position: absolute;
+    left: 0px;
+    top: 0;
+
+    width: 10px;
+    height: 10px;
+
+    margin: 10px;
+
+    content: '-';
+    color: transparent;
+    display: inline-block;
+
+    background: #daf;
+    border-radius: 20px;
+    opacity: 0;
+  }
+
+
+  .UICheckboxHolder input[type=checkbox]:checked + label::before {
+    opacity: 1;
+  }
+
+  
+
 
 
 

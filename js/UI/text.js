@@ -19,6 +19,25 @@ class UITitle {
 	}
 }
 
+class UIText {
+	#HTML = {};
+
+	constructor({text, customClass}) {
+		this.#HTML.self = createElement('div', 'UIText');
+		if (customClass) this.#HTML.self.classList.add(customClass);
+		this.setText(text);
+	}
+
+	setText(_text) {
+		setTextToElement(this.#HTML.self, _text);
+	}
+
+	get HTML() {		
+		return this.#HTML.self;
+	}
+}
+
+
 
 
 
@@ -115,3 +134,48 @@ class UIHorizontalSegment {
 		return this.#HTML.self;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+class UICheckbox {
+	#HTML = {};
+
+	get checked() {
+		return this.#HTML.checkbox.checked;
+	}
+	set checked(_on) {
+		this.#HTML.checkbox.checked = !!_on;
+	}
+
+	constructor({text, customClass, onChange}) {
+		this.#HTML.self = createElement('div', 'UICheckboxHolder');
+		if (customClass) this.#HTML.self.className += ' ' + customClass;
+		let id = newId();
+		this.#HTML.self.innerHTML = `
+			<input type="checkbox" id="` + id + `" value="Bike">
+  			<label for="` + id + `"> </label>
+		`;
+
+		this.#HTML.checkbox = this.#HTML.self.children[0];
+		this.#HTML.label = this.#HTML.self.children[1];
+
+		this.setText(text);
+	}
+
+	setText(_text) {
+		setTextToElement(this.#HTML.label, _text);
+	}
+
+	get HTML() {		
+		return this.#HTML.self;
+	}
+}
+
