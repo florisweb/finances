@@ -68,7 +68,7 @@ class TransactionTag {
 
 	
 	setExpensesBudget(_budget) {
-		let curMonthCode = new Date().getMonth() + '/' + new Date().getFullYear();
+		let curMonthCode = new MonthIdentifier().setFromDate(new Date()).id;
 		this.expensesBudget[curMonthCode] = _budget;
 	}
 
@@ -79,10 +79,7 @@ class TransactionTag {
 		let curBudget = 0;
 		for (let monthPair of months)
 		{
-			let parts = monthPair.split('/');
-			let date = new Date();
-			date.setMonth(parseInt(parts[0]));
-			date.setFullYear(parseInt(parts[1]));
+			let date = new MonthIdentifier().setFromId(monthPair).date;
 			if (date.getTime() < lastDate.getTime()) continue;
 			lastDate = date;
 			curBudget = this.expensesBudget[monthPair];
@@ -94,6 +91,35 @@ class TransactionTag {
 	get transactions() {
 		return TransactionManager.getByTag(this.id);
 	}
+
+	getPaymentDeficits() {
+		let months = {};
+
+		let transactions = this.transactions;
+		for (let transaction of transactions)
+		{
+			let curMonthCode = new MonthIdentifier().setFromDateString(transaction.date).id;
+			if (!months[curMonthCode]) months[curMonthCode] = 0;
+			months[curMonthCode] += transaction.deltaMoney;
+		}
+		return months;
+	}
+
+	// getBudgetDeficits() {
+	// 	let paymentDefs = this.getPaymentDeficits();
+
+
+
+
+	// }
+
+	// getBudgetByMonthId(_id) {
+	// 	if (this.#expensesBudget[_id] !== undefined) return this.#expensesBudget[_id];
+
+
+
+	// }
+
 
 	get totalExpenses() {
 		let sum = 0;
@@ -115,21 +141,57 @@ class TransactionTag {
 
 
 
+/*
+	Total balance on bank account
+	= sum savingsTags = sum all transactions = sum subset of transactions + c (c calculatable if asking total account balance)
+
+
+	tag:
+	per month:
+	- i Actual income							50
+	- e Actual expenses 						150
+	paymentDeficit = income - expenses 			= -100
+	
+	- b budget 									= 120
+
+	budgetDeficit: budget - paymentDeficit		= 120 - 100 = 20 -> 20 euro's left over
+	|- isSavingsTag => budgetDeficit optellen = savings
+	\- else: deficit to Unassigned
+
+
+
+	Default Tag: Unassigned - not budgetable
+
+
+	
+	
+
+	
+
+	BudgetPage: sum MUST be 0: -> rest goes into rest tag
+
+
+*/
+
+
 class SavingsTransactionTag extends TransactionTag {
 	isSavingsTag = true;
-	#startValue = 0;
-	get startValue() {
-		return this.#startValue;
-	}
+	startValue = 0;
+
 	constructor({name, color, id, filter, expensesBudget, startValue = 0}) {
 		super({name: name, color: color, id: id, filter: filter, expensesBudget: expensesBudget});
-		this.#startValue = startValue;
+		this.startValue = startValue;
+	}
+
+	get totalSavings() {
+
+
 	}
 
 	export() {
 		let data = super.export();
 		data.isSavingsTag = true;
-		data.startValue = this.#startValue;
+		data.startValue = this.startValue;
 		return data;
 	}
 }
@@ -179,6 +241,8 @@ class TagFilter {
 					default: foundWrongStatement = true; break;
 				}
 
+				if (!target) {foundWrongStatement = true; break}
+
 				switch (comperator)
 				{
 					case "includes": 
@@ -217,3 +281,33 @@ class TagFilter {
 
 
 
+
+
+class MonthIdentifier {
+	#string;
+
+	setFromId(_id) {
+		this.#string = _id;
+		return this;
+	}
+	setFromDate(_date) {
+		this.#string = _date.getMonth() + '/' + _date.getFullYear();
+		return this;
+	}
+	setFromDateString(_dateString) {
+		return this.setFromDate(new Date().setDateFromStr(_dateString));
+	}
+
+
+	get date() {
+		let parts = this.#string.split('/');
+		let date = new Date();
+		date.setMonth(parseInt(parts[0]));
+		date.setFullYear(parseInt(parts[1]));
+		return date;
+	}
+
+	get id() {
+		return this.#string;
+	}
+}

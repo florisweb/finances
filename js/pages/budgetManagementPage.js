@@ -48,20 +48,13 @@ new class BudgetManagementPage extends Page {
 
 		let sumRow = new UITableRow({
 			valueElements: [
-				'Total:',
+				'Budget Surplus:',
 				'',
 				this.HTML.budgetSumHolder,
 			]
 		})
 
 		this.table.addRow(sumRow);
-
-
-		
-		// let tagItem = new AddManagementPageTag();
-		// let html = tagItem.render();
-		// html.style.animationDelay = (items * .01) + 's';
-		// this.HTML.tagListHolder.append(html);
 	}
 
 	updateBudgetDeficit() {
@@ -76,11 +69,6 @@ class BudgetPageTag extends TransactionTag {
 	constructor({name, color, id, filter, expensesBudget, startValue = 0, isSavingsTag}) {
 		super({name: name, color: color, id: id, filter: filter, expensesBudget: expensesBudget, startValue: startValue});
 		this.isSavingsTag = isSavingsTag;
-	}
-
-	onMoneyInputFieldInput(_value) {
-		this.#updateMoneyInputFieldValue(_value);
-		this.#updateTagBudget();
 	}
 
 	#updateMoneyInputFieldValue(_value) {
@@ -102,7 +90,7 @@ class BudgetPageTag extends TransactionTag {
 
 	renderRow() {
 		this.#HTML.isExpenseCheckbox = new UICheckbox({text: '', onChange: () => this.#updateTagBudget()});
-		this.#HTML.moneyInputField = new UIInput({placeholder: '-', onInput: (_value) => this.onMoneyInputFieldInput(_value)});
+		this.#HTML.moneyInputField = new UIMoneyInput({placeholder: '-', onInput: (_value) => this.#updateTagBudget()});
 
 		this.#HTML.isExpenseCheckbox.checked = this.currentExpensesBudget <= 0;
 		this.#updateMoneyInputFieldValue(this.currentExpensesBudget);

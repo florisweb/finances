@@ -85,6 +85,39 @@ class UIInput {
 
 
 
+class UIMoneyInput extends UIInput {
+	#canBeNegative = false;
+	constructor({onInput, canBeNegative}) {
+		arguments[0].onInput = (a, b, c) => {
+			this.#updateMoneyInputFieldValue(this.HTML.value);
+			if (!onInput) return;
+			return onInput(a, b, c);
+		}
+		super(...arguments);
+		this.#canBeNegative = canBeNegative;
+	}
+
+	#updateMoneyInputFieldValue(_value) {
+		let regex = /[^0-9.,]/g;
+		if (this.#canBeNegative) regex = /[^0-9.,-]/g;
+		let parts = String(_value).replace(regex, '').replace(',', '.').split('.').splice(0, 2);
+		let string = parts[0];
+		if (parts.length === 1) return this.HTML.value = string;
+		this.HTML.value = string + '.' + parts[1].substr(0, 2);
+	}
+
+	set value(_value) {
+		this.#updateMoneyInputFieldValue(_value);
+	}
+
+	get value() {
+		if (!this.HTML.value) return 0;
+		return parseFloat(this.HTML.value);
+	}
+}
+
+
+
 
 
 
@@ -148,12 +181,14 @@ class UIHorizontalSegment {
 
 class UICheckbox {
 	#HTML = {};
+	#onChange;
 
 	get checked() {
 		return this.#HTML.checkbox.checked;
 	}
 	set checked(_on) {
 		this.#HTML.checkbox.checked = !!_on;
+		if (this.#onChange) this.#onChange();
 	}
 
 	constructor({text, customClass, onChange}) {
@@ -166,8 +201,10 @@ class UICheckbox {
 		`;
 
 		this.#HTML.checkbox = this.#HTML.self.children[0];
-		if (onChange) this.#HTML.checkbox.addEventListener('change', () => onChange());
 		this.#HTML.label = this.#HTML.self.children[1];
+
+		this.#onChange = onChange;
+		if (onChange) this.#HTML.checkbox.addEventListener('change', () => onChange());
 
 		this.setText(text);
 	}

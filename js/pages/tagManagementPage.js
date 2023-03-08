@@ -6,12 +6,14 @@
 class TagManagementPage_createTagPopup extends Popup {
 	#openPromiseResolver;
 	#HTML = {};
-	#curEditTag = false;
+	#curEditTag = {};
 	constructor() {
 		let titleHolder = new UITitle({title: 'Create Tag'});
-		let input = new UIInput({placeholder: "Tag Name...", onChange: () => console.log('hey')});
+		let tagNameInput = new UIInput({placeholder: "Tag Name..."});
+		let savingsTagStartMoneyInput = new UIMoneyInput({placeholder: "Start money", canBeNegative: true});
+
 		let dropDown = new DropDown({});
-		let checkBox = new UICheckbox({text: 'Is Savings tag'});
+		let checkBox = new UICheckbox({text: 'Is Savings tag', onChange: () => this.#onSavingsTagCheckboxToggle()});
 		let addButton = new UIButton({text: 'Add', customClass: 'alignRight', filled: true, onclick: () => this.createTag()});
 
 
@@ -28,11 +30,13 @@ class TagManagementPage_createTagPopup extends Popup {
 			content: [
 				titleHolder,
 				new UIVerticalSpacer({height: 20}),
-				input,
+				tagNameInput,
 				new UIVerticalSpacer({height: 20}),
 				dropDown,
 				new UIVerticalSpacer({height: 10}),
 				checkBox,
+				new UIVerticalSpacer({height: 10}),
+				savingsTagStartMoneyInput,
 
 				new UIVerticalSpacer({height: 80}),
 				new UIHorizontalSegment({content: [
@@ -42,55 +46,63 @@ class TagManagementPage_createTagPopup extends Popup {
 			],
 			customClass: "createTagPopup"
 		})
-		this.#HTML.input = input;
+		this.#HTML.tagNameInput = tagNameInput;
+		this.#HTML.savingsTagStartMoneyInput = savingsTagStartMoneyInput;
 		this.#HTML.dropDown = dropDown;
 		this.#HTML.titleHolder = titleHolder;
 		this.#HTML.addButton = addButton;
 		this.#HTML.checkBox = checkBox;
 	}
 
+	#onSavingsTagCheckboxToggle() {
+		this.#HTML.savingsTagStartMoneyInput.HTML.classList.remove('hide');
+		if (this.#HTML.checkBox.checked) return;
+		this.#HTML.savingsTagStartMoneyInput.HTML.classList.add('hide');
+	}
+
 
 
 	createTag() {
-		if (this.#HTML.input.value.length < 3) return alert('Please choose a longer name');
-
-		if (this.#curEditTag)
-		{
-			this.#curEditTag.name = this.#HTML.input.value;
-			this.#curEditTag.color = this.#HTML.dropDown.value
-			this.#curEditTag.isSavingsTag = this.#HTML.checkBox.checked;
-			this.#openPromiseResolver(this.#curEditTag);
-			return this.close();
-		}
+		if (this.#HTML.tagNameInput.value.length < 3) return alert('Please choose a longer name');
+		
+		if (typeof this.#curEditTag.id != 'number') this.#curEditTag.id = TagManager.getNewTagId();
+		this.#curEditTag.name = this.#HTML.tagNameInput.value;
+		this.#curEditTag.color = this.#HTML.dropDown.value;
+		this.#curEditTag.startValue = parseFloat(this.#HTML.savingsTagStartMoneyInput.value);
 
 		let constructor = this.#HTML.checkBox.checked ? SavingsTransactionTag : TransactionTag;
-		let tag = new constructor({id: TagManager.getNewTagId(), name: this.#HTML.input.value, color: this.#HTML.dropDown.value});
+		let tag = new constructor(this.#curEditTag);
 		this.#openPromiseResolver(tag);
 		return this.close();
 	}
 
 	open() {
+		this.#curEditTag = {};
 		this.#HTML.titleHolder.setTitle('Create Tag');
 		this.#HTML.addButton.setText('Add');
 		super.open();
-		this.#HTML.input.value = null;
-		this.#HTML.input.focus();
+		this.#HTML.tagNameInput.value = null;
+		this.#HTML.tagNameInput.focus();
+
+		this.#HTML.savingsTagStartMoneyInput.value = null;
+
 		return new Promise((resolver) => this.#openPromiseResolver = resolver);
 	}
 
 	openEdit(_tag) {
+		let promise = this.open();
+		this.#curEditTag = _tag;
+
 		this.#HTML.titleHolder.setTitle('Edit Tag');
 		this.#HTML.addButton.setText('Save');
 
-		super.open();
-		this.#curEditTag = _tag;
+		this.#HTML.tagNameInput.value = _tag.name;
 		this.#HTML.checkBox.checked = _tag.isSavingsTag;
-		this.#HTML.input.value = _tag.name;
-		this.#HTML.input.focus();
+		if (_tag.isSavingsTag) this.#HTML.savingsTagStartMoneyInput.value = _tag.startValue;
 
 		this.#HTML.dropDown.selectOption(_tag.color, true, (a, b) => a.hex === b.hex);
 
-		return new Promise((resolver) => this.#openPromiseResolver = resolver);
+		return promise; 
 	}
 
 	close() {
@@ -162,9 +174,10 @@ new class TagManagementPage extends Page {
 
 class ManagementPageTag extends TransactionTag {
 	isSavingsTag = false;
-	constructor({name, color, id, filter, isSavingsTag}) {
+	constructor({name, color, id, filter, isSavingsTag, startValue}) {
 		super({name: name, color: color, id: id, filter: filter});
 		this.isSavingsTag = isSavingsTag;
+		this.startValue = startValue;
 	}
 
 	render() {
