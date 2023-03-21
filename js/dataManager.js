@@ -26,7 +26,7 @@ class DataManager {
 
 
 	async writeData() {
-		return LocalDB.setData(this.type, this.data.map(t => t.export()));
+		return LocalDB.setData(this.type, this._data.map(t => t.export()));
 	}
 
 	async clear() {
@@ -70,7 +70,7 @@ const TransactionManager = new class extends DataManager {
 		let found = [];
 		for (let transaction of this.data)
 		{
-			if (transaction.typeCode !== _tagId && !(_tagId === undefined && transaction.typeCode === 0)) continue;
+			if (transaction.typeCode !== _tagId && !(_tagId === 0 && (transaction.typeCode === undefined || transaction.typeCode === 0))) continue; 
 			found.push(transaction);
 		}
 		return found;

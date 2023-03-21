@@ -6,8 +6,11 @@ class Transaction {
 	targetName = '';
 	deltaMoney;
 	description = '';
+	balance = 0;
+
 	constructor(_params) {
-		_params.deltaMoney = parseFloat(_params.deltaMoney);
+		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
+		_params.balance 	= parseFloat(_params.balance);
 		Object.assign(this, _params);
 	}
 
@@ -23,7 +26,8 @@ class Transaction {
 			targetIBAN: this.targetIBAN,
 			targetName: this.targetName,
 			deltaMoney: this.deltaMoney,
-			description: this.description
+			description: this.description,
+			balance: this.balance,
 		}
 	}
 }
@@ -164,9 +168,6 @@ class TransactionTag {
 
 
 	
-	
-
-	
 
 	BudgetPage: sum MUST be 0: -> rest goes into rest tag
 
@@ -184,8 +185,7 @@ class SavingsTransactionTag extends TransactionTag {
 	}
 
 	get totalSavings() {
-
-
+		return this.startValue + this.totalExpenses;
 	}
 
 	export() {
@@ -193,6 +193,14 @@ class SavingsTransactionTag extends TransactionTag {
 		data.isSavingsTag = true;
 		data.startValue = this.startValue;
 		return data;
+	}
+}
+
+
+class NonAssignedTag extends SavingsTransactionTag {
+	isNonAssignedTag = true;
+	constructor() {
+		super({name: "Non Assigned", color: TagManager.availableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
 	}
 }
 

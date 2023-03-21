@@ -97,7 +97,6 @@
 
 
 
-
 const TagManager = new class extends DataManager {
 	availableColors = [
 		{color: new Color('rgba(0, 0, 0, 0)'), name: '---'},
@@ -125,12 +124,26 @@ const TagManager = new class extends DataManager {
 	}
 
 
+	get data() {
+		return [...this._data, new NonAssignedTag()];
+	}
+	get actualData() {
+		return this._data;
+	}
+
+	set data(_data) {
+		this._data = _data.filter(_tag => !_tag.isNonAssignedTag);
+		this.writeData();
+	}
+
+
 	addTag(_tag) {
+		if (_tag.isNonAssignedTag) return;
 		let index = this.data.findIndex((_t) => _t.id === _tag.id);
 		if (index !== -1) 
 		{
-			this.data[index] = _tag;
-		} else this.data.push(_tag);
+			this._data[index] = _tag;
+		} else this._data.push(_tag);
 		return this.writeData();
 	}
 	removeTag(_tag) {
@@ -159,10 +172,3 @@ const TagManager = new class extends DataManager {
 		return false;
 	}
 }
-
-
-		// let filter = [
-		// 	[["description", "includes", "OV-chipkaart"]],
-		// 	[["description", "includes",  "Lexkesveer"]],
-		// ]
-

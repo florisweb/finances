@@ -129,7 +129,11 @@ new class TagManagementPage extends Page {
 	constructor() {
 		super({pageIndex: 4});
 		this.HTML.tagListHolder = $('.tagManagementPage .tagListHolder')[0];
-
+		this.HTML.overview = {
+			holder: $('.page.tagManagementPage > .overviewHolder')[0],
+			totalBalance: $('.page.tagManagementPage > .overviewHolder .balanceHolder.total')[0],
+			availableBalance: $('.page.tagManagementPage > .overviewHolder .balanceHolder.available')[0],
+		}
 
 		this.createTagPopup = new TagManagementPage_createTagPopup();
 	}
@@ -137,6 +141,9 @@ new class TagManagementPage extends Page {
 	open() {
 		super.open();
 		this.render();
+
+		setTextToElement(this.HTML.overview.totalBalance, formatMoneyString(BudgetManager.getBalance(), false));
+		setTextToElement(this.HTML.overview.availableBalance, formatMoneyString(BudgetManager.getAvailableBalance(), false));
 	}
 
 

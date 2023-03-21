@@ -120,6 +120,59 @@
 
 /* === TagManagementPage === */
 
+
+
+
+.page.tagManagementPage .overviewHolder {
+  position: relative;
+  display: flex;
+  margin-left: 20px;
+  width: calc(100% - 40px);
+  height: auto;
+
+  padding: 20px 0;
+  border-bottom: 1px solid #ddd;
+
+}
+
+.page.tagManagementPage .overviewHolder .balanceHolder {
+  position: relative;
+  font-size: 40px;
+  height: 70px;
+  line-height: 70px;
+  color: #333;
+  font-style: italic;
+  margin-right: 60px;
+  padding-right: 20px;
+}
+
+.page.tagManagementPage .overviewHolder .balanceHolder.available {
+  padding-left: 50px;
+  border-left: 1px solid #eee;
+  opacity: .5;
+}
+
+
+.page.tagManagementPage .overviewHolder .balanceHolder:before {
+  content: 'CURRENT BALANCE';
+  position: absolute;
+  top: 25px;
+  right: 20px;
+  font-size: 12px;
+}
+
+.page.tagManagementPage .overviewHolder .balanceHolder.available:before {
+  content: 'AVAILABLE BALANCE';
+}
+
+.page.tagManagementPage .overviewHolder .UIButton {
+  right: 0;
+}
+
+
+
+
+
 .page.tagManagementPage .tagListHolder {
   position: relative;
   margin: 20px;

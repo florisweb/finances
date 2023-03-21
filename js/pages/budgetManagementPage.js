@@ -38,7 +38,7 @@ new class BudgetManagementPage extends Page {
 
 	render() {
 		this.table.clear();
-		for (let tag of TagManager.data)
+		for (let tag of TagManager.actualData)
 		{
 			let budgetTag = new BudgetPageTag(tag);
 			this.table.addRow(budgetTag.renderRow());
@@ -58,7 +58,7 @@ new class BudgetManagementPage extends Page {
 	}
 
 	updateBudgetDeficit() {
-		this.budgetDeficit = TagManager.data.map(tag => tag.currentExpensesBudget).reduce((a, b) => a + b);
+		this.budgetDeficit = TagManager.actualData.map(tag => tag.currentExpensesBudget).reduce((a, b) => a + b);
 	}
 }
 
@@ -92,9 +92,8 @@ class BudgetPageTag extends TransactionTag {
 		this.#HTML.isExpenseCheckbox = new UICheckbox({text: '', onChange: () => this.#updateTagBudget()});
 		this.#HTML.moneyInputField = new UIMoneyInput({placeholder: '-', onInput: (_value) => this.#updateTagBudget()});
 
-		this.#HTML.isExpenseCheckbox.checked = this.currentExpensesBudget <= 0;
 		this.#updateMoneyInputFieldValue(this.currentExpensesBudget);
-
+		this.#HTML.isExpenseCheckbox.checked = this.currentExpensesBudget <= 0;
 
 		return new UITableRow({
 			valueElements: [

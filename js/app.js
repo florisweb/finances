@@ -10,6 +10,7 @@ const App = new class {
 		await LocalDB.setup();
 		await TransactionManager.setup();
 		await TagManager.setup();
+		await BudgetManager.setup();
 		
 		this.uploadCSVPage.open();
 		if (TransactionManager.data.length) this.tagManagementPage.open();

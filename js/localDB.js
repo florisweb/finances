@@ -16,8 +16,8 @@ const LocalDB = new function() {
       request.onupgradeneeded = function(_e) { // create object stores
         DB = _e.target.result;
 
-        const transactions     = DB.createObjectStore("transactions");
-        const tags             = DB.createObjectStore("tags");
+        DB.createObjectStore("transactions");
+        DB.createObjectStore("tags");
       }
 
       request.onsuccess = function(_e) {
@@ -42,7 +42,7 @@ const LocalDB = new function() {
       
       request.onsuccess = function(_e) {
         let data = request.result;
-        if (typeof data != "object") data = [];
+        if (typeof data != "object" && typeof data != 'number' && typeof data != 'string') data = [];
         resolve(data);
       }
     });
