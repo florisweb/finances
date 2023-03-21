@@ -16,9 +16,9 @@ const BudgetManager = new class {
 	}
 
 	getAvailableBalance() {
-		let assignedMoney = 0;
-		for (let tag of TagManager.actualData) assignedMoney += tag.totalExpenses;
-		return this.getBalance() - assignedMoney;
+		let savedMoney = 0;
+		for (let tag of TagManager.savingTags) savedMoney += tag.totalSavings;
+		return this.getBalance() - savedMoney;
 	}
 
 

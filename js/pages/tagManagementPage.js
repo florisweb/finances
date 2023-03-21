@@ -150,7 +150,8 @@ new class TagManagementPage extends Page {
 	render() {
 		this.HTML.tagListHolder.innerHTML = '';
 		let items = 0;
-		for (let tag of TagManager.data)
+		let tags = [...TagManager.savingTags, ...TagManager.normalTags];
+		for (let tag of tags)
 		{
 			let tagItem = new ManagementPageTag(tag);
 			let html = tagItem.render();
@@ -179,12 +180,11 @@ new class TagManagementPage extends Page {
 
 
 
-class ManagementPageTag extends TransactionTag {
+class ManagementPageTag extends SavingsTransactionTag {
 	isSavingsTag = false;
 	constructor({name, color, id, filter, isSavingsTag, startValue}) {
-		super({name: name, color: color, id: id, filter: filter});
+		super({name: name, color: color, id: id, filter: filter, startValue});
 		this.isSavingsTag = isSavingsTag;
-		this.startValue = startValue;
 	}
 
 	render() {
@@ -198,9 +198,7 @@ class ManagementPageTag extends TransactionTag {
 		element.style.borderBottomColor = this.color.hex;
 		element.children[0].append(super.render());
 
-
-		let money = Math.round(this.totalExpenses * 100) / 100;
-		if (this.isSavingsTag) setTextToElement(element.children[1], "Savings: " + formatMoneyString(money));
+		if (this.isSavingsTag) setTextToElement(element.children[1], "Savings: " + formatMoneyString(this.totalSavings));
 		return element;
 	}
 }

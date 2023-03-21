@@ -2,8 +2,8 @@
 
 
 
-// new TransactionTag({id: 0, name: '---', 						color: new Color('rgba(0, 0, 0, 0)')}),
-// [
+
+// data = [
 
 // 	new TransactionTag({id: 1, name: 'Kamer', 						color: new Color('rgb(106, 153, 208)'),
 // 		filter: [
@@ -130,6 +130,14 @@ const TagManager = new class extends DataManager {
 	get actualData() {
 		return this._data;
 	}
+
+	get savingTags() {
+		return this._data.filter((tag) => tag.isSavingsTag);
+	}
+	get normalTags() {
+		return this._data.filter((tag) => !tag.isSavingsTag);
+	}
+
 
 	set data(_data) {
 		this._data = _data.filter(_tag => !_tag.isNonAssignedTag);
