@@ -76,6 +76,23 @@ const TransactionManager = new class extends DataManager {
 		return found;
 	}
 
+	autoClassifyTransactions() {
+		let classifies = 0;
+		for (let trans of this._data)
+		{
+			if (trans.classificationState === 2) continue; // Already manually classified
+
+			let type = TagManager.autoDetectTransactionTag(trans);
+			if (type === false) continue;
+			
+			classifies++;
+			trans.typeCode = type;
+			trans.classificationState = 1;
+		}
+		return this.writeData();
+	}
+
+
 
 	downloadCSV() {
 		let data = [];

@@ -68,11 +68,11 @@ new class TransactionListViewerPage extends Page {
 			for (let tag of tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
 
 			typeInput.selectOption(transaction.typeCode);
-			typeInput.onInput = (_value) => {transaction.typeCode = _value; TransactionManager.writeData()}
+			typeInput.onInput = (_value) => {transaction.typeCode = _value; transaction.classificationState = 2; TransactionManager.writeData()}
 
 			let date = createElement('div', 'dateHolder');
 			setTextToElement(date, transaction.date);
-			if (transaction.tagAutoDetected) date.classList.add('tagAutoDetected');
+			if (transaction.classificationState === 1) date.classList.add('tagAutoDetected');
 
 			let row = new UITableRow({valueElements: [
 				date,
@@ -98,7 +98,6 @@ new class TransactionListViewerPage extends Page {
 			if (typeof ts.typeCode === 'number') continue;
 			transactions.push(ts);
 		}
-		console.log(transactions);
 		this.#updateTable(transactions);
 	}
 
@@ -174,7 +173,7 @@ new class TransactionListViewerPage extends Page {
 
 
 
-const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', null, null, null, null, 'description', 'xCode']
+const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 
 new class UploadCSVPage extends Page {
 	#HTML = {};
@@ -211,7 +210,6 @@ new class UploadCSVPage extends Page {
 				continue;
 			}
 			transaction.typeCode = type;
-			transaction.tagAutoDetected = true;
 			autoTypedTransactions.push(transaction);
 		}
 		

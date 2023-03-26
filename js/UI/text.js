@@ -1,4 +1,24 @@
 
+class UIContainer {
+	#HTML = {};
+	elements = [];
+
+	constructor(_elements = []) {
+		this.#HTML.self = createElement('div', 'UIContainer');
+		this.setElements(_elements);
+	}
+
+	setElements(_elements) {
+		this.elements = _elements;
+		this.#HTML.self.innerHTML = '';
+		for (let element of this.elements) this.#HTML.self.append(element.HTML);
+	}
+
+	
+	get HTML() {		
+		return this.#HTML.self;
+	}
+}
 
 
 class UITitle {

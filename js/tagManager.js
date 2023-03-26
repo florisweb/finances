@@ -57,6 +57,7 @@
 // 			[["targetName", "includes", "Zilveren Kruis"]],
 // 			[["description", "includes", "VOORSCHOT ZORGTOESLAG"]],
 // 			[["targetName", "includes", "INFOMEDICS"]],
+
 // 		]
 // 	}),
 // 	new TransactionTag({id: 7, name: 'Overig', 						color: new Color('rgb(158, 205, 251)')}),
@@ -118,6 +119,7 @@ const TagManager = new class extends DataManager {
 
 	constructor() {
 		super({type: "tags", typeClass: function (_tag) {
+			console.warn(_tag);
 			if (_tag.isSavingsTag) return new SavingsTransactionTag(...arguments);
 			return new TransactionTag(...arguments);
 		}});

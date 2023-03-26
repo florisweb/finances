@@ -7,6 +7,9 @@ class Transaction {
 	deltaMoney;
 	description = '';
 	balance = 0;
+	bankClassification = '';
+	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
+
 
 	constructor(_params) {
 		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
@@ -28,6 +31,8 @@ class Transaction {
 			deltaMoney: this.deltaMoney,
 			description: this.description,
 			balance: this.balance,
+			bankClassification: this.bankClassification,
+			classificationState: this.classificationState
 		}
 	}
 }
@@ -145,6 +150,47 @@ class TransactionTag {
 
 
 
+class ExpensesBudgetInterface {
+	#budget;
+	constructor(_expensesBudget) {
+		this.#budget = _expensesBudget;
+	}
+
+	getByMonth(_month) {
+
+	}
+
+	get totalBudget() {
+		let sum = 0;
+		let monthKeys = Object.keys(this.#budget).map((_month) => new MonthIdentifier().setFromId(_month));
+		monthKeys.sort((a, b) => a.date.getTime() > b.date.getTime());
+
+		if (!monthKeys[0]) return sum;
+		
+		let curMonth = monthKeys[0].date.moveMonth(-1);
+		let maxMonth = new MonthIdentifier().setFromDate(new Date()).date;;
+		let curMonthKey = monthKeys[0];
+
+		while (curMonth.getTime() < maxMonth.getTime())
+		{
+			curMonth.moveMonth(1);
+			for (let key of monthKeys)
+			{
+				if (key.id !== new MonthIdentifier().setFromDate(curMonth).id) continue;
+				curMonthKey = key;
+				break;
+			}
+			sum += this.#budget[curMonthKey.id];
+		}
+		return sum;
+	}
+}
+
+
+
+
+
+
 /*
 	Total balance on bank account
 	= sum savingsTags = sum all transactions = sum subset of transactions + c (c calculatable if asking total account balance)
@@ -170,8 +216,6 @@ class TransactionTag {
 	
 
 	BudgetPage: sum MUST be 0: -> rest goes into rest tag
-
-
 */
 
 
@@ -180,12 +224,13 @@ class SavingsTransactionTag extends TransactionTag {
 	startValue = 0;
 
 	constructor({name, color, id, filter, expensesBudget, startValue = 0}) {
-		super({name: name, color: color, id: id, filter: filter, expensesBudget: expensesBudget});
+		super(...arguments);
 		this.startValue = startValue;
 	}
 
 	get totalSavings() {
-		return this.startValue + this.totalExpenses;
+		let budgetedMoney = new ExpensesBudgetInterface(this.expensesBudget).totalBudget;;
+		return this.startValue + this.totalExpenses - budgetedMoney;
 	}
 
 	export() {
@@ -246,6 +291,7 @@ class TagFilter {
 				{
 					case "targetName": target = _transaction.targetName; break;
 					case "description": target = _transaction.description; break;
+					case "bankClassification": target = _transaction.bankClassification; break;
 					default: foundWrongStatement = true; break;
 				}
 
@@ -299,7 +345,7 @@ class MonthIdentifier {
 		return this;
 	}
 	setFromDate(_date) {
-		this.#string = _date.getMonth() + '/' + _date.getFullYear();
+		this.#string = (_date.getMonth() + 1) + '/' + _date.getFullYear();
 		return this;
 	}
 	setFromDateString(_dateString) {
@@ -310,8 +356,9 @@ class MonthIdentifier {
 	get date() {
 		let parts = this.#string.split('/');
 		let date = new Date();
-		date.setMonth(parseInt(parts[0]));
 		date.setFullYear(parseInt(parts[1]));
+		date.setMonth(parseInt(parts[0]) - 1);
+		date.setDate(1);
 		return date;
 	}
 

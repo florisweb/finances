@@ -8,6 +8,106 @@
 
 
 
+class BudgetManagementPage_manageBudgetPopup extends Popup {
+	#openPromiseResolver;
+	#HTML = {};
+	#curExpensesBudget = {};
+	constructor() {
+		let titleHolder = new UITitle({title: 'Manage Budget'});
+		let table = new UITable({keys: ['Date', 'Budget'], customClass: 'budgetTable'});
+		super({
+			content: [
+				titleHolder,
+				new UIVerticalSpacer({height: 10}),
+				table,
+
+				new UIHorizontalSegment({content: [
+					new UIButton({text: 'Save', customClass: 'alignRight', filled: true,  onclick: () => this.save()}),
+					new UIButton({text: 'Cancel', customClass: 'alignRight', onclick: () => this.close()})
+				]})
+			],
+			customClass: "manageBudgetPopup"
+		})
+		
+		this.#HTML.titleHolder = titleHolder;
+		this.#HTML.table = table;
+	}
+
+
+	open(_tag) {
+		this.#curExpensesBudget = Object.assign({}, _tag.expensesBudget);
+		this.#HTML.titleHolder.setTitle('Manage ' + _tag.name + '\'s budget');
+		this.updateTableContent(this.#curExpensesBudget);
+
+		super.open();
+		return new Promise((resolver) => this.#openPromiseResolver = resolver);
+	}
+
+	save() {
+		this.#openPromiseResolver(this.#curExpensesBudget);
+		this.close();
+	}
+
+
+
+	updateTableContent(_expensesBudget) {
+		this.#HTML.table.clear();
+		
+		let monthKeys = Object.keys(_expensesBudget).map((_month) => new MonthIdentifier().setFromId(_month));
+		monthKeys.sort((a, b) => a.date.getTime() > b.date.getTime());
+
+		if (!monthKeys[0]) return;
+		
+		let curMonth = monthKeys[0].date.moveMonth(-4);
+		let maxMonth = new MonthIdentifier().setFromDate(new Date()).date;;
+		
+		let curMonthKey = false;
+		let rows = [];
+
+		while (curMonth.getTime() < maxMonth.getTime())
+		{
+			curMonth.moveMonth(1);
+
+			for (let key of monthKeys)
+			{
+				if (key.id !== new MonthIdentifier().setFromDate(curMonth).id) continue;
+				curMonthKey = key;
+				break;
+			}
+		
+			rows.push(this.renderRow(curMonth.copy(), curMonthKey, _expensesBudget));
+		}
+
+
+		for (let i = rows.length - 1; i >= 0; i--) this.#HTML.table.addRow(rows[i]);
+	}
+
+	renderRow(_curMonth, _curMonthKey, _expensesBudget) {
+		let inputField = new UIMoneyInput({canBeNegative: true, onInput: () => {
+			let id = new MonthIdentifier().setFromDate(_curMonth).id;
+			_expensesBudget[id] = inputField.value;
+		}});
+		inputField.value = _expensesBudget[_curMonthKey.id];
+		
+		return new UITableRow({valueElements: [
+			_curMonth.getMonths()[_curMonth.getMonth()].name + ' ' + _curMonth.getFullYear(),
+			inputField.HTML,
+		]});
+	}
+
+	
+	close() {
+		super.close();
+		this.#curExpensesBudget = {};
+		this.#openPromiseResolver(false);
+	}
+}
+
+
+
+
+
+
 
 new class BudgetManagementPage extends Page {
 	HTML = {};
@@ -25,8 +125,10 @@ new class BudgetManagementPage extends Page {
 
 	constructor() {
 		super({pageIndex: 6});
-		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', 'Savings']})
+		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', '', 'Savings']})
 		this.pageHTML.append(this.table.HTML);
+
+		this.manageBudgetPopup = new BudgetManagementPage_manageBudgetPopup();
 	}
 
 	open() {
@@ -51,6 +153,7 @@ new class BudgetManagementPage extends Page {
 				'Budget Surplus:',
 				'',
 				this.HTML.budgetSumHolder,
+				'',
 			]
 		})
 
@@ -63,11 +166,11 @@ new class BudgetManagementPage extends Page {
 }
 
 
-class BudgetPageTag extends TransactionTag {
+class BudgetPageTag extends SavingsTransactionTag {
 	#HTML = {};
 	isSavingsTag = false;
 	constructor({name, color, id, filter, expensesBudget, startValue = 0, isSavingsTag}) {
-		super({name: name, color: color, id: id, filter: filter, expensesBudget: expensesBudget, startValue: startValue});
+		super(...arguments);
 		this.isSavingsTag = isSavingsTag;
 	}
 
@@ -92,6 +195,16 @@ class BudgetPageTag extends TransactionTag {
 		this.#HTML.isExpenseCheckbox = new UICheckbox({text: '', onChange: () => this.#updateTagBudget()});
 		this.#HTML.moneyInputField = new UIMoneyInput({placeholder: '-', onInput: (_value) => this.#updateTagBudget()});
 
+		let editBudgetButton = createElement('div', 'editBudgetButton');
+		editBudgetButton.innerHTML = '[]';
+		editBudgetButton.addEventListener('click', async () => {
+			let budget = await App.budgetManagementPage.manageBudgetPopup.open(this);
+			if (!budget) return;
+			TagManager.getTagById(this.id).expensesBudget = budget;
+			TagManager.writeData();
+			App.budgetManagementPage.open();
+		});
+
 		this.#updateMoneyInputFieldValue(this.currentExpensesBudget);
 		this.#HTML.isExpenseCheckbox.checked = this.currentExpensesBudget <= 0;
 
@@ -100,7 +213,8 @@ class BudgetPageTag extends TransactionTag {
 				this.render(),
 				this.#HTML.isExpenseCheckbox.HTML,
 				this.#HTML.moneyInputField.HTML,
-				'-'
+				editBudgetButton,
+				!this.isSavingsTag ? '-' : formatMoneyString(this.totalSavings, false)
 			]
 		})
 

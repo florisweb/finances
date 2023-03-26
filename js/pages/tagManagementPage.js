@@ -183,7 +183,7 @@ new class TagManagementPage extends Page {
 class ManagementPageTag extends SavingsTransactionTag {
 	isSavingsTag = false;
 	constructor({name, color, id, filter, isSavingsTag, startValue}) {
-		super({name: name, color: color, id: id, filter: filter, startValue});
+		super(...arguments);
 		this.isSavingsTag = isSavingsTag;
 	}
 

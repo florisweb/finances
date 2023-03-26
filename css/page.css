@@ -336,3 +336,10 @@
   margin-right: 200px;
   box-shadow: none;
 }
+
+
+.UIPopupHolder.manageBudgetPopup .budgetTable {
+  height: calc(100vh - 200px);
+  overflow: auto;
+
+}
