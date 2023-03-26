@@ -1,0 +1,68 @@
+
+
+.UITagFilterBuilder {
+
+
+}
+
+.UITagFilterBuilder .UIText {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+
+
+.UIFilterRule {
+  display: flex;
+  margin-left: 5px;
+}
+
+.UIFilterRule:not(:first-child) {
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+}
+.UIFilterRule:last-child {
+  margin-bottom: 20px;
+}
+
+.UIFilterRule:not(:first-child)::before {
+  position: absolute;
+  margin-left: 10px;
+  margin-top: -15px;
+  content: 'AND';
+  font-size: 10px;
+  color: #777;
+}
+
+.UIFilterRule:last-child::after {
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 15px;
+  content: '+';
+  font-size: 10px;
+  color: #777;
+}
+
+.UIFilterRule .dropDownButton {
+  border-right-width: 0;
+}
+.UIFilterRule .UIInputHolder {
+  font-size: 12px;
+}
+
+
+
+
+.UIFilter_ANDSet {
+  border-left: 3px solid #eee;
+  margin-bottom: 25px;
+}
+
+.UIFilter_ANDSet:not(:first-child)::before {
+  position: absolute;
+  margin-left: 10px;
+  margin-top: -20px;
+  content: 'OR';
+  font-size: 10px;
+  color: #777;
+}

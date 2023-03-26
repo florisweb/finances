@@ -83,7 +83,7 @@ class UIInput {
 		this.#HTML.self.value = _value;
 	}
 
-	constructor({placeholder = '', customClass, onChange, onInput}) {
+	constructor({placeholder = '', customClass, onChange, onInput} = {placeholder: ''}) {
 		this.#HTML.self = createElement('input', 'UIInputHolder');
 		if (customClass) this.#HTML.self.classList.add(customClass);
 		this.#HTML.self.setAttribute('placeholder', placeholder)

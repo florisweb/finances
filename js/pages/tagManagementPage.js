@@ -26,6 +26,8 @@ class TagManagementPage_createTagPopup extends Popup {
 			});
 		}
 
+		let filterBuilder = new UITagFilterBuilder();
+
 		super({
 			content: [
 				titleHolder,
@@ -37,6 +39,10 @@ class TagManagementPage_createTagPopup extends Popup {
 				checkBox,
 				new UIVerticalSpacer({height: 10}),
 				savingsTagStartMoneyInput,
+				new UIVerticalSpacer({height: 30}),
+
+				
+				filterBuilder,
 
 				new UIVerticalSpacer({height: 80}),
 				new UIHorizontalSegment({content: [
@@ -52,6 +58,7 @@ class TagManagementPage_createTagPopup extends Popup {
 		this.#HTML.titleHolder = titleHolder;
 		this.#HTML.addButton = addButton;
 		this.#HTML.checkBox = checkBox;
+		this.#HTML.filterBuilder = filterBuilder;
 	}
 
 	#onSavingsTagCheckboxToggle() {
@@ -64,7 +71,8 @@ class TagManagementPage_createTagPopup extends Popup {
 
 	createTag() {
 		if (this.#HTML.tagNameInput.value.length < 3) return alert('Please choose a longer name');
-		
+		this.#HTML.filterBuilder.setFilter(); // Clears the builder	
+
 		if (typeof this.#curEditTag.id != 'number') this.#curEditTag.id = TagManager.getNewTagId();
 		this.#curEditTag.name = this.#HTML.tagNameInput.value;
 		this.#curEditTag.color = this.#HTML.dropDown.value;
@@ -86,6 +94,7 @@ class TagManagementPage_createTagPopup extends Popup {
 
 		this.#HTML.savingsTagStartMoneyInput.value = null;
 
+		this.#HTML.filterBuilder.setFilter([[["description", "includes", "maandelijkse leef- en studievergoeding"]],[["description", "includes", "zakgeld"], ["description", "includes", "maandelijkse leef- en studievergoeding"]]]);
 		return new Promise((resolver) => this.#openPromiseResolver = resolver);
 	}
 

@@ -264,7 +264,7 @@ class NonAssignedTag extends SavingsTransactionTag {
 		x AND y
 	]
 	x = Property action comperator
-	Property = description | targetName
+	Property = description | targetName | bankClassification
 	action = == | < | > | contains
 */
 

@@ -10,7 +10,7 @@ class DropDown {
 	}
 
 
-	constructor({customClass}) {
+	constructor({customClass} = {customClass: ''}) {
 		this.#HTML.self = createElement('div', 'UIDropDownWrapper');
 		this.#HTML.button = createElement('div', 'dropDownButton');
 		this.#HTML.button.innerHTML = `
