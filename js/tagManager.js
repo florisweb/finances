@@ -119,7 +119,6 @@ const TagManager = new class extends DataManager {
 
 	constructor() {
 		super({type: "tags", typeClass: function (_tag) {
-			console.warn(_tag);
 			if (_tag.isSavingsTag) return new SavingsTransactionTag(...arguments);
 			return new TransactionTag(...arguments);
 		}});
@@ -157,9 +156,9 @@ const TagManager = new class extends DataManager {
 		return this.writeData();
 	}
 	removeTag(_tag) {
-		let index = this.data.findIndex((_t) => _t.id === _tag.id);
+		let index = this._data.findIndex((_t) => _t.id === _tag.id);
 		if (index === -1) return;
-		this.data.splice(index, 1);
+		this._data.splice(index, 1);
 		return this.writeData();
 	}
 
@@ -168,9 +167,9 @@ const TagManager = new class extends DataManager {
 	}
 
 	getNewTagId() {
-		if (this.data.length === 0) return 0;
-		this.data.sort((a, b) => a.id > b.id);
-		return this.data[this.data.length - 1].id + 1;
+		if (this._data.length === 0) return 0;
+		this._data.sort((a, b) => a.id > b.id);
+		return this._data[this._data.length - 1].id + 1;
 	}
 
 
