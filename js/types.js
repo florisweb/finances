@@ -45,13 +45,13 @@ class TransactionTag {
 	id;
 	expensesBudget = {}; 
 
-	#filter;
+	filter;
 	constructor({name, color, id, filter, expensesBudget = {}}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id;
 		this.expensesBudget = expensesBudget;
-		this.#filter = new TagFilter(filter);
+		this.filter = new TagFilter(filter);
 	}
 
 	render() {
@@ -71,8 +71,8 @@ class TransactionTag {
 	}
 
 	transactionFitsTag(_transaction) {
-		if (!this.#filter) return false;
-		return this.#filter.evaluate(_transaction);
+		if (!this.filter) return false;
+		return this.filter.evaluate(_transaction);
 	}
 
 	
@@ -142,7 +142,7 @@ class TransactionTag {
 			name: this.name,
 			color: this.color.hex,
 			id: this.id,
-			filter: this.#filter.export(),
+			filter: this.filter.export(),
 			expensesBudget: this.expensesBudget,
 		}
 	}
@@ -270,6 +270,9 @@ class NonAssignedTag extends SavingsTransactionTag {
 
 class TagFilter {
 	#filter = [];
+	get value() {
+		return this.#filter;
+	}
 	constructor(_filter = []) {
 		this.#filter = _filter;
 	}

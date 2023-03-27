@@ -290,6 +290,10 @@
 }
 
 
+.UIPopupHolder.createTagPopup .UITagFilterBuilder .statementHolder {
+  max-height: calc(100vh - 400px);
+}
+
 
 
 
@@ -341,5 +345,5 @@
 .UIPopupHolder.manageBudgetPopup .budgetTable {
   height: calc(100vh - 200px);
   overflow: auto;
-
 }
+

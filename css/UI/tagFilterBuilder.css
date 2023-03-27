@@ -2,12 +2,16 @@
 
 .UITagFilterBuilder {
 
-
 }
+
 
 .UITagFilterBuilder .UIText {
   margin-bottom: 5px;
   font-size: 12px;
+}
+
+.UITagFilterBuilder .statementHolder {
+  overflow: auto;
 }
 
 
@@ -15,54 +19,93 @@
 .UIFilterRule {
   display: flex;
   margin-left: 5px;
+  pointer-events: none;
+  transition: margin-top .3s, opacity .3s;
 }
+  .UIFilterRule > * {
+    pointer-events: all;
+  }
+
+.UIFilterRule.removeAnimation {
+  margin-top: -50px;
+  opacity: 0;
+}
+.UIFilterRule.removeAnimation:not(:first-child) {
+  margin-top: -35px;
+}
+.UIFilterRule.removeAnimation:first-child:last-child {
+  margin-top: -70px;
+}
+
+
+.UIFilterRule.removeAnimation::before {
+  opacity: 0;
+  margin-top: -10px;
+}
+
 
 .UIFilterRule:not(:first-child) {
   margin-top: 15px;
-  border-top: 1px solid #eee;
-}
-.UIFilterRule:last-child {
-  margin-bottom: 20px;
 }
 
 .UIFilterRule:not(:first-child)::before {
-  position: absolute;
-  margin-left: 10px;
-  margin-top: -15px;
+  position: relative;
+  margin-left: 0px;
+  margin-top: -14px;
+  margin-right: -22px;
+
   content: 'AND';
   font-size: 10px;
   color: #777;
 }
 
+/* Last Child: add button */
+
+
 .UIFilterRule:last-child::after {
-  position: absolute;
-  margin-left: 10px;
-  margin-top: 15px;
-  content: '+';
+  position: relative;
+  margin-top: 35px;
+  right: calc(100% - 74.5px);
+  margin-left: -75px;
+
+  height: 20px;
+  padding: 0 10px;
+
+  border: 1px solid #eee;
+
+  pointer-events: all;
+  content: '+ Add rule';
+  white-space: nowrap;
+  line-height: 20px;
+  text-align: center;
   font-size: 10px;
   color: #777;
 }
 
-.UIFilterRule .dropDownButton {
-  border-right-width: 0;
-}
-.UIFilterRule .UIInputHolder {
-  font-size: 12px;
-}
+  .UIFilterRule .dropDownButton {
+    border-right-width: 0;
+  }
+  .UIFilterRule .UIInputHolder {
+    font-size: 12px;
+  }
+
+
+  .UIFilterRule .removeButton {
+    height: 35px;
+    width: 68px;
+    padding: 10px 0px;
+    text-align: center;
+  }
+
+
+
+
+
 
 
 
 
 .UIFilter_ANDSet {
-  border-left: 3px solid #eee;
-  margin-bottom: 25px;
-}
-
-.UIFilter_ANDSet:not(:first-child)::before {
-  position: absolute;
-  margin-left: 10px;
-  margin-top: -20px;
-  content: 'OR';
-  font-size: 10px;
-  color: #777;
+  border-left: 3px solid #daf;
+  margin-bottom: 15px;
 }

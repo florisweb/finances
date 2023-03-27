@@ -82,5 +82,13 @@
 .UIDropDownWrapper .optionPanel .option {
   cursor: pointer;
 }
+.UIDropDownWrapper .optionPanel .option > a {
+  position: relative;
+  height: 20px;
+  line-height: 20px;
+  font-size: 13px;
+  color: #444;
+  margin-left: -5px;
+}
 
 
