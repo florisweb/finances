@@ -288,13 +288,13 @@ class TagFilter {
 
 				let targetType 	= ANDStatement[0];
 				let comperator 	= ANDStatement[1];
-				let comparee 	= ANDStatement[2];
+				let comparee 	= ANDStatement[2].toLowerCase();
 				let target = '';
 				switch (targetType)
 				{
-					case "targetName": target = _transaction.targetName; break;
-					case "description": target = _transaction.description; break;
-					case "bankClassification": target = _transaction.bankClassification; break;
+					case "targetName": target = _transaction.targetName.toLowerCase(); break;
+					case "description": target = _transaction.description.toLowerCase(); break;
+					case "bankClassification": target = _transaction.bankClassification.toLowerCase(); break;
 					default: foundWrongStatement = true; break;
 				}
 

@@ -119,3 +119,10 @@ function formatMoneyString(_money, _addEuroSign = true) {
 function newId() {
 	return String(Math.round(Math.random() * 1000000000000));
 }
+
+
+
+function findTotalScrollTop(_element) {
+	if (_element.parentNode !== document.body) return findTotalScrollTop(_element.parentNode) + _element.scrollTop;
+	return _element.scrollTop;
+}

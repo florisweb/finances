@@ -18,12 +18,10 @@
 
 
 
-.UITable > tr.tableRow {
+.UITable.UIHeaderTable > tr.tableRow, 
+.UITable > tr.tableRow:not(:last-child) {
   border-bottom: 1px solid #ddd;
 }
-.UITable > tr.tableRow:nth-child(even) { 
-}
-
 .UITable > .tableRow > .rowElement {
   position: relative;
   padding: 5px 10px;

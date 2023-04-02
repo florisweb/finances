@@ -22,7 +22,7 @@
   pointer-events: none;
   transition: margin-top .3s, opacity .3s;
 }
-  .UIFilterRule > * {
+  .UIPopupHolder:not(.hide) .UIFilterRule > * {
     pointer-events: all;
   }
 
@@ -73,7 +73,7 @@
 
   border: 1px solid #eee;
 
-  pointer-events: all;
+
   content: '+ Add rule';
   white-space: nowrap;
   line-height: 20px;
@@ -81,6 +81,11 @@
   font-size: 10px;
   color: #777;
 }
+
+.UIPopupHolder:not(.hide) .UIFilterRule:last-child::after {
+  pointer-events: all;
+}
+
 
   .UIFilterRule .dropDownButton {
     border-right-width: 0;
@@ -108,4 +113,12 @@
 .UIFilter_ANDSet {
   border-left: 3px solid #daf;
   margin-bottom: 15px;
+}
+
+
+
+.UITagFilterBuilder .statementHolder > .UIButton {
+  font-size: 12px;
+  padding-left: 0;
+  margin-top: -15px;
 }

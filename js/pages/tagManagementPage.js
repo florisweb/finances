@@ -107,7 +107,6 @@ class TagManagementPage_createTagPopup extends Popup {
 		this.#HTML.tagNameInput.value = _tag.name;
 		this.#HTML.checkBox.checked = _tag.isSavingsTag;
 		if (_tag.isSavingsTag) this.#HTML.savingsTagStartMoneyInput.value = _tag.startValue;
-		console.log('v', _tag.filter.value);
 		this.#HTML.filterBuilder.setFilter(_tag.filter.value);
 
 		this.#HTML.dropDown.selectOption(_tag.color, true, (a, b) => a.hex === b.hex);
@@ -233,6 +232,7 @@ class AddManagementPageTag extends ManagementPageTag {
 			let tag = await App.tagManagementPage.createTagPopup.open();
 			if (!tag) return;
 			TagManager.addTag(tag);
+			TransactionManager.autoClassifyTransactions();
 			App.tagManagementPage.open();
 		}
 		return html;

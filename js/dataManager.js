@@ -76,20 +76,25 @@ const TransactionManager = new class extends DataManager {
 		return found;
 	}
 
-	autoClassifyTransactions() {
+	async autoClassifyTransactions() {
 		let classifies = 0;
+		let newClassifies = 0;
 		for (let trans of this._data)
 		{
+			if (trans.typeCode !== undefined) classifies++;
 			if (trans.classificationState === 2) continue; // Already manually classified
 
 			let type = TagManager.autoDetectTransactionTag(trans);
 			if (type === false) continue;
-			
-			classifies++;
+			if (trans.typeCode !== type) newClassifies++; // Changed/added the classification
+
 			trans.typeCode = type;
 			trans.classificationState = 1;
 		}
-		return this.writeData();
+		await this.writeData();
+
+		App.statusMessage.open('Classified ' + newClassifies + ' new transactions (' + Math.round(classifies / this._data.length * 1000) / 10 + '% classified)')
+		return classifies;
 	}
 
 

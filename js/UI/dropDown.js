@@ -78,9 +78,18 @@ class DropDown {
 
 
 	async open() {
+		this.#HTML.optionPanel.style.transition = 'all 0s';
+		this.#HTML.optionPanel.style.maxHeight = '';
+		this.#HTML.optionPanel.style.marginTop = '';
+		if (!this.#isChildOfInfiniteScroller()) this.#HTML.optionPanel.style.marginTop = -findTotalScrollTop(this.#HTML.optionPanel) + 'px';
+		
+		await wait(0);
+		this.#HTML.optionPanel.style.transition = '';
+
+
 		let box = this.#HTML.optionPanel.getBoundingClientRect();
 		let panelHeight = this.#HTML.optionPanel.offsetHeight;
-
+		
 		let topSpaceLeft = box.top - panelHeight;
 		let bottomSpaceLeft = window.innerHeight - (box.top + panelHeight);
 
@@ -92,7 +101,9 @@ class DropDown {
 			this.#HTML.self.classList.add('openAbove');
 			await wait(0);
 			this.#HTML.optionPanel.style.transition = '';
-		}
+		} 
+		
+
 
 		await wait(0);
 		this.#HTML.self.classList.add('optionPanelOpen');
@@ -104,6 +115,16 @@ class DropDown {
 			this.#HTML.self.classList.remove('openAbove');
 			this.#HTML.optionPanel.style.maxHeight = '';
 		}, 300);
+	}
+
+	#isChildOfInfiniteScroller() {
+		let panels = $('.infiniteScroll .UIDropDownWrapper .optionPanel');
+		let isInfiniteScroller = false;
+		for (let panel of panels) 
+		{
+			if (panel == this.#HTML.optionPanel) return true;
+		}
+		return false;
 	}
 }
 

@@ -217,6 +217,7 @@ new class UploadCSVPage extends Page {
 		transactions.sort((a, b) => new Date().fromString(a.date) > new Date().fromString(b.date))
 
 		TransactionManager.addTransactions(transactions);
+		TransactionManager.autoClassifyTransactions();
 		App.transactionListViewerPage.open(TransactionManager.data);
 	}
 }
@@ -389,6 +390,7 @@ new class TagPage extends Page {
 			let tag = await App.tagManagementPage.createTagPopup.openEdit(this.#curTag);
 			if (!tag) return;
 			await TagManager.addTag(tag);
+			TransactionManager.autoClassifyTransactions();
 			this.open(tag);
 		}});
 

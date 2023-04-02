@@ -46,7 +46,7 @@ class UITagFilterBuilder {
 	}
 
 	#addANDSetAtEnd() {
-		let newSet = new UITagFilterBuilder_ANDSet({statements: [[0, 0, null]]}, this);
+		let newSet = new UITagFilterBuilder_ANDSet({statements: [['description', 'includes', null]]}, this);
 		this._ANDGroups.push(newSet);
 		this.updateHTML();
 	}
@@ -167,7 +167,6 @@ class UITagFilterBuilder_rule {
 	}
 
 	get HTML() {
-		console.log(this.#HTML.self);
 		return this.#HTML.self;
 	}
 }
