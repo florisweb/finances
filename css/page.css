@@ -338,16 +338,32 @@
   width: 100%;
 }
 
-
-.page.budgetManagementPage .UITableWrapper .UITable .UIInputHolder {
-  width: 80px;
-  margin-right: 200px;
-  box-shadow: none;
-}
-
-
 .UIPopupHolder.manageBudgetPopup .budgetTable {
   height: calc(100vh - 200px);
   overflow: auto;
 }
+
+
+.page.budgetManagementPage .UITableWrapper .UITable .inputContainer > * {
+  float: left;
+}
+
+.page.budgetManagementPage .UITableWrapper .UITable .UIInputHolder {
+  width: 80px;
+  box-shadow: none;
+  margin-right: 5px;
+}
+.page.budgetManagementPage .UITableWrapper .UITable .editBudgetButton {
+  width: 25px;
+  height: auto;
+  padding: 3px;
+  margin: 5px;
+  margin-right: 200px;
+
+  cursor: pointer;
+  opacity: .5;
+}
+
+
+
 

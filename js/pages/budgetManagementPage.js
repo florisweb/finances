@@ -125,7 +125,7 @@ new class BudgetManagementPage extends Page {
 
 	constructor() {
 		super({pageIndex: 6});
-		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', '', 'Savings']})
+		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', 'Savings']})
 		this.pageHTML.append(this.table.HTML);
 
 		this.manageBudgetPopup = new BudgetManagementPage_manageBudgetPopup();
@@ -195,8 +195,10 @@ class BudgetPageTag extends SavingsTransactionTag {
 		this.#HTML.isExpenseCheckbox = new UICheckbox({text: '', onChange: () => this.#updateTagBudget()});
 		this.#HTML.moneyInputField = new UIMoneyInput({placeholder: '-', onInput: (_value) => this.#updateTagBudget()});
 
-		let editBudgetButton = createElement('div', 'editBudgetButton');
-		editBudgetButton.innerHTML = '[]';
+		let inputContainer = createElement('div', 'inputContainer');
+		
+		let editBudgetButton = createElement('img', 'editBudgetButton');
+		editBudgetButton.setAttribute('src', 'images/monthIconDark.png');
 		editBudgetButton.addEventListener('click', async () => {
 			let budget = await App.budgetManagementPage.manageBudgetPopup.open(this);
 			if (!budget) return;
@@ -205,6 +207,9 @@ class BudgetPageTag extends SavingsTransactionTag {
 			App.budgetManagementPage.open();
 		});
 
+		inputContainer.append(this.#HTML.moneyInputField.HTML);
+		inputContainer.append(editBudgetButton);
+
 		this.#updateMoneyInputFieldValue(this.currentExpensesBudget);
 		this.#HTML.isExpenseCheckbox.checked = this.currentExpensesBudget <= 0;
 
@@ -212,8 +217,7 @@ class BudgetPageTag extends SavingsTransactionTag {
 			valueElements: [
 				this.render(),
 				this.#HTML.isExpenseCheckbox.HTML,
-				this.#HTML.moneyInputField.HTML,
-				editBudgetButton,
+				inputContainer,
 				!this.isSavingsTag ? '-' : formatMoneyString(this.totalSavings, false)
 			]
 		})
