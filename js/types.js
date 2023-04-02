@@ -292,13 +292,14 @@ class TagFilter {
 				let target = '';
 				switch (targetType)
 				{
-					case "targetName": target = _transaction.targetName.toLowerCase(); break;
-					case "description": target = _transaction.description.toLowerCase(); break;
-					case "bankClassification": target = _transaction.bankClassification.toLowerCase(); break;
+					case "targetName": target = _transaction.targetName; break;
+					case "description": target = _transaction.description; break;
+					case "bankClassification": target = _transaction.bankClassification; break;
 					default: foundWrongStatement = true; break;
 				}
 
 				if (!target) {foundWrongStatement = true; break}
+				target = target.toLowerCase(); 
 
 				switch (comperator)
 				{

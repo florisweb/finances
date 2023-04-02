@@ -167,7 +167,7 @@ const TagManager = new class extends DataManager {
 	}
 
 	getNewTagId() {
-		if (this._data.length === 0) return 0;
+		if (this._data.length === 0) return 1; // 0 is the non-assigned tag
 		this._data.sort((a, b) => a.id > b.id);
 		return this._data[this._data.length - 1].id + 1;
 	}

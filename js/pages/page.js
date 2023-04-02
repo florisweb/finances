@@ -73,6 +73,7 @@ new class TransactionListViewerPage extends Page {
 			let date = createElement('div', 'dateHolder');
 			setTextToElement(date, transaction.date);
 			if (transaction.classificationState === 1) date.classList.add('tagAutoDetected');
+			if (transaction.classificationState === 2) date.classList.add('tagManuallySet');
 
 			let row = new UITableRow({valueElements: [
 				date,

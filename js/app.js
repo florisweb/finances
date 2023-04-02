@@ -33,6 +33,6 @@ class GlobalStatusMessage extends UIStatusMessage {
 	open(_text) {
 		this.#textHolder.setText(_text);
 		super.open();
-		setTimeout(() => this.close(), 400 * _text.length);
+		setTimeout(() => this.close(), 300 * _text.length);
 	}
 }

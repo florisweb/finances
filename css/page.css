@@ -97,11 +97,15 @@
 
 .page.transactionListViewerPage .UITableWrapper.transactionTable .dateHolder {
   padding-left: 10px;
+  border-left: 3px solid transparent;
+}
+.page.transactionListViewerPage .UITableWrapper.transactionTable .dateHolder.tagManuallySet {
   border-left: 3px solid #333;
 }
 .page.transactionListViewerPage .UITableWrapper.transactionTable .dateHolder.tagAutoDetected {
   border-left: 3px solid #f00;
 }
+
 
 
 
