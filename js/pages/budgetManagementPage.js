@@ -136,6 +136,8 @@ new class BudgetManagementPage extends Page {
 		this.#budgetDeficit = _x;
 		if (!this.HTML.budgetSumHolder) return;
 		setTextToElement(this.HTML.budgetSumHolder, formatMoneyString(this.#budgetDeficit));
+		this.HTML.budgetSumHolder.classList.remove('warning');
+		if (this.#budgetDeficit < 0) this.HTML.budgetSumHolder.classList.add('warning');
 		SideBar.setBudgetPageWarning(this.#budgetDeficit < 0);
 	}
 	get budgetDeficit() {

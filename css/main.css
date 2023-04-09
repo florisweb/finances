@@ -15,6 +15,7 @@ body {
 
 :root {
   --sideBarWidth: 300px;
+  --warningColor: rgb(237, 112, 122);
 }
 
 
@@ -66,7 +67,7 @@ body {
   }
 
   #sideBar .item .button.warning {
-    background: rgb(237, 112, 122);
+    background: var(--warningColor);
     padding-right: 30px;
   }
   #sideBar .item .button.warning:after {

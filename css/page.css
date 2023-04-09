@@ -436,6 +436,14 @@
   opacity: .5;
 }
 
+.page.budgetManagementPage .UITableWrapper .UITable .budgetSumHolder {
+  transition: color .3s;
+}
+.page.budgetManagementPage .UITableWrapper .UITable .budgetSumHolder.warning {
+  color: var(--warningColor);
+
+}
+
 
 
 
