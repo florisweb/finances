@@ -18,10 +18,12 @@ class Page {
 
 	open() {
 		let pages = document.querySelectorAll('#mainContent .page');
+		if (App.curPage) App.curPage.close();
 		App.curPage = this;
 		for (let page of pages) page.classList.add('hide');
 		pages[this.#pageIndex].classList.remove('hide');
 	}
+	close() {}
 }
 
 

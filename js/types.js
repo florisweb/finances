@@ -96,6 +96,18 @@ class TransactionTag {
 		return curBudget;
 	}
 
+	get averageExpenses() {
+		let transactions = this.transactions;
+		let curMonth = new MonthIdentifier().setFromDate(new Date());
+		let startMonth = curMonth.date.moveMonth(-3);
+		curMonth = curMonth.date;
+
+		return -transactions.filter((t) => {
+			let date = new Date().setFromStr(t.date);
+			return date.getTime() > startMonth.getTime() && date.getTime() < curMonth.getTime();
+		}).map(t => t.deltaMoney).reduce((a, b) => a + b, 0) / 3;
+	}
+
 
 	get transactions() {
 		return TransactionManager.getByTag(this.id);

@@ -1,17 +1,20 @@
 
 
 new class TagPage extends Page {
-	HTML = {};
+	HTML = {
+		pageHeader: $('.tagPage .pageHeader')[0],
+		pageTitleHolder: $('.tagPage .pageHeader .titleHolder')[0],
+		tagContentHolder: $('.tagPage .tagContentHolder')[0],
+		overview: {
+			savings: $('.tagPage .overviewHolder .balanceHolder.savings')[0],
+			expenses: $('.tagPage .overviewHolder .balanceHolder.expenses')[0]
+		}
+	};
 	table;
 	#curTag;
 	constructor() {
 		super({pageIndex: 5});
-		this.HTML.pageHeader = $('.tagPage .pageHeader')[0];
-		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
 
-		this.HTML.tagContentHolder = $('.tagPage .tagContentHolder')[0];
-
-	
  		// Header
 		this.HTML.removeButton = new UIButton({text: 'Remove', customClass: 'alignRight removeButton',  filled: true,  onclick: async () => {
 			await TagManager.removeTag(this.#curTag);
@@ -100,6 +103,16 @@ new class TagPage extends Page {
 			})
 		]);
 	
+
+
+		this.HTML.overview.savings.classList.add('hide');
+		if (_tag.isSavingsTag) 
+		{
+			this.HTML.overview.savings.classList.remove('hide');
+			setTextToElement(this.HTML.overview.savings, formatMoneyString(_tag.totalSavings, false));
+		}
+		setTextToElement(this.HTML.overview.expenses, formatMoneyString(_tag.averageExpenses, false));
+
 
 		this.render();
 	}

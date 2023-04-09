@@ -66,15 +66,17 @@ class UITable {
 class UITableRow {
 	#HTML = {};
 	#valueElements;
+	#customClass = '';
 
-	constructor({valueElements = []}) {
+	constructor({valueElements = [], customClass = ''}) {
 		this.#valueElements = valueElements;
+		this.#customClass = customClass;
 	}
 
 	get HTML() {	
 		if (this.#HTML.self) return this.#HTML.self;
 		
-		this.#HTML.self = createElement('tr', 'tableRow');
+		this.#HTML.self = createElement('tr', 'tableRow ' + (this.#customClass ? this.#customClass : ''));
 		for (let valueEl of this.#valueElements)
 		{
 			this.#HTML.self.append(this._renderRowItem(valueEl));

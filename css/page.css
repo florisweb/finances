@@ -1,3 +1,90 @@
+
+
+
+
+
+
+
+
+
+.page .overviewHolder {
+  position: relative;
+  display: flex;
+  margin-left: 20px;
+  width: calc(100% - 40px);
+  height: auto;
+
+  padding: 20px 0;
+  border-bottom: 1px solid #ddd;
+
+}
+
+.page .overviewHolder .balanceHolder {
+  position: relative;
+  font-size: 40px;
+  height: 70px;
+  line-height: 70px;
+  color: #333;
+  font-style: italic;
+  margin-right: 60px;
+  padding-right: 20px;
+}
+
+.page .overviewHolder .balanceHolder.available {
+  padding-left: 50px;
+  border-left: 1px solid #eee;
+  opacity: .5;
+}
+
+
+.page .overviewHolder .balanceHolder:before {
+  content: 'CURRENT BALANCE';
+  position: absolute;
+  top: 25px;
+  right: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.page .overviewHolder .balanceHolder.available:before {
+  content: 'AVAILABLE BALANCE';
+}
+
+.page .overviewHolder .UIButton {
+  right: 0;
+}
+
+.page.tagPage .overviewHolder .balanceHolder.hide {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #mainContent > .page {
   position: absolute;
   left: 0;
@@ -123,56 +210,6 @@
 
 
 /* === TagManagementPage === */
-
-
-
-
-.page.tagManagementPage .overviewHolder {
-  position: relative;
-  display: flex;
-  margin-left: 20px;
-  width: calc(100% - 40px);
-  height: auto;
-
-  padding: 20px 0;
-  border-bottom: 1px solid #ddd;
-
-}
-
-.page.tagManagementPage .overviewHolder .balanceHolder {
-  position: relative;
-  font-size: 40px;
-  height: 70px;
-  line-height: 70px;
-  color: #333;
-  font-style: italic;
-  margin-right: 60px;
-  padding-right: 20px;
-}
-
-.page.tagManagementPage .overviewHolder .balanceHolder.available {
-  padding-left: 50px;
-  border-left: 1px solid #eee;
-  opacity: .5;
-}
-
-
-.page.tagManagementPage .overviewHolder .balanceHolder:before {
-  content: 'CURRENT BALANCE';
-  position: absolute;
-  top: 25px;
-  right: 20px;
-  font-size: 12px;
-}
-
-.page.tagManagementPage .overviewHolder .balanceHolder.available:before {
-  content: 'AVAILABLE BALANCE';
-}
-
-.page.tagManagementPage .overviewHolder .UIButton {
-  right: 0;
-}
-
 
 
 
@@ -321,11 +358,32 @@
 .page.tagPage .tagContentHolder {
   display: grid;
   grid-template-areas: 
+    'overview overview'
     'graph graph'
     '. transactionTable';
-  grid-template-rows: 260px calc(100vh - 260px - 65px);
+  grid-template-rows: 100px 260px calc(100vh - 260px - 65px);
   grid-template-columns: 50% auto;
 }
+
+
+.page.tagPage .tagContentHolder .overviewHolder {
+  grid-area: overview;
+}
+
+
+.page.tagPage .overviewHolder .balanceHolder.savings:before {
+  content: 'SAVINGS';
+}
+
+.page.tagPage .overviewHolder .balanceHolder.expenses:before {
+  content: 'AVERAGE EXPENSES';
+}
+
+
+
+
+
+
 
 
 .page.tagPage .tagContentHolder .expensesGraph {
@@ -374,8 +432,6 @@
   height: auto;
   padding: 3px;
   margin: 5px;
-  margin-right: 200px;
-
   cursor: pointer;
   opacity: .5;
 }

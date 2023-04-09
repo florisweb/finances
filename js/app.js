@@ -18,6 +18,9 @@ const App = new class {
 		
 		this.uploadCSVPage.open();
 		if (TransactionManager.data.length) this.tagManagementPage.open();
+
+		App.budgetManagementPage.updateBudgetDeficit();
+		SideBar.setup();
 	}
 }
 

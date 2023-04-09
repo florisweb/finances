@@ -136,6 +136,7 @@ new class BudgetManagementPage extends Page {
 		this.#budgetDeficit = _x;
 		if (!this.HTML.budgetSumHolder) return;
 		setTextToElement(this.HTML.budgetSumHolder, formatMoneyString(this.#budgetDeficit));
+		SideBar.setBudgetPageWarning(this.#budgetDeficit < 0);
 	}
 	get budgetDeficit() {
 		return this.#budgetDeficit;
@@ -143,7 +144,7 @@ new class BudgetManagementPage extends Page {
 
 	constructor() {
 		super({pageIndex: 6});
-		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', 'Savings']})
+		this.table = new UITable({keys: ['Tag', 'Is Expense', 'Budget', 'Average Expenses', 'Savings']})
 		this.pageHTML.append(this.table.HTML);
 
 		this.manageBudgetPopup = new BudgetManagementPage_manageBudgetPopup();
@@ -154,13 +155,18 @@ new class BudgetManagementPage extends Page {
 		this.render();
 		this.updateBudgetDeficit();
 	}
+	close() {
+		SideBar.setBudgetPageWarning(this.#budgetDeficit < 0);
+	}
 
 
 	render() {
 		this.table.clear();
-		for (let tag of TagManager.actualData)
+		let totalAverageExpenses = 0;
+		for (let tag of TagManager.data)
 		{
 			let budgetTag = new BudgetPageTag(tag);
+			totalAverageExpenses += budgetTag.averageExpenses;
 			this.table.addRow(budgetTag.renderRow());
 		}
 
@@ -171,6 +177,7 @@ new class BudgetManagementPage extends Page {
 				'Budget Surplus:',
 				'',
 				this.HTML.budgetSumHolder,
+				formatMoneyString(totalAverageExpenses),
 				'',
 			]
 		})
@@ -187,9 +194,11 @@ new class BudgetManagementPage extends Page {
 class BudgetPageTag extends SavingsTransactionTag {
 	#HTML = {};
 	isSavingsTag = false;
-	constructor({name, color, id, filter, expensesBudget, startValue = 0, isSavingsTag}) {
+	isNonAssignedTag = false;
+	constructor({name, color, id, filter, expensesBudget, startValue = 0, isSavingsTag, isNonAssignedTag}) {
 		super(...arguments);
 		this.isSavingsTag = isSavingsTag;
+		this.isNonAssignedTag = isNonAssignedTag;
 	}
 
 	#updateMoneyInputFieldValue(_value) {
@@ -208,8 +217,32 @@ class BudgetPageTag extends SavingsTransactionTag {
 		App.budgetManagementPage.updateBudgetDeficit();
 	}
 
+	render() {
+		let html = super.render();
+		html.onclick = () => {
+			App.tagPage.open(this);
+		}
+		return html;
+	}
+
 
 	renderRow() {
+		if (this.isNonAssignedTag)
+		{
+			return new UITableRow({
+				valueElements: [
+					this.render(),
+					'',
+					'',
+					formatMoneyString(this.averageExpenses, false),
+					!this.isSavingsTag ? '-' : formatMoneyString(this.totalSavings, false)
+				],
+				customClass: 'nonAssignedTag'
+			});
+		}
+
+
+
 		this.#HTML.isExpenseCheckbox = new UICheckbox({text: '', onChange: () => this.#updateTagBudget()});
 		this.#HTML.moneyInputField = new UIMoneyInput({placeholder: '-', onInput: (_value) => this.#updateTagBudget()});
 
@@ -236,6 +269,7 @@ class BudgetPageTag extends SavingsTransactionTag {
 				this.render(),
 				this.#HTML.isExpenseCheckbox.HTML,
 				inputContainer,
+				formatMoneyString(this.averageExpenses, false),
 				!this.isSavingsTag ? '-' : formatMoneyString(this.totalSavings, false)
 			]
 		})
