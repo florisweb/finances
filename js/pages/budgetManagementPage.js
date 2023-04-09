@@ -12,6 +12,9 @@ class BudgetManagementPage_manageBudgetPopup extends Popup {
 	#openPromiseResolver;
 	#HTML = {};
 	#curExpensesBudget = {};
+	#earliestMonth = new Date();
+	
+
 	constructor() {
 		let titleHolder = new UITitle({title: 'Manage Budget'});
 		let table = new UITable({keys: ['Date', 'Budget'], customClass: 'budgetTable'});
@@ -31,6 +34,13 @@ class BudgetManagementPage_manageBudgetPopup extends Popup {
 		
 		this.#HTML.titleHolder = titleHolder;
 		this.#HTML.table = table;
+
+
+		this.#HTML.table.HTML.addEventListener('scroll', (e) => {
+			let top = this.#HTML.table.HTML.scrollHeight - this.#HTML.table.HTML.scrollTop - this.#HTML.table.HTML.offsetHeight;
+			if (top > 150) return;
+			this.#addRowAtEnd(this.#curExpensesBudget);
+		});
 	}
 
 
@@ -58,7 +68,8 @@ class BudgetManagementPage_manageBudgetPopup extends Popup {
 
 		if (!monthKeys[0]) return;
 		
-		let curMonth = monthKeys[0].date.moveMonth(-4);
+		let curMonth = monthKeys[0].date.moveMonth(-1 - 15);
+		this.#earliestMonth = curMonth.copy().moveMonth(1);
 		let maxMonth = new MonthIdentifier().setFromDate(new Date()).date;;
 		
 		let curMonthKey = false;
@@ -82,10 +93,13 @@ class BudgetManagementPage_manageBudgetPopup extends Popup {
 		for (let i = rows.length - 1; i >= 0; i--) this.#HTML.table.addRow(rows[i]);
 	}
 
+
 	renderRow(_curMonth, _curMonthKey, _expensesBudget) {
 		let inputField = new UIMoneyInput({canBeNegative: true, onInput: () => {
 			let id = new MonthIdentifier().setFromDate(_curMonth).id;
 			_expensesBudget[id] = inputField.value;
+			
+			for (let i = 0; i < 3; i++) this.#addRowAtEnd(_expensesBudget);
 		}});
 		inputField.value = _expensesBudget[_curMonthKey.id];
 		
@@ -95,6 +109,10 @@ class BudgetManagementPage_manageBudgetPopup extends Popup {
 		]});
 	}
 
+	#addRowAtEnd(_expensesBudget) {
+		this.#earliestMonth.moveMonth(-1);
+		this.#HTML.table.addRow(this.renderRow(this.#earliestMonth.copy(), new MonthIdentifier().setFromDate(this.#earliestMonth), _expensesBudget));
+	}
 	
 	close() {
 		super.close();
