@@ -13,7 +13,7 @@ class UITable {
 		this.#keys = keys;
 		this.setKeys(keys);
 		this.clear();
-		window.addEventListener('resize', () => this._updateUIHeaderTableSize());
+		window.addEventListener('resize', () => this.onResize());
 	}
 
 	setHeader(_row) {
@@ -35,6 +35,9 @@ class UITable {
 		this.setHeader(new UIHeaderRow({valueElements: this.#keys}));
 	}
 
+	onResize() {
+		this._updateUIHeaderTableSize();
+	}
 	async _updateUIHeaderTableSize() {
 		let headerParts = this._HTML.headerTable.children[0].children;
 		if (!this._HTML.table.children.length) return;
@@ -242,6 +245,140 @@ class InfiniteScrollUITable extends UITable {
 	}
 }
 
+
+
+class InfiniteScrollTransactionTable extends InfiniteScrollUITable {
+	#transactions = [];
+	constructor() {
+		super({
+			...arguments,
+			keys: [
+				new UISortableHeaderItem({title: 'Date', sortFunction: (topSort) => this.sortByDate(topSort)}), 
+				new UISortableHeaderItem({title: 'Type', sortFunction: (topSort) => this.sortByType(topSort)}), 
+				'Target Name', 
+				new UISortableHeaderItem({title: 'Money', sortFunction: (topSort) => this.sortByMoney(topSort)}), 
+				'Description'
+			], 
+		});
+	}
+
+	setTransactions(_transactions = []) {
+		this.#transactions = _transactions;
+	}
+
+	showTransactions(_transactions = this.#transactions) {
+		let rows = [];
+		for (let transaction of _transactions)
+		{
+			let typeInput = new DropDown({customClass: 'typeSelector'});
+			let tags = [new TransactionTag({id: 0, name: '---', color: new Color('rgba(0, 0, 0, 0)')}), ...TagManager.data];
+			for (let tag of tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
+
+			typeInput.selectOption(transaction.typeCode);
+			typeInput.onInput = (_value) => {transaction.typeCode = _value; transaction.classificationState = 2; TransactionManager.writeData()}
+
+			let date = createElement('div', 'dateHolder');
+			setTextToElement(date, transaction.date);
+			if (transaction.classificationState === 1) date.classList.add('tagAutoDetected');
+			if (transaction.classificationState === 2) date.classList.add('tagManuallySet');
+
+			let row = new UITableRow({valueElements: [
+				date,
+				typeInput.HTML,
+				transaction.targetName,
+				formatMoneyString(transaction.deltaMoney),
+				transaction.description
+			]})
+			rows.push(row);
+		}
+
+		this.setData(rows);
+	}
+
+
+	clearFilters() {
+		this.showTransactions(this.#transactions);		
+	}
+
+
+	filterNonAssigned() {
+		let transactions = [];
+		for (let ts of this.#transactions)
+		{
+			if (typeof ts.typeCode === 'number') continue;
+			transactions.push(ts);
+		}
+		this.showTransactions(transactions);
+	}
+
+
+
+	sortByDate(_topSort) {
+		this.#transactions.sort((a, b) => {
+			if (_topSort) return new Date().fromString(a.date) < new Date().fromString(b.date);
+			return new Date().fromString(a.date) > new Date().fromString(b.date)
+		});
+		this.showTransactions(this.#transactions);
+	}
+	sortByType(_topSort) {
+		this.#transactions.sort((a, b) => {
+			let aTypeCode = a.typeCode === undefined ? -1 : a.typeCode;
+			let bTypeCode = b.typeCode === undefined ? -1 : b.typeCode;
+			if (_topSort) return aTypeCode < bTypeCode;
+			return aTypeCode > bTypeCode;
+		});
+		this.showTransactions(this.#transactions);
+	}
+
+	sortByMoney(_topSort) {
+		this.#transactions.sort((a, b) => {
+			if (_topSort) return parseFloat(a.deltaMoney) < parseFloat(b.deltaMoney);
+			return parseFloat(a.deltaMoney) > parseFloat(b.deltaMoney);
+		});
+		this.showTransactions(this.#transactions);
+	}
+
+
+	search(_query) {
+		this.#transactions.sort((a, b) => this.#getTransactionScoreByQuery(a, _query) < this.#getTransactionScoreByQuery(b, _query));
+		let subSet = Object.assign([], this.#transactions).splice(0, 50);
+		this.showTransactions(subSet);
+		this.setPointer(0);
+	}
+
+	#getTransactionScoreByQuery(_transaction, _query) {
+		let tag = TagManager.getTagById(_transaction.typeCode);
+
+		let scoreDesc = this.stringSimilarity(_transaction.description, _query);
+		let scoreTarget = this.stringSimilarity(_transaction.targetName, _query);
+		let scoreTag = tag ? this.stringSimilarity(tag.name, _query) : 0;
+		return scoreDesc * 5 + scoreTarget + scoreTag;
+	}
+
+	stringSimilarity(_string, _query) {
+		return similarity(_string, _query);
+
+		// let scores = [];
+		// for (let i = 0; i < _query.length + 1; i++)
+		// {
+		// 	let curSubString = _query.substr(0, i);
+		// 	let curItemTitle = _string.substr(0, i);
+		// 	let score = similarity(curSubString, curItemTitle) - Math.abs(i - _query.length) * .1;
+		// 	let item = {
+		// 		str: curSubString,
+		// 		score: i == 0 ? 0 : score,
+		// 	}
+		// 	scores.push(item);
+		// }
+
+		// if (scores.length < 1) return 0;
+		// return scores.sort(function(a, b){
+	    //  	return b.score - a.score;
+	    // })[0].score;
+	}
+
+
+}
 
 
 

@@ -303,6 +303,7 @@
 
 /* === TagPage === */
 
+
 .page.tagPage .expensesGraph {
   position: relative;
   width: 100%;
@@ -317,7 +318,22 @@
 }
 
 
+.page.tagPage .tagContentHolder {
+  display: grid;
+  grid-template-areas: 
+    'graph graph'
+    '. transactionTable';
+  grid-template-rows: 260px calc(100vh - 260px - 65px);
+  grid-template-columns: 50% auto;
+}
 
+
+.page.tagPage .tagContentHolder .expensesGraph {
+  grid-area: graph;
+}
+.page.tagPage .tagContentHolder .transactionTable {
+  grid-area: transactionTable;
+}
 
 
 

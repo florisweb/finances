@@ -31,21 +31,13 @@ class Page {
 new class TransactionListViewerPage extends Page {
 	HTML = {};
 	table;
-	#transactions = [];
 	constructor() {
 		super({pageIndex: 0});
 		
 		this.HTML.searchField = document.querySelector('.page.transactionListViewerPage .searchField');
 		this.HTML.searchField.addEventListener('input', () => this.search(this.HTML.searchField.value))
 
-		this.table = new InfiniteScrollUITable({
-			keys: [
-				new UISortableHeaderItem({title: 'Date', sortFunction: (topSort) => this.sortByDate(topSort)}), 
-				new UISortableHeaderItem({title: 'Type', sortFunction: (topSort) => this.sortByType(topSort)}), 
-				'Target Name', 
-				new UISortableHeaderItem({title: 'Money', sortFunction: (topSort) => this.sortByMoney(topSort)}), 
-				'Description'
-			], 
+		this.table = new InfiniteScrollTransactionTable({
 			customClass: 'transactionTable',
 			badgeSize: 10,
 		});
@@ -53,121 +45,18 @@ new class TransactionListViewerPage extends Page {
 	}
 
 	open(_transactions) {
-		this.#transactions = _transactions;
-		this.#updateTable();
-
+		this.table.setTransactions(_transactions);
+		this.table.showTransactions();
 		super.open();
 	}
 
-	#updateTable(_transactions = this.#transactions) {
-		let rows = [];
-		for (let transaction of _transactions)
-		{
-			let typeInput = new DropDown({customClass: 'typeSelector'});
-			let tags = [new TransactionTag({id: 0, name: '---', color: new Color('rgba(0, 0, 0, 0)')}), ...TagManager.data];
-			for (let tag of tags) typeInput.addOption({contentHTML: tag.render(), value: tag.id});
-
-			typeInput.selectOption(transaction.typeCode);
-			typeInput.onInput = (_value) => {transaction.typeCode = _value; transaction.classificationState = 2; TransactionManager.writeData()}
-
-			let date = createElement('div', 'dateHolder');
-			setTextToElement(date, transaction.date);
-			if (transaction.classificationState === 1) date.classList.add('tagAutoDetected');
-			if (transaction.classificationState === 2) date.classList.add('tagManuallySet');
-
-			let row = new UITableRow({valueElements: [
-				date,
-				typeInput.HTML,
-				transaction.targetName,
-				formatMoneyString(transaction.deltaMoney),
-				transaction.description
-			]})
-			rows.push(row);
-		}
-
-		this.table.setData(rows);
-	}
-
 	clearFilters() {
-		this.#updateTable();		
+		this.table.clearFilters();
 	}
 
-	filterNonAssigned() {
-		let transactions = [];
-		for (let ts of this.#transactions)
-		{
-			if (typeof ts.typeCode === 'number') continue;
-			transactions.push(ts);
-		}
-		this.#updateTable(transactions);
+	search() {
+		this.table.search(...arguments);
 	}
-
-
-	
-	sortByDate(_topSort) {
-		this.#transactions.sort((a, b) => {
-			if (_topSort) return new Date().fromString(a.date) < new Date().fromString(b.date);
-			return new Date().fromString(a.date) > new Date().fromString(b.date)
-		});
-		this.#updateTable();	
-	}
-	sortByType(_topSort) {
-		this.#transactions.sort((a, b) => {
-			let aTypeCode = a.typeCode === undefined ? -1 : a.typeCode;
-			let bTypeCode = b.typeCode === undefined ? -1 : b.typeCode;
-			if (_topSort) return aTypeCode < bTypeCode;
-			return aTypeCode > bTypeCode;
-		});
-		this.#updateTable();	
-	}
-
-	sortByMoney(_topSort) {
-		this.#transactions.sort((a, b) => {
-			if (_topSort) return parseFloat(a.deltaMoney) < parseFloat(b.deltaMoney);
-			return parseFloat(a.deltaMoney) > parseFloat(b.deltaMoney);
-		});
-		this.#updateTable();	
-	}
-
-	search(_query) {
-		this.#transactions.sort((a, b) => this.#getTransactionScoreByQuery(a, _query) < this.#getTransactionScoreByQuery(b, _query));
-		let subSet = Object.assign([], this.#transactions).splice(0, 50);
-		this.#updateTable(subSet);
-		this.table.setPointer(0);
-	}
-
-	#getTransactionScoreByQuery(_transaction, _query) {
-		let tag = TagManager.getTagById(_transaction.typeCode);
-
-		let scoreDesc = this.stringSimilarity(_transaction.description, _query);
-		let scoreTarget = this.stringSimilarity(_transaction.targetName, _query);
-		let scoreTag = tag ? this.stringSimilarity(tag.name, _query) : 0;
-		return scoreDesc * 5 + scoreTarget + scoreTag;
-		
-	}
-
-	stringSimilarity(_string, _query) {
-		return similarity(_string, _query);
-
-		// let scores = [];
-		// for (let i = 0; i < _query.length + 1; i++)
-		// {
-		// 	let curSubString = _query.substr(0, i);
-		// 	let curItemTitle = _string.substr(0, i);
-		// 	let score = similarity(curSubString, curItemTitle) - Math.abs(i - _query.length) * .1;
-		// 	let item = {
-		// 		str: curSubString,
-		// 		score: i == 0 ? 0 : score,
-		// 	}
-		// 	scores.push(item);
-		// }
-
-		// if (scores.length < 1) return 0;
-		// return scores.sort(function(a, b){
-	    //  	return b.score - a.score;
-	    // })[0].score;
-	}
-
 }
 
 
@@ -356,114 +245,3 @@ new class TagOverviewPage extends Page {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-new class TagPage extends Page {
-	HTML = {};
-	table;
-	#curTag;
-	constructor() {
-		super({pageIndex: 5});
-		this.HTML.pageHeader = $('.tagPage .pageHeader')[0];
-		this.HTML.pageTitleHolder = $('.tagPage .pageHeader .titleHolder')[0];
-		this.HTML.tagContentHolder = $('.tagPage .tagContentHolder')[0];
-
-		this.expensesGraph = new UILineGraph({title: 'Income'});
-		this.expensesGraph.HTML.classList.add('expensesGraph');
-		this.HTML.tagContentHolder.append(this.expensesGraph.HTML);
-
-
-		this.HTML.removeButton = new UIButton({text: 'Remove', customClass: 'alignRight removeButton',  filled: true,  onclick: async () => {
-			await TagManager.removeTag(this.#curTag);
-			App.tagManagementPage.open();
-		}});
-		this.HTML.editButton = new UIButton({text: 'Edit', customClass: 'alignRight', filled: true, onclick: async () => {
-			let tag = await App.tagManagementPage.createTagPopup.openEdit(this.#curTag);
-			if (!tag) return;
-			await TagManager.addTag(tag);
-			TransactionManager.autoClassifyTransactions();
-			this.open(tag);
-		}});
-
-		this.HTML.pageHeader.append(this.HTML.removeButton.HTML);
-		this.HTML.pageHeader.append(this.HTML.editButton.HTML);
-	}
-
-	open(_tag) {
-		if (!_tag) return;
-		this.#curTag = _tag;
-		super.open();
-		setTextToElement(this.HTML.pageTitleHolder, _tag.name);
-
-		let transactions = _tag.transactions;
-		let expensesMap = new Map();
-		let incomeMap = new Map();
-		for (let t of transactions)
-		{
-			let date = new Date().setDateFromStr(t.date);
-			let id = '1-' + date.getMonth() + '-' + date.getFullYear();
-				
-			if (t.deltaMoney < 0)
-			{
-				let output = expensesMap.get(id);
-				if (!output) output = 0;
-				output += -t.deltaMoney;
-				expensesMap.set(id, output);
-			} else {
-				let output = incomeMap.get(id);
-				if (!output) output = 0;
-				output += t.deltaMoney;
-				incomeMap.set(id, output);
-			}
-		}
-
-		let expenses = [];
-		for (let [date, money] of expensesMap)
-		{
-			expenses.push(new Vector(new Date().setDateFromStr(date).getTime(), money));	
-		}
-		let incomes = [];
-		for (let [date, money] of incomeMap)
-		{
-			incomes.push(new Vector(new Date().setDateFromStr(date).getTime(), money));	
-		}
-
-
-
-		this.expensesGraph.setData([
-			new LineGraphLineData({
-				label: 'Expenses', 
-				color: new Color('#f00'),
-				data: expenses,
-				doNotInterpolate: true,
-			}),
-			new LineGraphLineData({
-				label: 'Income', 
-				color: new Color('#0f0'),
-				data: incomes,
-				doNotInterpolate: true,
-			})
-		]);
-	
-
-		this.render();
-	}
-
-
-	render() {
-		this.expensesGraph.render()
-		// this.HTML.tagListHolder.innerHTML = '';
-
-	}
-
-}
