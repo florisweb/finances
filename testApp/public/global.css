@@ -1,3 +1,10 @@
+:root {
+	--sideBarWidth: 300px;
+	--warningColor: rgb(237, 112, 122);
+  }
+
+  
+
 html, body {
 	position: fixed;
 	width: 100vw;
@@ -9,3 +16,72 @@ html, body {
 	box-sizing: border-box;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
+
+
+
+
+
+
+
+
+.button {
+	position: relative;
+	display: inline-block;
+	margin: 10px;
+	width: auto;
+	font-size: 14px;
+	padding: 10px 15px;
+	
+	transition: box-shadow .3s;
+  
+	background: #daf;
+	color: #fff;
+	text-transform: uppercase;
+  
+	cursor: pointer;
+}
+.button:hover {
+	box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
+}
+
+  
+  
+  
+.textHolder {
+	position: relative;
+	display: inline-block;
+	margin: 10px;
+	width: auto;
+	font-size: 14px;
+	padding: 10px 0px;
+	color: #666;
+
+	text-transform: uppercase;
+}
+
+
+
+
+.inputField {
+	position: relative;
+	display: inline-block;
+	margin: 10px;
+	width: auto;
+	height: 37px;
+	padding: 10px 15px;
+
+
+	line-height: 37px;
+	font-size: 14px;
+	border: 2px solid #daf;
+	color: #a7b;
+	text-transform: uppercase;
+
+	cursor: pointer;
+}
+.inputField::placeholder { 
+	color: #a7b;
+	opacity: 1; /* Firefox */
+}
+
+

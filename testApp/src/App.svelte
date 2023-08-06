@@ -1,5 +1,6 @@
 <script>
 	import DropDown from "./UI/dropDown.svelte";
+	import SideBar from "./sideBar.svelte";
 	
 	let options = [];
 
@@ -13,5 +14,6 @@
 </script>
 
 <main>
+	<SideBar></SideBar>
 	<DropDown options={options} on:change={(_event) => console.log(_event.detail)}></DropDown>
 </main>
