@@ -1,0 +1,19 @@
+{
+  "name": "finances",
+  "version": "1.0.0",
+  "description": "A personal finance manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/florisweb/finances.git"
+  },
+  "author": "floris@florisweb.dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/florisweb/finances/issues"
+  },
+  "homepage": "https://github.com/florisweb/finances#readme"
+}
