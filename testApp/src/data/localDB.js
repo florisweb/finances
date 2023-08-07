@@ -1,10 +1,17 @@
 const DBName = "financeDB";
 let DBVersion = 2;
 let DB;
+let isReadyPromise = new Promise((resolve) => {});
+
 const LocalDB = new class {
   constructor() {
-    this.setup();
+    isReadyPromise = this.setup()
   }
+
+  ready() {
+    return isReadyPromise;
+  }
+
   setup() {
     return new Promise(function (resolve, error) {
       const request = indexedDB.open(DBName, DBVersion);

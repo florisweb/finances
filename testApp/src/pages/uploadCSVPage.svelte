@@ -3,7 +3,6 @@
 	import { CSVFileManager } from '../CSV.js';
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
-	import { transactionStore } from '../data/transactionManager';
 
 	const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 	const CSVReader = new CSVFileManager(BankExportRowKeys);
@@ -13,12 +12,11 @@
 	  	const [firstFile] = _event.target.files
 		let rows = await CSVReader.load(firstFile);
 		let transactions = rows.map(row => new Transaction(row));
-		console.warn('data', transactions);
 		TransactionManager.add(transactions);
 	}
 
 	let transactions = [];
-	transactionStore.subscribe((_transactions) => transactions = _transactions)
+	TransactionManager.dataStore.subscribe((_transactions) => transactions = _transactions)
 </script>
 
 <Page title="Upload CSV">

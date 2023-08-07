@@ -1,9 +1,5 @@
 import DataManager from "./dataManager";
 import { Transaction } from "../types";
-import { readonly, writable } from 'svelte/store';	
-
-const transactionWriteStore = writable([]);
-export let transactionStore = readonly(transactionWriteStore);
 
 const TransactionManager = new class extends DataManager {
 	constructor() {
@@ -27,8 +23,6 @@ const TransactionManager = new class extends DataManager {
 			if (this.data.find((_ts) => _ts.identifier === ts.identifier) !== undefined) continue;
 			this._data.push(ts);
 		}
-		console.log('update object', this._data);
-		TransactionManager = TransactionManager;
 		return this.writeData();
 	}
 
@@ -61,11 +55,6 @@ const TransactionManager = new class extends DataManager {
 
 		App.statusMessage.open('Classified ' + newClassifies + ' new transactions (' + Math.round(classifies / this._data.length * 1000) / 10 + '% classified)')
 		return classifies;
-	}
-
-	writeData(_data) {
-		transactionWriteStore.set(this._data);
-		return super.writeData();
 	}
 }
 
