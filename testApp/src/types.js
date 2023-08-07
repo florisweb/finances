@@ -1,0 +1,223 @@
+
+export class Transaction {
+	date;
+	typeCode;
+	targetIBAN = '';
+	targetName = '';
+	deltaMoney;
+	description = '';
+	balance = 0;
+	bankClassification = '';
+	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
+
+
+	constructor(_params) {
+		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
+		_params.balance 	= parseFloat(_params.balance);
+		Object.assign(this, _params);
+	}
+
+	get identifier() {
+		return this.date + this.deltaMoney + this.targetIBAN + this.description;
+	}
+
+
+	export() {
+		return {
+			date: this.date, 
+			typeCode: this.typeCode, 
+			targetIBAN: this.targetIBAN,
+			targetName: this.targetName,
+			deltaMoney: this.deltaMoney,
+			description: this.description,
+			balance: this.balance,
+			bankClassification: this.bankClassification,
+			classificationState: this.classificationState
+		}
+	}
+}
+
+
+
+export class TransactionTag {
+	name;
+	color;
+	id;
+	expensesBudget = {}; 
+
+	filter;
+	constructor({name, color, id, filter, expensesBudget = {}}) {
+		this.name = name;
+		this.color = typeof color === 'string' ? new Color(color) : color;
+		this.id = id;
+		this.expensesBudget = expensesBudget;
+		this.filter = new TagFilter(filter);
+	}
+
+	render() {
+		let element = createElement('div', 'tag');
+		element.append(this.renderIndicator());
+		let titleHolder = createElement('div', 'tagNameHolder');
+		setTextToElement(titleHolder, this.name);
+		element.append(titleHolder);
+		
+		return element;
+	}
+	renderIndicator() {
+		let indicator = createElement('div', 'tagIndicator');
+		indicator.style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA;
+		indicator.style.borderColor = this.color.hex;
+		return indicator;
+	}
+
+	transactionFitsTag(_transaction) {
+		if (!this.filter) return false;
+		return this.filter.evaluate(_transaction);
+	}
+
+	
+	setExpensesBudget(_budget) {
+		let curMonthCode = new MonthIdentifier().setFromDate(new Date()).id;
+		this.expensesBudget[curMonthCode] = _budget;
+	}
+
+	get currentExpensesBudget() {
+		let months = Object.keys(this.expensesBudget);
+		let lastDate = new Date();
+		lastDate.setYear(1970);
+		let curBudget = 0;
+		for (let monthPair of months)
+		{
+			let date = new MonthIdentifier().setFromId(monthPair).date;
+			if (date.getTime() < lastDate.getTime()) continue;
+			lastDate = date;
+			curBudget = this.expensesBudget[monthPair];
+		}
+		return curBudget;
+	}
+
+	get averageExpenses() {
+		let transactions = this.transactions;
+		let curMonth = new MonthIdentifier().setFromDate(new Date());
+		let startMonth = curMonth.date.moveMonth(-3);
+		curMonth = curMonth.date;
+
+		return -transactions.filter((t) => {
+			let date = new Date().setFromStr(t.date);
+			return date.getTime() > startMonth.getTime() && date.getTime() < curMonth.getTime();
+		}).map(t => t.deltaMoney).reduce((a, b) => a + b, 0) / 3;
+	}
+
+
+	get transactions() {
+		return TransactionManager.getByTag(this.id);
+	}
+
+	getPaymentDeficits() {
+		let months = {};
+
+		let transactions = this.transactions;
+		for (let transaction of transactions)
+		{
+			let curMonthCode = new MonthIdentifier().setFromDateString(transaction.date).id;
+			if (!months[curMonthCode]) months[curMonthCode] = 0;
+			months[curMonthCode] += transaction.deltaMoney;
+		}
+		return months;
+	}
+
+	// getBudgetDeficits() {
+	// 	let paymentDefs = this.getPaymentDeficits();
+
+
+
+
+	// }
+
+	// getBudgetByMonthId(_id) {
+	// 	if (this.#expensesBudget[_id] !== undefined) return this.#expensesBudget[_id];
+
+
+
+	// }
+
+
+	get totalExpenses() {
+		let sum = 0;
+		let transactions = this.transactions;
+		for (let transaction of transactions) sum += transaction.deltaMoney;
+		return sum;
+	}
+
+	export() {
+		return {
+			name: this.name,
+			color: this.color.hex,
+			id: this.id,
+			filter: this.filter.export(),
+			expensesBudget: this.expensesBudget,
+		}
+	}
+}
+
+export class SavingsTransactionTag extends TransactionTag {
+	isSavingsTag = true;
+	startValue = 0;
+
+	constructor({name, color, id, filter, expensesBudget, startValue = 0}) {
+		super(...arguments);
+		this.startValue = startValue;
+	}
+
+	get totalSavings() {
+		let budgetedMoney = new ExpensesBudgetInterface(this.expensesBudget).totalBudget;;
+		return this.startValue + this.totalExpenses - budgetedMoney;
+	}
+
+	export() {
+		let data = super.export();
+		data.isSavingsTag = true;
+		data.startValue = this.startValue;
+		return data;
+	}
+}
+
+
+export class NonAssignedTag extends SavingsTransactionTag {
+	isNonAssignedTag = true;
+	constructor() {
+		super({name: "Non Assigned", color: TagManager.availableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
+	}
+}
+
+
+
+export class MonthIdentifier {
+	#string;
+
+	setFromId(_id) {
+		this.#string = _id;
+		return this;
+	}
+	setFromDate(_date) {
+		this.#string = (_date.getMonth() + 1) + '/' + _date.getFullYear();
+		return this;
+	}
+	setFromDateString(_dateString) {
+		return this.setFromDate(new Date().setDateFromStr(_dateString));
+	}
+
+
+	get date() {
+		let parts = this.#string.split('/');
+		let date = new Date();
+		date.setFullYear(parseInt(parts[1]));
+		date.setMonth(parseInt(parts[0]) - 1);
+		date.setDate(1);
+		return date;
+	}
+
+	get id() {
+		return this.#string;
+	}
+}

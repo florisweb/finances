@@ -21,7 +21,6 @@
 	let maxHeight = 500;
 
 	function updatePanelPosition() {
-		console.log('try update');
 		if (!optionPanel) return;
 		const screenMargin = 20;
 		
