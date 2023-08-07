@@ -1,5 +1,7 @@
 import Color from './color';
+import { AvailableColors } from './color';
 import Date from './time';
+import TransactionManager from './data/transactionManager';
 
 export class Transaction {
 	date;
@@ -99,6 +101,18 @@ export class TransactionTag {
 		return TransactionManager.getByTag(this.id);
 	}
 
+	getTransactionsByMonth(_monthId) {
+		let found = [];
+		for (let transaction of this.transactions)
+		{
+			if (!_monthId.containsDate(transaction.date)) continue;
+			found.push(transaction);
+		}
+		return found;
+	}
+
+
+
 	getPaymentDeficits() {
 		let months = {};
 
@@ -169,12 +183,21 @@ export class SavingsTransactionTag extends TransactionTag {
 }
 
 
-export class NonAssignedTag extends SavingsTransactionTag {
+export class NonAssignedTag extends TransactionTag {
 	isNonAssignedTag = true;
 	constructor() {
-		super({name: "Non Assigned", color: TagManager.availableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
+		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
 	}
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -199,6 +222,12 @@ export class MonthIdentifier {
 	}
 	setFromDateString(_dateString) {
 		return this.setFromDate(new Date().setDateFromStr(_dateString));
+	}
+
+	containsDate(_date) {
+		let date = new Date().setDateFromStr(_date.toString())
+		let ownDate = this.date;
+		return date.dateIsBetween(ownDate, ownDate.copy().moveMonth(1));
 	}
 
 

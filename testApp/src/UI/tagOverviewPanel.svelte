@@ -21,8 +21,10 @@
 		{#if (expenses !== 0)}
 			<p>{formatMoneyString(expenses)} out</p>
 		{/if}
-		<div class='subtractLine'></div>
-		<p style={'margin-left: ' + (income - expenses < 0 ? '-2px' : '')}>{formatMoneyString(income - expenses)} netto ({formatMoneyString(budget)} budget)</p>
+		{#if (income !== 0 || expenses !== 0)}
+			<div class='subtractLine'></div>
+		{/if}
+		<p style={'margin-left: ' + (income - expenses < 0 ? '-3px' : '')}>{formatMoneyString(income - expenses)} netto ({formatMoneyString(budget)} budget)</p>
 	</div>
 </div>
 
@@ -40,6 +42,7 @@
 		background-color: #fff;
 		position: relative;
 		padding: 20px;
+		height: auto;
 
 		border: 1px solid #eee;
 		border-top: none;

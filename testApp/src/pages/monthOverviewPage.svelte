@@ -1,21 +1,50 @@
 <script>
 	import Page from "../UI/page.svelte";
-	import { MonthIdentifier } from "../types";
+	import { MonthIdentifier, NonAssignedTag } from "../types";
 	import TagManager from '../data/tagManager';
+	import TransactionManager from "../data/transactionManager";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
 
 	export let curMonth = new MonthIdentifier();
 
 
-	let tags = [];
-	TagManager.dataStore.subscribe((_tags) => tags = _tags);
+	let tagsWithMetaData = {};
+	let totalDelta = 0;
+	window.tagsWithMetaData = tagsWithMetaData;
 
-	let totalDelta = 50;
+	$: {
+		tagsWithMetaData = {};
+		totalDelta = 0;
+		for (let tag of tags)
+		{
+			let trans = tag.getTransactionsByMonth(curMonth);
+			console.log('get', trans, tag);
+			let income = trans.filter((t) => t.deltaMoney > 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
+			let expenses = -trans.filter((t) => t.deltaMoney < 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
+			console.log(tag, income, expenses);
+			tagsWithMetaData[tag.id] = {
+				in: income,
+				out: expenses,
+				transactions: trans
+			}
+
+			if (tag.isSavingsTag) continue;
+			totalDelta = income - expenses;
+		}
+	}
+	
+	let tags = [];
+	let nonAssignedTag = new NonAssignedTag();
+	TagManager.dataStore.subscribe((_tags) => {
+		tags = [...Object.assign([], _tags), nonAssignedTag]
+	});
+
 </script>
 
 <Page>
 	<div class='infoHolder'>
-		<!-- <div class={'monthSuccessIndicator' + (totalDelta > 0 ? ' positive' : (totalDelta < 0 ? ' negative' : ''))}>{(totalDelta > 0 ? '+' : '') + totalDelta}</div> -->
+		<div class={'balanceHolder' + (totalDelta > 0 ? ' positive' : (totalDelta < 0 ? ' negative' : ''))}>{(totalDelta > 0 ? '+' : '') + Math.round(totalDelta)}</div>
+		
 		<div class='monthHolder'>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))}>‹</div> 
@@ -24,11 +53,20 @@
 			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))}>›</div> 
 		</div>
 
+		<div class='buttonHolder'>
+			<div class='buttonWrapper'>
+				<div class='button'>Budgetter</div>
+			</div>
+			<div class='buttonWrapper'>
+				<div class='button'>assign {nonAssignedTag.getTransactionsByMonth(curMonth).length} transactions</div>
+			</div>
+		</div>
+
 	</div>
 
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagOverviewPanel {...tag}></TagOverviewPanel>
+			<TagOverviewPanel {...tag} income={tagsWithMetaData[tag.id].in} expenses={tagsWithMetaData[tag.id].out} totalSavings={0}></TagOverviewPanel>
 		{/each}
 	</div>
 </Page>
@@ -48,28 +86,32 @@
 		padding: 20px 0;
 		border-bottom: 1px solid #ddd;
 	}
-		.monthSuccessIndicator {
+		
+		.balanceHolder {
 			position: relative;
-			height: 80px;
-			width: auto;
-
-			padding: 10px;
-
-			font-size: 30px;
-			line-height: 50px;
-			text-align: center;
+			font-size: 40px;
+			height: 70px;
+			line-height: 70px;
 			color: #333;
+			font-style: italic;
+			padding-right: 20px;
+		}
+		.balanceHolder.positive {
+			color: #383;
+		}
+		.balanceHolder.negative {
+			color: #833;
+		}
 
-			border: 3px solid #f00;
+			.balanceHolder:before {
+				content: 'CHANGE';
+				position: absolute;
+				top: 25px;
+				right: 20px;
+				font-size: 12px;
+				white-space: nowrap;
+			}
 
-			margin-right: 20px;
-		}
-		.monthSuccessIndicator.positive {
-			color: #3a3;
-		}
-		.monthSuccessIndicator.negative {
-			color: #a33;
-		}
 
 
 		.monthHolder {
@@ -87,34 +129,28 @@
 			font-style: normal;
 			color: #999;
 			cursor: pointer;
-			margin: 0 5px;
+			margin: -10px -5px;
+			padding: 10px;
 		}
 
 	
 
-		.balanceHolder {
-			position: relative;
-			font-size: 40px;
-			height: 70px;
-			line-height: 70px;
-			color: #333;
-			font-style: italic;
-			margin-right: 60px;
-			padding-right: 20px;
-		}
 
-
-
-		.balanceHolder:before {
-			content: 'CURRENT BALANCE';
+		.buttonHolder {
 			position: absolute;
-			top: 25px;
-			right: 20px;
-			font-size: 12px;
-			white-space: nowrap;
+			float: right;
+			top: 15px;
+			right: 0;
+			display: flex;
+			flex-direction: column;
 		}
-
-
+		.buttonHolder .buttonWrapper {
+			margin-bottom: 5px;
+			text-align: right;
+		}
+		.buttonWrapper .button {
+			margin: 0;
+		}
 
 
 

@@ -30,7 +30,24 @@ const TransactionManager = new class extends DataManager {
 		let found = [];
 		for (let transaction of this.data)
 		{
-			if (transaction.typeCode !== _tagId && !(_tagId === 0 && (transaction.typeCode === undefined || transaction.typeCode === 0))) continue; 
+			if (
+				transaction.typeCode !== _tagId &&
+				!(
+					_tagId === 0 && (
+						transaction.typeCode === undefined || transaction.typeCode === 0
+					)
+				)
+			) continue; 
+			found.push(transaction);
+		}
+		return found;
+	}
+
+	getByMonth(_monthId) {
+		let found = [];
+		for (let transaction of this.data)
+		{
+			if (!_monthId.containsDate(transaction.date)) continue;
 			found.push(transaction);
 		}
 		return found;
