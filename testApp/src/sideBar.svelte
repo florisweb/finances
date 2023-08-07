@@ -12,27 +12,14 @@
 
 	<div class="item">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(0)}>
-			Transactions
-		</div>
-	</div>
-	<div class="item">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(0)}>
-			Tag Overview
+		<div class='button' on:click={() => openPageByIndex(2)}>
+			Month Overview
 		</div>
 	</div>
 	<div class="item">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class='button' on:click={() => openPageByIndex(1)}>
 			Tags
-		</div>
-	</div>
-
-	<div class="item">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(0)}>
-			Budget Manager
 		</div>
 	</div>
 

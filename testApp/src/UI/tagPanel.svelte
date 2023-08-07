@@ -3,7 +3,7 @@
 	import Color from '../color';
 
 	export let color = new Color('#000');
-	export let title = 'No title...';
+	export let name = 'No name...';
 	export let isSavingsTag;
 	export let totalSavings;
 </script>
@@ -14,11 +14,12 @@
 			'background: ' + color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA + '; ' + 
 			'border-color: ' + color.hex
 		}></div>
-		<div class='titleHolder'>{title}</div>
+		<div class='nameHolder'>{name}</div>
 	</div>
 	{#if isSavingsTag}
 		<div class='savingInfoHolder'>Savings: {formatMoneyString(totalSavings)}</div>
 	{/if}
+	<slot/>
 </div>
 
 
@@ -57,7 +58,7 @@
 			border: 1px solid #888;
 		}
 
-		.titleHolder {
+		.nameHolder {
 			position: relative;
 			height: 20px;
 			line-height: 20px;

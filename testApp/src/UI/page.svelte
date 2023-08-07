@@ -2,7 +2,7 @@
 	import { openPageIndexStore } from '../App.js';
 	import { onMount } from 'svelte';
 	import PageHeader from './pageHeader.svelte';
-	export let title;
+	export let title = false;
 	export let isOpen = false;
 
 	let self;
@@ -20,7 +20,9 @@
 </script>
 
 <div class={'page' + (!isOpen ? ' hide' : '')} bind:this={self}>
-	<PageHeader title={title}></PageHeader>
+	{#if (title !== false)}
+		<PageHeader title={title}></PageHeader>
+	{/if}
 	<slot />
 </div>
 

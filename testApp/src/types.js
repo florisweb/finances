@@ -1,5 +1,5 @@
 import Color from './color';
-
+import Date from './time';
 
 export class Transaction {
 	date;
@@ -180,6 +180,14 @@ export class NonAssignedTag extends SavingsTransactionTag {
 
 export class MonthIdentifier {
 	#string;
+
+	get name() {
+		return this.date.getMonths()[this.date.getMonth()].name + ' ' + this.date.getFullYear();
+	}
+
+	constructor() {
+		this.setFromDate(new Date());
+	}
 
 	setFromId(_id) {
 		this.#string = _id;

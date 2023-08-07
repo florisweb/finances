@@ -1,16 +1,24 @@
 <script>
 	import Page from "../UI/page.svelte";
-	import TagPanel from "../UI/tagPanel.svelte";
+	import { MonthIdentifier } from "../types";
 	import TagManager from '../data/tagManager';
+    import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
+
+	export let curMonth = new MonthIdentifier();
+
 
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 </script>
 
-<Page title="Tag Management">
+<Page>
+	<div class='infoHolder'>
+		Date: {curMonth.name}
+	</div>
+
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagPanel {...tag}></TagPanel>
+			<TagOverviewPanel {...tag}></TagOverviewPanel>
 		{/each}
 	</div>
 </Page>
