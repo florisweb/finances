@@ -2,7 +2,6 @@
 	import Page from "../UI/page.svelte";
 	import { MonthIdentifier, NonAssignedTag } from "../types";
 	import TagManager from '../data/tagManager';
-	import TransactionManager from "../data/transactionManager";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
 
 	export let curMonth = new MonthIdentifier();
@@ -10,7 +9,6 @@
 
 	let tagsWithMetaData = {};
 	let totalDelta = 0;
-	window.tagsWithMetaData = tagsWithMetaData;
 
 	$: {
 		tagsWithMetaData = {};
@@ -51,11 +49,11 @@
 			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))}>›</div> 
 		</div>
 
-		<div class='buttonHolder'>
+		<div class={'buttonHolder' + (nonAssignedTag.getTransactionsByMonth(curMonth).length === 0 ? ' noAssignableTransactions' : '')}>
 			<div class='buttonWrapper'>
 				<div class='button'>Budgetter</div>
 			</div>
-			<div class='buttonWrapper'>
+			<div class='buttonWrapper assignTransactions'>
 				<div class='button'>assign {nonAssignedTag.getTransactionsByMonth(curMonth).length} transactions</div>
 			</div>
 		</div>
@@ -71,9 +69,6 @@
 
 <style>
 	/* INFOHOLDER */
-
-
-		
 	.infoHolder {
 		position: relative;
 		display: flex;
@@ -142,13 +137,25 @@
 			display: flex;
 			flex-direction: column;
 		}
-		.buttonHolder .buttonWrapper {
-			margin-bottom: 5px;
-			text-align: right;
-		}
-		.buttonWrapper .button {
-			margin: 0;
-		}
+			.buttonHolder .buttonWrapper {
+				margin-bottom: 5px;
+				margin-top: 0;
+				text-align: right;
+				transition: .3s opacity, .3s margin-top;
+			}
+			.buttonHolder.noAssignableTransactions .buttonWrapper:not(.assignTransactions) {
+				margin-top: 25px;
+			}
+			.buttonHolder.noAssignableTransactions .buttonWrapper.assignTransactions {
+				opacity: 0;
+				margin-top: -50px;
+				pointer-events: none;
+			}
+
+				.buttonWrapper .button {
+					margin: 0;
+				}
+			
 
 
 
