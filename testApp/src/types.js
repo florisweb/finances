@@ -102,6 +102,8 @@ export class TransactionTag {
 	}
 
 	getTransactionsByMonth(_monthId) {
+		return TransactionManager.getByMonthAndTag(_monthId, this.id);
+
 		let found = [];
 		for (let transaction of this.transactions)
 		{

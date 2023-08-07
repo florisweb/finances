@@ -18,10 +18,8 @@
 		for (let tag of tags)
 		{
 			let trans = tag.getTransactionsByMonth(curMonth);
-			console.log('get', trans, tag);
 			let income = trans.filter((t) => t.deltaMoney > 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 			let expenses = -trans.filter((t) => t.deltaMoney < 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
-			console.log(tag, income, expenses);
 			tagsWithMetaData[tag.id] = {
 				in: income,
 				out: expenses,

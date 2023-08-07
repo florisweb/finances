@@ -1,10 +1,18 @@
 import DataManager from "./dataManager";
-import { Transaction } from "../types";
+import { Transaction, MonthIdentifier } from "../types";
 
 const TransactionManager = new class extends DataManager {
 	constructor() {
 		super({type: "transactions", dataToObject: (_transaction) => new Transaction(_transaction)});
 	}
+
+	#transactionsPerMonth = {};
+	async setup() {
+		await super.setup();
+		this.#catagorizeTransactionsByMonth();
+	}
+
+
 
 	set(_transactions) {
 		this._data = [];
@@ -26,9 +34,9 @@ const TransactionManager = new class extends DataManager {
 		return this.writeData();
 	}
 
-	getByTag(_tagId) {
+	getByTag(_tagId, _data = this.data) {
 		let found = [];
-		for (let transaction of this.data)
+		for (let transaction of _data)
 		{
 			if (
 				transaction.typeCode !== _tagId &&
@@ -44,13 +52,11 @@ const TransactionManager = new class extends DataManager {
 	}
 
 	getByMonth(_monthId) {
-		let found = [];
-		for (let transaction of this.data)
-		{
-			if (!_monthId.containsDate(transaction.date)) continue;
-			found.push(transaction);
-		}
-		return found;
+		return this.#transactionsPerMonth[_monthId.id] || [];
+	}
+
+	getByMonthAndTag(_monthId, _tagId) {
+		return this.getByTag(_tagId, this.getByMonth(_monthId));
 	}
 
 	async autoClassifyTransactions() {
@@ -72,6 +78,21 @@ const TransactionManager = new class extends DataManager {
 
 		App.statusMessage.open('Classified ' + newClassifies + ' new transactions (' + Math.round(classifies / this._data.length * 1000) / 10 + '% classified)')
 		return classifies;
+	}
+
+	writeData() {
+		this.#catagorizeTransactionsByMonth();
+		return super.writeData();
+	}
+
+	#catagorizeTransactionsByMonth() {
+		this.#transactionsPerMonth = {};
+		for (let transaction of this._data)
+		{
+			let monthId = new MonthIdentifier().setFromDateString(transaction.date).id;
+			if (!this.#transactionsPerMonth[monthId]) this.#transactionsPerMonth[monthId] = [];
+			this.#transactionsPerMonth[monthId] = [...this.#transactionsPerMonth[monthId], transaction];
+		}
 	}
 }
 
