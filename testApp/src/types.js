@@ -1,3 +1,5 @@
+import Color from './color';
+
 
 export class Transaction {
 	date;
@@ -45,29 +47,13 @@ export class TransactionTag {
 	id;
 	expensesBudget = {}; 
 
-	filter;
+	// filter;
 	constructor({name, color, id, filter, expensesBudget = {}}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id;
-		this.expensesBudget = expensesBudget;
-		this.filter = new TagFilter(filter);
-	}
-
-	render() {
-		let element = createElement('div', 'tag');
-		element.append(this.renderIndicator());
-		let titleHolder = createElement('div', 'tagNameHolder');
-		setTextToElement(titleHolder, this.name);
-		element.append(titleHolder);
-		
-		return element;
-	}
-	renderIndicator() {
-		let indicator = createElement('div', 'tagIndicator');
-		indicator.style.background = this.color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA;
-		indicator.style.borderColor = this.color.hex;
-		return indicator;
+		// this.expensesBudget = expensesBudget;
+		// this.filter = new TagFilter(filter);
 	}
 
 	transactionFitsTag(_transaction) {
@@ -154,8 +140,8 @@ export class TransactionTag {
 			name: this.name,
 			color: this.color.hex,
 			id: this.id,
-			filter: this.filter.export(),
-			expensesBudget: this.expensesBudget,
+			// filter: this.filter.export(),
+			// expensesBudget: this.expensesBudget,
 		}
 	}
 }

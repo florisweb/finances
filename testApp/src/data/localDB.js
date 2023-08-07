@@ -40,7 +40,6 @@ const LocalDB = new class {
   getData(_key) {
     return new Promise(function (resolve, error) {
       let store = DB.transaction(_key, "readonly").objectStore(_key);
-
       let request = store.get("IDENTIFIER");
       
       request.onsuccess = function(_e) {

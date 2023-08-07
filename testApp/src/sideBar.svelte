@@ -1,3 +1,8 @@
+<script>
+	import { openPageByIndex } from './App.js';
+
+</script>
+
 <div id='sideBar'>
 	<div class="item appLogo">
 		<div class='appLogo'>
@@ -6,30 +11,35 @@
 	</div>
 
 	<div class="item">
-		<div class='button' onclick='App.transactionListViewerPage.open(TransactionManager.data);'>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='button' on:click={() => openPageByIndex(0)}>
 			Transactions
 		</div>
 	</div>
 	<div class="item">
-		<div class='button' onclick='App.tagOverviewPage.open()'>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='button' on:click={() => openPageByIndex(0)}>
 			Tag Overview
 		</div>
 	</div>
 	<div class="item">
-		<div class='button' onclick='App.tagManagementPage.open()'>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='button' on:click={() => openPageByIndex(1)}>
 			Tags
 		</div>
 	</div>
 
 	<div class="item">
-		<div class='button budgetManagement' onclick='App.budgetManagementPage.open()'>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='button' on:click={() => openPageByIndex(0)}>
 			Budget Manager
 		</div>
 	</div>
 
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item">
-		<div class='button' onclick='App.uploadCSVPage.open()'>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='button' on:click={() => openPageByIndex(0)}>
 			Upload CSV
 		</div>	
 	</div>

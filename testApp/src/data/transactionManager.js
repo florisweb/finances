@@ -3,7 +3,7 @@ import { Transaction } from "../types";
 
 const TransactionManager = new class extends DataManager {
 	constructor() {
-		super({type: "transactions", typeClass: Transaction});
+		super({type: "transactions", dataToObject: (_transaction) => new Transaction(_transaction)});
 	}
 
 	set(_transactions) {

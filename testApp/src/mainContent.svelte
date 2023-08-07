@@ -1,10 +1,12 @@
 <script>
 	import Page from "./UI/page.svelte";
 	import UploadCsvPage from "./pages/uploadCSVPage.svelte";
+	import TagManagementPage from "./pages/tagManagementPage.svelte";
 </script>
 
 <div id='mainContent'>
 	<UploadCsvPage></UploadCsvPage>
+	<TagManagementPage></TagManagementPage>
 	<Page title={'hey there'}></Page>
 	<Page title={'hey there 2'}></Page>
 </div>
