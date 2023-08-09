@@ -1,14 +1,16 @@
 <script>
 	import { assignableTransactions, openPageByIndex } from '../App.js';
-	import { MonthIdentifier, NonAssignedTag } from "../types";
+	import { MonthIdentifier } from "../types";
+	import { getContext }from 'svelte';
 	import TagManager from '../data/tagManager';
 	import TransactionManager from '../data/transactionManager.js';
 
 	import Page from "../UI/page.svelte";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
-	import TransactionTable from "../UI/transactionTable.svelte";
     import Button from '../UI/button.svelte';
+
 	export let curMonth = new MonthIdentifier();
+	const App = getContext('App');
 	
 	let tags = [];
 	let tagsWithMetaData = {};
@@ -68,9 +70,13 @@
 
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagOverviewPanel {...tag} income={tagsWithMetaData[tag.id].in} expenses={tagsWithMetaData[tag.id].out} totalSavings={0}>
-				<TransactionTable slot='transactionTable' transactions={tagsWithMetaData[tag.id].transactions}></TransactionTable>
-			</TagOverviewPanel>
+			<TagOverviewPanel 
+				{...tag} 
+				income={tagsWithMetaData[tag.id].in} 
+				expenses={tagsWithMetaData[tag.id].out} 
+				totalSavings={0}
+				on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
+			></TagOverviewPanel>
 		{/each}
 	</div>
 </Page>

@@ -104,3 +104,20 @@ html, body {
 	}
   }
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .popupHolder.TransactionViewerPopup .popup {
+	top: 50vh !important;
+	max-width: unset !important;
+  }

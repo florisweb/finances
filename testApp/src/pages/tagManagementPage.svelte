@@ -13,7 +13,7 @@
 <Page title="Tag Management">
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagPanel tag={tag} on:click={() => App.createTagPopup.openEdit(tag)}></TagPanel>
+			<TagPanel tag={tag} on:click={() => {if (!tag.isNonAssignedTag) App.createTagPopup.openEdit(tag)}}></TagPanel>
 		{/each}
 
 		<AddTagPanel></AddTagPanel>

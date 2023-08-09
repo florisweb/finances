@@ -2,6 +2,9 @@
 	import { formatMoneyString } from '../polyfill';
 	import TagPanel from './tagPanel.svelte';
 
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher()
+
 	export let name;
 	export let color;
 	export let isSavingsTag;
@@ -9,14 +12,11 @@
 	export let income = 15;
 	export let expenses = 50;
 	export let budget = 20;
-
-
-	let showTransactions = false;
 </script>
 
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class={'tagOverviewPanel' + (showTransactions ? ' showTransactions' : '')} on:click={() => showTransactions = !showTransactions}>
+<div class='tagOverviewPanel' on:click={() => dispatch('click')}>
 	<TagPanel tag={{name: name, color: color, isSavingsTag: isSavingsTag, totalSavings: totalSavings}}></TagPanel>
 	<div class='infoHolder'>
 		{#if (income !== 0)}
@@ -29,9 +29,6 @@
 			<div class='subtractLine'></div>
 		{/if}
 		<p style={'margin-left: ' + (income - expenses < 0 ? '-3px' : '')}>{formatMoneyString(income - expenses)} netto ({formatMoneyString(budget)} budget)</p>
-	</div>
-	<div class='transactionTableHolder'>
-		<slot name='transactionTable' />
 	</div>
 </div>
 
@@ -73,33 +70,5 @@
 			color: #444;
 			margin: 0;
 			margin-left: 5px;
-		}
-
-
-	.tagOverviewPanel.showTransactions {
-		transition: .3s all;
-		
-	}
-	.tagOverviewPanel.showTransactions {
-		position: fixed;
-		top: 50vh;
-		left: 50vw;
-		z-index: 100;
-
-		transform: translate(-50%, -50%);
-		width: 80vw;
-		height: 80vh;
-		box-shadow: 10px 10px 50px 30px rgba(0, 0, 0, .1);
-	}
-	.tagOverviewPanel:not(.showTransactions) .transactionTableHolder {
-		display: none;
-	}
-	.tagOverviewPanel .transactionTableHolder {
-		position: relative;
-		width: 100%;
-		height: calc(80vh - 200px);
-		overflow: auto;
-		padding: 20px;
-	}
-	
+		}	
 </style>
