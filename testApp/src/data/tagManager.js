@@ -10,6 +10,9 @@ const TagManager = new class extends DataManager {
 
 		window.TagManager = this;
 	}
+	getById(_id) {
+		return this._data.find((_tag) => _tag.id === _id);
+	}
 	
 	set(_tags) {
 		this._data = _tags;

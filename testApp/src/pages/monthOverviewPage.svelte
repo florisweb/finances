@@ -1,9 +1,11 @@
 <script>
-	import Page from "../UI/page.svelte";
+	import { assignableTransactions, openPageByIndex } from '../App.js';
 	import { MonthIdentifier, NonAssignedTag } from "../types";
 	import TagManager from '../data/tagManager';
-    import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
 
+	import Page from "../UI/page.svelte";
+    import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
+	import TransactionTable from "../UI/transactionTable.svelte";
 	export let curMonth = new MonthIdentifier();
 
 
@@ -23,6 +25,7 @@
 				out: expenses,
 				transactions: trans
 			}
+			window.t = tagsWithMetaData;
 
 			if (tag.isSavingsTag) continue;
 			totalDelta = income - expenses;
@@ -34,7 +37,6 @@
 	TagManager.dataStore.subscribe((_tags) => {
 		tags = [...Object.assign([], _tags), nonAssignedTag]
 	});
-
 </script>
 
 <Page>
@@ -53,7 +55,11 @@
 			<div class='buttonWrapper'>
 				<div class='button'>Budgetter</div>
 			</div>
-			<div class='buttonWrapper assignTransactions'>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<div class='buttonWrapper assignTransactions' on:click={() => {
+				assignableTransactions.set(nonAssignedTag.getTransactionsByMonth(curMonth));
+				openPageByIndex(3);
+			}}>
 				<div class='button'>assign {nonAssignedTag.getTransactionsByMonth(curMonth).length} transactions</div>
 			</div>
 		</div>
@@ -62,7 +68,9 @@
 
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagOverviewPanel {...tag} income={tagsWithMetaData[tag.id].in} expenses={tagsWithMetaData[tag.id].out} totalSavings={0}></TagOverviewPanel>
+			<TagOverviewPanel {...tag} income={tagsWithMetaData[tag.id].in} expenses={tagsWithMetaData[tag.id].out} totalSavings={0}>
+				<TransactionTable slot='transactionTable' transactions={tagsWithMetaData[tag.id].transactions}></TransactionTable>
+			</TagOverviewPanel>
 		{/each}
 	</div>
 </Page>

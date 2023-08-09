@@ -5,13 +5,15 @@
 	export let customClass;
 	export let isOpen = false;
 	export let options;
+	export let value = false;
 
-	let selectedOption = {
-		value: false,
-		contentHTML: 'No option selected'
+	$: dispatch('change', value);
+	let selectedOptionContentHTML = 'No option selected';
+	$: {
+		console.log('update value', value);
+		selectedOptionContentHTML = options.find((_opt) => _opt.value === value)?.contentHTML || 'No option selected';
 	}
 
-	$: dispatch('change', selectedOption.value);
 	$: if (isOpen) updatePanelPosition();
 
 	
@@ -41,7 +43,13 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class='button' on:click={() => isOpen = !isOpen}>
 		<img src='images/dropDownIconDark.png' alt="Dropdown icon." class='dropDownIcon'>
-		<div class='contentHolder'>{selectedOption.contentHTML}</div>
+		<div class='contentHolder'>
+			{#if (typeof selectedOptionContentHTML === 'object')}
+				<svelte:component this={selectedOptionContentHTML.component} {...selectedOptionContentHTML.config}/>
+			{:else}
+				{selectedOptionContentHTML}
+			{/if}
+		</div>
 	</div>
 	<div 
 		bind:this={optionPanel}
@@ -50,7 +58,13 @@
 	>
 		{#each options as option}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class='option' on:click={() => {selectedOption = option; isOpen = false}}>{option.contentHTML}</div>
+			<div class='option' on:click={() => {value = option.value; isOpen = false}}>
+				{#if (typeof option.contentHTML === 'object')}
+					<svelte:component this={option.contentHTML.component} {...option.contentHTML.config}/>
+				{:else}
+					{option.contentHTML}
+				{/if}
+			</div>
 		{/each}
 	</div>
 </div>
@@ -60,7 +74,6 @@
 <style>
 	.wrapper {
 		position: relative;
-		margin: 200px;
 	}
 
 

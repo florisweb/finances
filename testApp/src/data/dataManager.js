@@ -7,7 +7,7 @@ export default class DataManager {
 	#dataToObject;
 	_data = [];
 	#dataWriteStore = writable([]);
-	dataStore;
+	dataStore = readonly(this.#dataWriteStore);
 
 	get data() {
 		return this._data;
@@ -19,7 +19,6 @@ export default class DataManager {
 	}
 
 	constructor({type, dataToObject}) {
-		this.dataStore = readonly(this.#dataWriteStore);
 		this.type = type;
 		this.#dataToObject = dataToObject;
 		LocalDB.ready().then(() => this.setup());
