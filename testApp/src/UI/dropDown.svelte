@@ -126,7 +126,7 @@
 		min-width: 120px;
 		height: auto;
 
-		padding: 5px 20px;
+		padding: 10px 15px;
 
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .05);
 		border: 1px solid #eee;
@@ -158,6 +158,10 @@
 	.option {
 		cursor: pointer;
 	}
+	.option:not(:first-child) {
+		margin-top: 10px;
+	}
+
 	.option > a {
 		position: relative;
 		height: 20px;

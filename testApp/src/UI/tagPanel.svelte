@@ -1,6 +1,7 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
 	import Color from '../color';
+    import Tag from './tag.svelte';
 
 	export let color = new Color('#000');
 	export let name = 'No name...';
@@ -9,13 +10,7 @@
 </script>
 
 <div class='tagPanel' style={'border-bottom-color: ' + color.hex}>
-	<div class='tagHolder'>
-		<div class='indicator' style={
-			'background: ' + color.copy().merge(new Color('rgba(255, 255, 255, 0)'), .4).RGBA + '; ' + 
-			'border-color: ' + color.hex
-		}></div>
-		<div class='nameHolder'>{name}</div>
-	</div>
+	<Tag {color} {name}></Tag>
 	{#if isSavingsTag}
 		<div class='savingInfoHolder'>Savings: {formatMoneyString(totalSavings)}</div>
 	{/if}
