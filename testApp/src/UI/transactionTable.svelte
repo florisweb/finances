@@ -28,6 +28,7 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		border-collapse: collapse;
+		border-spacing: 10px 0;
 	}
 
 	th {

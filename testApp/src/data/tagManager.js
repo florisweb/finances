@@ -1,5 +1,5 @@
 import DataManager from "./dataManager";
-import { TransactionTag, SavingsTransactionTag } from "../types";
+import { TransactionTag, SavingsTransactionTag, NonAssignedTag } from "../types";
 
 const TagManager = new class extends DataManager {
 	constructor() {
@@ -7,8 +7,6 @@ const TagManager = new class extends DataManager {
 			if (_tag.isSavingsTag) return new SavingsTransactionTag(...arguments);
 			return new TransactionTag(...arguments);
 		}});
-
-		window.TagManager = this;
 	}
 	getById(_id) {
 		return this._data.find((_tag) => _tag.id === _id);
@@ -17,6 +15,10 @@ const TagManager = new class extends DataManager {
 	set(_tags) {
 		this._data = _tags;
 		return this.writeData();
+	}
+
+	_setStore(_tags) {
+		return super._setStore([..._tags, new NonAssignedTag()]);
 	}
 }
 

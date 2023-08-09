@@ -4,7 +4,8 @@
 	import TagManager from "../data/tagManager";
 	import { createEventDispatcher } from 'svelte';
 	
-	export let value;
+	export let value = 0;
+	console.log('new value', value);
 	const dispatch = createEventDispatcher();
 	$: dispatch('change', value);
 	

@@ -40,5 +40,6 @@
 			font-size: 13px;
 			color: #444;
 			margin-left: 5px;
+			white-space: nowrap;
 		}
 </style>

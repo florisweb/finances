@@ -34,9 +34,7 @@
 	
 	let tags = [];
 	let nonAssignedTag = new NonAssignedTag();
-	TagManager.dataStore.subscribe((_tags) => {
-		tags = [...Object.assign([], _tags), nonAssignedTag]
-	});
+	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 </script>
 
 <Page>

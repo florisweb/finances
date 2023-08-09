@@ -14,15 +14,14 @@
 
 	let curTag;
 	$: curTag = TagManager.getById(typeCode);
-	$: console.warn('update', curTag);
 </script>
 
 
 <tr class={'transaction' + (' classificationState_' + classificationState)}>
 	<td class='dateTD'>{date}</td>
-	<td>{formatMoneyString(deltaMoney)}</td>
+	<td class='moneyTD'>{formatMoneyString(deltaMoney)}</td>
 	<td><TagSelectDropDown value={curTag}></TagSelectDropDown></td>
-	<td>{targetName + (targetIBAN ? `(${targetIBAN})` : '')}</td>
+	<td>{targetName + (targetIBAN ? ` (${targetIBAN})` : '')}</td>
 	<td>{description}</td>
 </tr>
 
@@ -37,9 +36,19 @@
 		line-height: 20px;
 		font-size: 13px;
 		color: #444;
+		
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+	td:not(:last-child) {
+		padding-right: 10px;
 	}
 	td.dateTD {
-		min-width: 90px;
+		min-width: 100px;
+	}
+	td.moneyTD {
+		white-space: nowrap;
+		overflow-wrap: unset;
 	}
 	
 

@@ -28,15 +28,19 @@ export default class DataManager {
 		let response = await LocalDB.getData(this.type);
 		if (!response) return console.warn('An error accured while loading ', this.type, response);		
 		this._data = response.map(dataPoint => this.#dataToObject(dataPoint));
-		this.#dataWriteStore.set(this._data);
+		this._setStore(this._data);
 	}
 
 
 	async writeData() {
-		this.#dataWriteStore.set(this._data);
+		this._setStore(this._data);
 		this.dataCount = this._data.length;
 		this._data.length = this._data.length;
 		return LocalDB.setData(this.type, this._data.map(t => t.export()));
+	}
+
+	_setStore(_data) {
+		this.#dataWriteStore.set(_data);
 	}
 
 	async clear() {

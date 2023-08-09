@@ -9,10 +9,7 @@
 
 	$: dispatch('change', value);
 	let selectedOptionContentHTML = 'No option selected';
-	$: {
-		console.log('update value', value);
-		selectedOptionContentHTML = options.find((_opt) => _opt.value === value)?.contentHTML || 'No option selected';
-	}
+	$: selectedOptionContentHTML = options.find((_opt) => _opt.value === value)?.contentHTML || 'No option selected';
 
 	$: if (isOpen) updatePanelPosition();
 
@@ -90,7 +87,9 @@
 		background: #fff;
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
 		border: 1px solid #eee;
-
+		
+		margin: 0;
+		
 		cursor: pointer;
 	}
 
