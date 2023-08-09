@@ -114,6 +114,7 @@
 		line-height: 20px;
 		width: auto;
 		overflow: hidden;
+		color: #333;
 	}
 
 
