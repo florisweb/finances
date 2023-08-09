@@ -7,6 +7,7 @@
 	import Page from "../UI/page.svelte";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
 	import TransactionTable from "../UI/transactionTable.svelte";
+    import Button from '../UI/button.svelte';
 	export let curMonth = new MonthIdentifier();
 	
 	let tags = [];
@@ -52,14 +53,14 @@
 
 		<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
 			<div class='buttonWrapper'>
-				<div class='button'>Budgetter</div>
+				<Button name='Budgetter'></Button>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class='buttonWrapper assignTransactions' on:click={() => {
 				assignableTransactions.set(nonAssignedTransactions);
 				openPageByIndex(3);
 			}}>
-				<div class='button'>assign {nonAssignedTransactions.length} transactions</div>
+				<Button name={`assign ${nonAssignedTransactions.length} transactions`}></Button>
 			</div>
 		</div>
 

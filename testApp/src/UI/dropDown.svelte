@@ -74,7 +74,7 @@
 	/* BUTTON */
 	.wrapper .button {
 		position: relative;
-		display: flex;
+		display: inline-flex;
 		
 		width: auto;
 		height: 35px;

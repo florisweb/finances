@@ -12,12 +12,11 @@
 
 
 	let isOpen = false;
+	let inEditMode = false;
 	let curTag = new TransactionTag({
 		name: null,
 		color: AvailableColors[0].color,
 	});
-	let inEditMode = false;
-
 
 	export function open() {
 		isOpen = true;
@@ -45,6 +44,7 @@
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false}>
 	<Header slot='header' title={(inEditMode ? 'Edit' : 'Create') + ' Tag'}></Header>
+	<br><br>
 	<DropDown on:change={(_event) => curTag.color = _event.detail} value={curTag.color} options={AvailableColors.map((_colorSet) => {
 		return {
 			value: _colorSet.color,
@@ -54,12 +54,13 @@
 			}
 		}
 	})}></DropDown>
-
+	<br>
 	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} placeholder='Tag name...'></Input>
-	
+	<br>
+	<br>
 	<div class='buttonHolder'>
 		<Button name='Save' on:click={() => {saveTag(); console.log('create')}}></Button>
-		<Button name='Cancel' on:click={() => {isOpen = false; console.log('cancel')}}></Button>
+		<Button name='Cancel' filled={false} on:click={() => {isOpen = false; console.log('cancel')}}></Button>
 	</div>
 </Popup>
 

@@ -17,7 +17,7 @@
 	input {
 		position: relative;
 		
-		width: auto;
+		width: 100%;
 		height: 35px;
 		padding: 7.5px;
 
@@ -25,9 +25,5 @@
 		background: #fff;
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
 		border: 1px solid #eee;
-
-		margin-top: 0;
-		opacity: 1;
-		transition: opacity .2s, margin-top .2s;
 	}
 </style>
