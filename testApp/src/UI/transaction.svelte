@@ -1,8 +1,6 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
 	import TagSelectDropDown from './tagSelectDropDown.svelte';
-	import TransactionManager from '../data/transactionManager';
-
 	export let transaction;
 </script>
 

@@ -177,8 +177,9 @@ export class SavingsTransactionTag extends TransactionTag {
 	}
 
 	get totalSavings() {
-		let budgetedMoney = new ExpensesBudgetInterface(this.expensesBudget).totalBudget;;
-		return this.startValue + this.totalExpenses - budgetedMoney;
+		return 0;
+		// let budgetedMoney = new ExpensesBudgetInterface(this.expensesBudget).totalBudget;;
+		// return this.startValue + this.totalExpenses - budgetedMoney;
 	}
 
 	export() {

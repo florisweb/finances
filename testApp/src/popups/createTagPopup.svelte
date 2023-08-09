@@ -5,9 +5,10 @@
 	import ColorCircleSet from "../UI/colorCircleSet.svelte";
     import Input from "../UI/input.svelte";
     import Button from "../UI/button.svelte";
+    import Checkbox from "../UI/checkbox.svelte";
 
 	import TagManager from "../data/tagManager";
-	import { TransactionTag } from "../types";
+	import { TransactionTag, SavingsTransactionTag } from "../types";
 	import { AvailableColors } from '../color';
 
 
@@ -37,9 +38,13 @@
 	}
 
 	function saveTag() {
-		TagManager.add(new TransactionTag(curTag));
+		let constructor = curTag.isSavingsTag ? SavingsTransactionTag : TransactionTag;
+		TagManager.add(new constructor(curTag));
 		close();
 	}
+
+
+	$: console.log('change isSavings', curTag.isSavingsTag);
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false}>
@@ -54,6 +59,8 @@
 			}
 		}
 	})}></DropDown>
+	<br>
+	<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
 	<br>
 	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} placeholder='Tag name...'></Input>
 	<br>

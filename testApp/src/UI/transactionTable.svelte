@@ -1,8 +1,6 @@
 <script>
 	import Transaction from "./Transaction.svelte";
-
 	export let transactions = [];
-
 </script>
 
 <table class='transactionTable'>

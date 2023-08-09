@@ -34,4 +34,9 @@
 		animation: panelFadeIn .45s;
 		animation-fill-mode: forwards;
 	}
+	.savingInfoHolder {
+		color: #444;
+		font-size: 12px;
+		margin-left: 23px;
+	}
 </style>
