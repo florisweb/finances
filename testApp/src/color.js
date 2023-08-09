@@ -4,7 +4,10 @@ export default class Color {
   constructor(_str) {
     this.value = this.#setColorValue(_str);
   }
-
+  get id() {
+    return this.RGBA;
+  }
+  
   copy() {
     return new Color(this.RGBA);
   }

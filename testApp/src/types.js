@@ -2,6 +2,7 @@ import Color from './color';
 import { AvailableColors } from './color';
 import Date from './time';
 import TransactionManager from './data/transactionManager';
+import { newId } from './polyfill';
 
 export class Transaction {
 	date;
@@ -21,7 +22,7 @@ export class Transaction {
 		Object.assign(this, _params);
 	}
 
-	get identifier() {
+	get id() {
 		return this.date + this.deltaMoney + this.targetIBAN + this.description;
 	}
 
@@ -57,7 +58,7 @@ export class TransactionTag {
 	constructor({name, color, id, filter, expensesBudget = {}}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
-		this.id = id;
+		this.id = id ?? newId();
 		// this.expensesBudget = expensesBudget;
 		// this.filter = new TagFilter(filter);
 	}

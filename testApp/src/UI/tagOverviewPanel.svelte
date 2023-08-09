@@ -17,7 +17,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class={'tagOverviewPanel' + (showTransactions ? ' showTransactions' : '')} on:click={() => showTransactions = !showTransactions}>
-	<TagPanel name={name} color={color} isSavingsTag={isSavingsTag} totalSavings={totalSavings}></TagPanel>
+	<TagPanel tag={{name: name, color: color, isSavingsTag: isSavingsTag, totalSavings: totalSavings}}></TagPanel>
 	<div class='infoHolder'>
 		{#if (income !== 0)}
 			<p>{formatMoneyString(income)} in</p>

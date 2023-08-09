@@ -1,6 +1,6 @@
 <script>
 	import { openPageByIndex } from './App.js';
-
+	import Button from './UI/button.svelte';
 </script>
 
 <div id='sideBar'>
@@ -11,24 +11,15 @@
 	</div>
 
 	<div class="item">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(2)}>
-			Month Overview
-		</div>
+		<Button name='Month Overview' on:click={() => openPageByIndex(2)}></Button>
 	</div>
 	<div class="item">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(1)}>
-			Tags
-		</div>
+		<Button name='Tags' on:click={() => openPageByIndex(1)}></Button>
 	</div>
 
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class='button' on:click={() => openPageByIndex(0)}>
-			Upload CSV
-		</div>	
+		<Button name='Upload CSV' on:click={() => openPageByIndex(0)}></Button>
 	</div>
 </div>
 

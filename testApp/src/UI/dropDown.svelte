@@ -6,11 +6,10 @@
 	export let isOpen = false;
 	export let options;
 	export let value = false;
+	
 	let selectedOptionContentHTML = 'No option selected';
-	$: selectedOptionContentHTML = options.find((_opt) => _opt.value === value)?.contentHTML || 'No option selected';
-
+	$: selectedOptionContentHTML = options.find((_opt) => _opt.value === value || _opt.value.id === value.id)?.contentHTML || 'No option selected';	
 	$: if (isOpen) updatePanelPosition();
-
 	
 	let optionPanel;
 	let openAbove = true;

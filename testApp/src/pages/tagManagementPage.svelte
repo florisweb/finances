@@ -2,6 +2,7 @@
 	import Page from "../UI/page.svelte";
 	import TagPanel from "../UI/tagPanel.svelte";
 	import TagManager from '../data/tagManager';
+	import AddTagPanel from "../UI/addTagPanel.svelte";
 
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
@@ -10,8 +11,10 @@
 <Page title="Tag Management">
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagPanel {...tag}></TagPanel>
+			<TagPanel tag={tag}></TagPanel>
 		{/each}
+
+		<AddTagPanel></AddTagPanel>
 	</div>
 </Page>
 

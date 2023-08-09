@@ -1,18 +1,19 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
+	import { getContext } from 'svelte';
 	import Color from '../color';
     import Tag from './tag.svelte';
 
-	export let color = new Color('#000');
-	export let name = 'No name...';
-	export let isSavingsTag;
-	export let totalSavings;
+	export let tag;
+
+	let App = getContext('App');
 </script>
 
-<div class='tagPanel' style={'border-bottom-color: ' + color.hex}>
-	<Tag {color} {name}></Tag>
-	{#if isSavingsTag}
-		<div class='savingInfoHolder'>Savings: {formatMoneyString(totalSavings)}</div>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class='tagPanel' style={'border-bottom-color: ' + tag.color.hex} on:click={() => App.createTagPopup.openEdit(tag)}>
+	<Tag color={tag.color} name={tag.name}></Tag>
+	{#if tag.isSavingsTag}
+		<div class='savingInfoHolder'>Savings: {formatMoneyString(tag.totalSavings)}</div>
 	{/if}
 	<slot/>
 </div>

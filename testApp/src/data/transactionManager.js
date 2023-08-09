@@ -28,7 +28,7 @@ const TransactionManager = new class extends DataManager {
 		for (let ts of _transactions) 
 		{
 			if (!ts.date || ts.targetIBAN === undefined) continue;
-			let index = this._data.findIndex((_ts) => _ts.identifier === ts.identifier);
+			let index = this._data.findIndex((_ts) => _ts.id === ts.id);
 			if (index !== -1) 
 			{
 				this._data[index] = ts;

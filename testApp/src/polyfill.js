@@ -13,3 +13,6 @@ export function formatMoneyString(_money, _addEuroSign = true) {
 }
 
 
+export function newId() {
+	return String(Math.round(Math.random() * 1000000000000));
+}

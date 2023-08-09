@@ -1,9 +1,11 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 	export let isOpen = false;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class={'popupHolder' + (!isOpen ? ' hide' : '')} on:click|self={() => isOpen = false}>
+<div class={'popupHolder' + (!isOpen ? ' hide' : '')} on:click|self={() => dispatch('passiveClose')}>
 	<div class='popup'>
 		<slot name='header'/>
 		<slot/>

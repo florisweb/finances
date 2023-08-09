@@ -17,6 +17,21 @@ const TagManager = new class extends DataManager {
 		return this.writeData();
 	}
 
+	add(_tags) {
+		if (typeof _tags.length !== 'number') _tags = [_tags];
+		for (let tag of _tags) 
+		{
+			let index = this._data.findIndex((_tag) => _tag.id === tag.id);
+			if (index !== -1) 
+			{
+				this._data[index] = tag;
+				continue;
+			}
+			this._data.push(tag);
+		}
+		return this.writeData();
+	}
+
 	_setStore(_tags) {
 		return super._setStore([..._tags, new NonAssignedTag()]);
 	}
