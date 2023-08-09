@@ -6,8 +6,6 @@
 	export let isOpen = false;
 	export let options;
 	export let value = false;
-
-	$: dispatch('change', value);
 	let selectedOptionContentHTML = 'No option selected';
 	$: selectedOptionContentHTML = options.find((_opt) => _opt.value === value)?.contentHTML || 'No option selected';
 
@@ -55,7 +53,7 @@
 	>
 		{#each options as option}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class='option' on:click={() => {value = option.value; isOpen = false}}>
+			<div class='option' on:click={() => {value = option.value; dispatch('change', value); isOpen = false}}>
 				{#if (typeof option.contentHTML === 'object')}
 					<svelte:component this={option.contentHTML.component} {...option.contentHTML.config}/>
 				{:else}

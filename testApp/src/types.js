@@ -5,7 +5,7 @@ import TransactionManager from './data/transactionManager';
 
 export class Transaction {
 	date;
-	typeCode;
+	typeCode = 0;
 	targetIBAN = '';
 	targetName = '';
 	deltaMoney;
@@ -14,15 +14,19 @@ export class Transaction {
 	bankClassification = '';
 	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
 
-
 	constructor(_params) {
 		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
 		_params.balance 	= parseFloat(_params.balance);
+		_params.typeCode 	= _params.typeCode ?? 0;
 		Object.assign(this, _params);
 	}
 
 	get identifier() {
 		return this.date + this.deltaMoney + this.targetIBAN + this.description;
+	}
+
+	update() {
+		TransactionManager.add(this);
 	}
 
 

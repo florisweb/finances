@@ -2,17 +2,19 @@
 	import { assignableTransactions, openPageByIndex } from '../App.js';
 	import { MonthIdentifier, NonAssignedTag } from "../types";
 	import TagManager from '../data/tagManager';
+	import TransactionManager from '../data/transactionManager.js';
 
 	import Page from "../UI/page.svelte";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
 	import TransactionTable from "../UI/transactionTable.svelte";
 	export let curMonth = new MonthIdentifier();
-
-
+	
+	let tags = [];
 	let tagsWithMetaData = {};
-	let totalDelta = 0;
+	let nonAssignedTransactions = [];
 
-	$: {
+	let totalDelta = 0;
+	function catagorizeTransactions() {
 		tagsWithMetaData = {};
 		totalDelta = 0;
 		for (let tag of tags)
@@ -25,16 +27,15 @@
 				out: expenses,
 				transactions: trans
 			}
-			window.t = tagsWithMetaData;
-
+			if (tag.id === 0) nonAssignedTransactions = trans;
 			if (tag.isSavingsTag) continue;
-			totalDelta = income - expenses;
+			totalDelta += income - expenses;
 		}
 	}
-	
-	let tags = [];
-	let nonAssignedTag = new NonAssignedTag();
-	TagManager.dataStore.subscribe((_tags) => tags = _tags);
+
+	$: curMonth && catagorizeTransactions();
+	TagManager.dataStore.subscribe((_tags) => {tags = _tags; catagorizeTransactions()});
+	TransactionManager.dataStore.subscribe(() => {catagorizeTransactions()});
 </script>
 
 <Page>
@@ -49,16 +50,16 @@
 			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))}>›</div> 
 		</div>
 
-		<div class={'buttonHolder' + (nonAssignedTag.getTransactionsByMonth(curMonth).length === 0 ? ' noAssignableTransactions' : '')}>
+		<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
 			<div class='buttonWrapper'>
 				<div class='button'>Budgetter</div>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class='buttonWrapper assignTransactions' on:click={() => {
-				assignableTransactions.set(nonAssignedTag.getTransactionsByMonth(curMonth));
+				assignableTransactions.set(nonAssignedTransactions);
 				openPageByIndex(3);
 			}}>
-				<div class='button'>assign {nonAssignedTag.getTransactionsByMonth(curMonth).length} transactions</div>
+				<div class='button'>assign {nonAssignedTransactions.length} transactions</div>
 			</div>
 		</div>
 

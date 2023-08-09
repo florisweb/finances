@@ -1,28 +1,22 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
 	import TagSelectDropDown from './tagSelectDropDown.svelte';
-	import TagManager from '../data/tagManager';
+	import TransactionManager from '../data/transactionManager';
 
-	export let date;
-	export let description = 'No description...';
-	export let targetIBAN;
-	export let targetName;
-	export let deltaMoney = 0;
-	export let classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
-	export let typeCode = 0;
-	// export let transactionTag;
-
-	let curTag;
-	$: curTag = TagManager.getById(typeCode);
+	export let transaction;
 </script>
 
-
-<tr class={'transaction' + (' classificationState_' + classificationState)}>
-	<td class='dateTD'>{date}</td>
-	<td class='moneyTD'>{formatMoneyString(deltaMoney)}</td>
-	<td><TagSelectDropDown value={curTag}></TagSelectDropDown></td>
-	<td>{targetName + (targetIBAN ? ` (${targetIBAN})` : '')}</td>
-	<td>{description}</td>
+<tr class={'transaction' + (' classificationState_' + transaction.classificationState)}>
+	<td><div class='dateHolder'>{transaction.date}</div></td>
+	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
+	<td><TagSelectDropDown value={transaction.typeCode} on:change={(_event) => {
+			transaction.typeCode = _event.detail || transaction.typeCode;
+			transaction.classificationState = 2;
+			transaction.update() // Updates the transaction
+		}
+	}></TagSelectDropDown></td>
+	<td>{transaction.targetName + (transaction.targetIBAN ? ` (${transaction.targetIBAN})` : '')}</td>
+	<td>{transaction.description}</td>
 </tr>
 
 
@@ -30,6 +24,7 @@
 	.transaction:not(:last-child) {
 		border-bottom: 1px solid #ddd;
 	}
+
 	td {
 		position: relative;
 		height: 20px;
@@ -43,22 +38,27 @@
 	td:not(:last-child) {
 		padding-right: 10px;
 	}
-	td.dateTD {
-		min-width: 100px;
-	}
 	td.moneyTD {
 		white-space: nowrap;
 		overflow-wrap: unset;
 	}
-	
 
-	.classificationState_0 td:first-child {
+
+	.dateHolder {
+		position: relative;
+		min-width: 100px;
+		height: 30px;
+		line-height: 20px;
+		padding: 5px 0;
+		padding-left: 7px;
+
 		border-left: 3px solid transparent;
+		transition: .2s border-left-color;
 	}
-	.classificationState_1 td:first-child {
-		border-left: 3px solid red;
+	.classificationState_1 .dateHolder {
+		border-left-color: red;
 	}
-	.classificationState_2 td:first-child {
-		border-left: 3px solid #daf;
-	}
+	.classificationState_2 .dateHolder {
+		border-left-color: #daf;
+	}	
 </style>

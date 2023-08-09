@@ -16,8 +16,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each transactions as trans}
-			<Transaction {...trans}></Transaction>
+		{#each transactions as transaction}
+			<Transaction {transaction}></Transaction>
 		{/each}
 	</tbody>
 </table>
@@ -28,7 +28,6 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		border-collapse: collapse;
-		border-spacing: 10px 0;
 	}
 
 	th {
