@@ -2,7 +2,8 @@
 	export let isOpen = false;
 </script>
 
-<div class={'popupHolder' + (!isOpen ? ' hide' : '')}>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class={'popupHolder' + (!isOpen ? ' hide' : '')} on:click|self={() => isOpen = false}>
 	<div class='popup'>
 		<slot name='header'/>
 		<slot/>
