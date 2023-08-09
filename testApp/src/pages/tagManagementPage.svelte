@@ -3,6 +3,8 @@
 	import TagPanel from "../UI/tagPanel.svelte";
 	import TagManager from '../data/tagManager';
 	import AddTagPanel from "../UI/addTagPanel.svelte";
+	import { getContext } from 'svelte';
+	const App = getContext('App');
 
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
@@ -11,7 +13,7 @@
 <Page title="Tag Management">
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagPanel tag={tag}></TagPanel>
+			<TagPanel tag={tag} on:click={() => App.createTagPopup.openEdit(tag)}></TagPanel>
 		{/each}
 
 		<AddTagPanel></AddTagPanel>

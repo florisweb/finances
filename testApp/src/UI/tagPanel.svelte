@@ -1,16 +1,14 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
-	import { getContext } from 'svelte';
-	import Color from '../color';
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
     import Tag from './tag.svelte';
 
 	export let tag;
-
-	let App = getContext('App');
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class='tagPanel' style={'border-bottom-color: ' + tag.color.hex} on:click={() => App.createTagPopup.openEdit(tag)}>
+<div class='tagPanel' style={'border-bottom-color: ' + tag.color.hex} on:click={(_event) => dispatch('click', _event)}>
 	<Tag color={tag.color} name={tag.name}></Tag>
 	{#if tag.isSavingsTag}
 		<div class='savingInfoHolder'>Savings: {formatMoneyString(tag.totalSavings)}</div>

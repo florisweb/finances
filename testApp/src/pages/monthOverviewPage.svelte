@@ -160,12 +160,6 @@
 				pointer-events: none;
 			}
 
-				.buttonWrapper .button {
-					margin: 0;
-				}
-			
-
-
 
 	/* Tag List */
 	.tagListHolder {
