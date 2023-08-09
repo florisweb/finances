@@ -97,6 +97,8 @@
 	.tagOverviewPanel .transactionTableHolder {
 		position: relative;
 		width: 100%;
+		height: calc(80vh - 200px);
+		overflow: auto;
 		padding: 20px;
 	}
 	

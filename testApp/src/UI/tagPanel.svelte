@@ -35,30 +35,4 @@
 		animation: panelFadeIn .45s;
 		animation-fill-mode: forwards;
 	}
-
-
-	.tagHolder {
-		display: flex;
-		height: 20px;
-		width: auto;
-	}
-		
-		.indicator {
-			position: relative;
-			width: 16px;
-			height: 16px;
-			border-radius: 100%;
-			margin: 2px;
-			margin-left: 0;
-			border: 1px solid #888;
-		}
-
-		.nameHolder {
-			position: relative;
-			height: 20px;
-			line-height: 20px;
-			font-size: 13px;
-			color: #444;
-			margin-left: 5px;
-		}
 </style>

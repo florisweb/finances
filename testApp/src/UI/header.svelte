@@ -1,19 +1,9 @@
 <script>
 	export let title;
 </script>
-<div class="pageHeader">
-	<div class="titleHolder">{title}</div>
-	<slot />
-</div>
+<div class="titleHolder">{title}</div>
 
 <style>
-	.pageHeader {
-		position: relative;
-		width: 100%;
-		padding: 20px;
-		padding-bottom: 10px;
-	}
-
 	.titleHolder {
 		position: relative;
 		height: 30px;

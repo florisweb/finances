@@ -1,7 +1,7 @@
 <script>
 	import { openPageIndexStore } from '../App.js';
 	import { onMount } from 'svelte';
-	import PageHeader from './pageHeader.svelte';
+	import Header from './header.svelte';
 	export let title = false;
 	export let isOpen = false;
 
@@ -21,7 +21,9 @@
 
 <div class={'page' + (!isOpen ? ' hide' : '')} bind:this={self}>
 	{#if (title !== false)}
-		<PageHeader title={title}></PageHeader>
+		<div class="pageHeader">
+			<Header title={title}></Header>
+		</div>
 	{/if}
 	<slot />
 </div>
@@ -45,5 +47,12 @@
 		opacity: 0;
 		pointer-events: none;
 		margin-top: 30px;
+	}
+
+	.pageHeader {
+		position: relative;
+		width: 100%;
+		padding: 20px;
+		padding-bottom: 10px;
 	}
 </style>

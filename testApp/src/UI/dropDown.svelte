@@ -159,13 +159,4 @@
 	.option:not(:first-child) {
 		margin-top: 10px;
 	}
-
-	.option > a {
-		position: relative;
-		height: 20px;
-		line-height: 20px;
-		font-size: 13px;
-		color: #444;
-		margin-left: -5px;
-	}
 </style>
