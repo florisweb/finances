@@ -16,3 +16,9 @@ export function formatMoneyString(_money, _addEuroSign = true) {
 export function newId() {
 	return String(Math.round(Math.random() * 1000000000000));
 }
+
+export function wait(_dt) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, _dt);
+	});
+}

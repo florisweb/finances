@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
+	import { wait } from '../polyfill';
 
 	export let customClass;
 	export let isOpen = false;
@@ -20,30 +21,46 @@
 	$: if (isOpen) updatePanelPosition();
 	
 	let optionPanel;
-	let openAbove = true;
+	let button;
+	let openAbove = false;
 	let top = 0;
 	let maxHeight = 500;
-
-	function updatePanelPosition() {
-		if (!optionPanel) return;
-		const screenMargin = 20;
-		
-		let box = optionPanel.getBoundingClientRect();
-		let panelHeight = optionPanel.offsetHeight;
 	
-		let topSpaceLeft = box.top - panelHeight - screenMargin;
-		let bottomSpaceLeft = window.innerHeight - (box.top + panelHeight) - screenMargin;
+	window.setAbove = (x) => openAbove = x;
+	window.update = updatePanelPosition;
+	async function updatePanelPosition() {
+		if (!optionPanel || !button) return;
+		const screenMargin = 20;
+
+		top = 0;
+		openAbove = false;
+		await wait(0);
+		let buttonTop = button.getBoundingClientRect().top;
+		let panelHeight = optionPanel.offsetHeight;	
+		let topSpaceLeft = buttonTop - panelHeight - screenMargin;
+		let bottomSpaceLeft = window.innerHeight - (buttonTop + panelHeight) - screenMargin;
 
 		let biggestSpace = Math.max(topSpaceLeft, bottomSpaceLeft);
 		maxHeight = panelHeight + biggestSpace;
-		openAbove = topSpaceLeft === biggestSpace;	
+		openAbove = topSpaceLeft === biggestSpace;
+
+	
+		let offsetToGetPanelToTopOfButton = buttonTop - optionPanel.getBoundingClientRect().top;
+		if (openAbove) 
+		{
+			offsetToGetPanelToTopOfButton -= panelHeight - 10;
+		} else {
+			offsetToGetPanelToTopOfButton += button.offsetHeight - 10;
+		}
+
+		top = offsetToGetPanelToTopOfButton;
 	}
 </script>
 
 
-<div class={"wrapper " + (customClass ? customClass : '') + (isOpen ? ' optionPanelOpen' : '')}>
+<div class={"wrapper " + (customClass ? customClass : '') + (isOpen ? ' optionPanelOpen' : '') + (openAbove ? ' openAbove' : '')}>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class='button' on:click={() => isOpen = !isOpen}>
+	<div class='button' on:click={() => isOpen = !isOpen} bind:this={button}>
 		<img src='images/dropDownIconDark.png' alt="Dropdown icon." class='dropDownIcon'>
 		<div class='contentHolder'>
 			{#if (typeof selectedOptionContentHTML === 'object')}
@@ -55,7 +72,7 @@
 	</div>
 	<div 
 		bind:this={optionPanel}
-		class={'optionPanel' + (openAbove ? ' openAbove' : '')} 
+		class='optionPanel' 
 		style={'top: ' + top + 'px; max-height: ' + maxHeight + 'px'}
 	>
 		{#each options as option}
@@ -128,7 +145,7 @@
 
 	/* OPTIONPANEL */
 	.wrapper .optionPanel {
-		position: absolute;
+		position: fixed;
 		min-width: 120px;
 		height: auto;
 		z-index: 100;
@@ -143,23 +160,20 @@
 
 		transition: opacity .3s, margin-top .3s;
 
-		margin-top: 0;
 		overflow: auto;
+		margin-top: 10px;
+	}
+	.wrapper.optionPanelOpen.openAbove .optionPanel {
+		margin-top: -10px;
 	}
 
 	.wrapper:not(.optionPanelOpen) .optionPanel {
 		pointer-events: none;
 		opacity: 0;
-		margin-top: -20px;
-	}
-	.wrapper:not(.optionPanelOpen).openAbove .optionPanel {
-		margin-top: 20px;
+		margin-top: 0px;
 	}
 
-	.wrapper.openAbove .optionPanel {
-		transform: translateY(calc(-100% - 35px));
-	}
-
+	
 
 	/* OPTION */
 	.option {
