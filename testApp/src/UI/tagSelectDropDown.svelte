@@ -19,4 +19,4 @@
 			config: _tag
 		}
 	}
-})} value={value} on:change={(_event) => dispatch('change', _event.detail)}></DropDown>
+})} bind:value={value} on:change={(_event) => dispatch('change', _event.detail)}></DropDown>

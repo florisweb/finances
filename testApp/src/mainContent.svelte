@@ -2,14 +2,12 @@
 	import UploadCsvPage from "./pages/uploadCSVPage.svelte";
 	import TagManagementPage from "./pages/tagManagementPage.svelte";
 	import MonthOverviewPage from "./pages/monthOverviewPage.svelte";
-    import TransactionAssignPage from "./pages/transactionAssignPage.svelte";
 </script>
 
 <div id='mainContent'>
 	<UploadCsvPage></UploadCsvPage>
 	<TagManagementPage></TagManagementPage>
 	<MonthOverviewPage></MonthOverviewPage>
-	<TransactionAssignPage></TransactionAssignPage>
 </div>
 <style>
 	#mainContent {

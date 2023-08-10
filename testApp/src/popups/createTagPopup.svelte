@@ -42,9 +42,6 @@
 		TagManager.add(new constructor(curTag));
 		close();
 	}
-
-
-	$: console.log('change isSavings', curTag.isSavingsTag);
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false}>
@@ -66,8 +63,8 @@
 	<br>
 	<br>
 	<div class='buttonHolder'>
-		<Button name='Save' on:click={() => {saveTag(); console.log('create')}}></Button>
-		<Button name='Cancel' filled={false} on:click={() => {isOpen = false; console.log('cancel')}}></Button>
+		<Button name='Save' on:click={() => saveTag()}></Button>
+		<Button name='Cancel' filled={false} on:click={() => close()}></Button>
 	</div>
 </Popup>
 

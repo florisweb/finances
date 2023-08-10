@@ -1,10 +1,6 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
-	
 	export let checked = false;
 	export let title = '';
-	$: console.warn('checked', checked);
 </script>
 
 <div class='holder'>

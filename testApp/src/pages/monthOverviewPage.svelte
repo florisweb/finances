@@ -1,5 +1,4 @@
 <script>
-	import { assignableTransactions, openPageByIndex } from '../App.js';
 	import { MonthIdentifier } from "../types";
 	import { getContext }from 'svelte';
 	import TagManager from '../data/tagManager';
@@ -59,13 +58,11 @@
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class='buttonWrapper assignTransactions' on:click={() => {
-				assignableTransactions.set(nonAssignedTransactions);
-				openPageByIndex(3);
+				App.transactionViewerPopup.open(nonAssignedTransactions, `Assign ${nonAssignedTransactions.length} Transactions`);
 			}}>
 				<Button name={`assign ${nonAssignedTransactions.length} transactions`}></Button>
 			</div>
 		</div>
-
 	</div>
 
 	<div class='tagListHolder'>

@@ -8,7 +8,15 @@
 	export let value = false;
 	
 	let selectedOptionContentHTML = 'No option selected';
-	$: selectedOptionContentHTML = options.find((_opt) => _opt.value === value || _opt.value.id === value.id)?.contentHTML || 'No option selected';	
+	$: {
+		selectedOptionContentHTML = options.find(
+			(_opt) => 
+				_opt.value === value || (
+					_opt.value.id === value.id && 
+					_opt.value.id !== undefined
+				)
+		)?.contentHTML || 'No option selected';	
+	}
 	$: if (isOpen) updatePanelPosition();
 	
 	let optionPanel;
@@ -123,6 +131,7 @@
 		position: absolute;
 		min-width: 120px;
 		height: auto;
+		z-index: 100;
 
 		padding: 10px 15px;
 

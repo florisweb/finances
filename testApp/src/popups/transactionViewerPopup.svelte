@@ -16,7 +16,6 @@
 	}
 	export function close() {
 		isOpen = false;
-		inEditMode = false;
 	}
 </script>
 
