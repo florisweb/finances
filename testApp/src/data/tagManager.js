@@ -7,15 +7,12 @@ const TagManager = new class extends DataManager {
 			if (_tag.isSavingsTag) return new SavingsTransactionTag(...arguments);
 			return new TransactionTag(...arguments);
 		}});
+		window.TagManager = this;
 	}
 	getById(_id) {
 		return this._data.find((_tag) => _tag.id === _id);
 	}
-	
-	set(_tags) {
-		this._data = _tags;
-		return this.writeData();
-	}
+
 
 	add(_tags) {
 		if (typeof _tags.length !== 'number') _tags = [_tags];

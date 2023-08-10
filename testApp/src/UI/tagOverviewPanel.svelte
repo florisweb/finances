@@ -1,4 +1,5 @@
 <script>
+	import { fade } from 'svelte/transition';
 	import { formatMoneyString } from '../polyfill';
 	import TagPanel from './tagPanel.svelte';
 

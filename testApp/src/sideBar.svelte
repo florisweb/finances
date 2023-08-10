@@ -16,6 +16,9 @@
 	<div class="item">
 		<Button name='Tags' on:click={() => openPageByIndex(1)}></Button>
 	</div>
+	<div class="item">
+		<Button name='Budgetter' on:click={() => openPageByIndex(3)}></Button>
+	</div>
 
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item">

@@ -13,7 +13,6 @@ const TransactionManager = new class extends DataManager {
 	}
 
 
-
 	set(_transactions) {
 		this._data = [];
 		for (let ts of _transactions) {

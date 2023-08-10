@@ -5,6 +5,8 @@
 	export let value;
 	export let placeholder = 'No name...';
 	export let element;
+	export let isInvisibleInput;
+	export let customClass;
 </script>
 
 <input 
@@ -13,6 +15,8 @@
 	value={value}
  	placeholder={placeholder}
 	bind:this={element}
+	class:isInvisibleInput={isInvisibleInput}
+	class={customClass ?? ''}
  >
 
 <style>
@@ -27,5 +31,17 @@
 		background: #fff;
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
 		border: 1px solid #eee;
+	}
+	input.isInvisibleInput {
+		border: none;
+		box-shadow: none;
+		padding: 0 2.5px;
+		height: 25px;
+	}
+
+	input.header {
+		color: #444;
+		text-transform: uppercase;
+		font-style: italic;
 	}
 </style>

@@ -206,9 +206,6 @@ export class NonAssignedTag extends TransactionTag {
 
 
 
-
-
-
 export class MonthIdentifier {
 	#string;
 
@@ -250,5 +247,68 @@ export class MonthIdentifier {
 
 	get id() {
 		return this.#string;
+	}
+}
+window.MonthIdentifier = MonthIdentifier;
+
+
+
+
+
+export class Budget {
+	id;
+	startMonthId;
+	endMonthId = false; // False if still running
+	sections = [];
+
+	constructor({id, startMonthId, endMonthId, sections}) {
+		this.id = id ?? newId();
+		this.startMonthId = startMonthId;
+		this.endMonthId = endMonthId ?? false;
+
+		this.sections = sections?.map((_section) => {
+			if (_section instanceof BudgetSection) return _section;
+			return new BudgetSection(_section);
+		}) || [];
+	}
+
+	export() {
+		return {
+			startMonthId: this.startMonthId.id,
+			endMonthId: this.endMonthId?.id,
+			sections: this.sections.map(s => s.export())
+		}
+	}
+}
+
+// start = new MonthIdentifier()
+// budget = new Budget({
+// 	startMonthId: start, 
+// 	sections: [{
+// 		name: 'default', 
+// 		tagBudgetSets: [
+// 			{tagId: '786165905165', budget: 15}
+// 		]
+// 	}]
+// })
+
+class BudgetSection {
+	name = '';
+	tagBudgetSets = [];
+	// { 
+	//	tagId:
+	//	budget: (+ = expenses, - = income)
+	// }	
+
+	constructor({name, tagBudgetSets = []}) {
+		this.name = name ?? 'No name';
+		this.tagBudgetSets = tagBudgetSets ?? [];
+	}
+
+	export() {
+		return {
+			name: this.name,
+			tagBudgetSets: this.tagBudgetSets
+		}
 	}
 }

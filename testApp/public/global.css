@@ -121,3 +121,7 @@ html, body {
 	top: 50vh !important;
 	max-width: unset !important;
   }
+
+  .popupHolder.CreateBudgetPopup .popup {
+	top: 50vh !important;
+  }

@@ -18,6 +18,11 @@ export default class DataManager {
 		this.writeData();
 	}
 
+	set(_data) {
+		this._data = _data;
+		return this.writeData();
+	}
+
 	constructor({type, dataToObject}) {
 		this.type = type;
 		this.#dataToObject = dataToObject;

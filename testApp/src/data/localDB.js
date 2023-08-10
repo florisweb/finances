@@ -1,5 +1,5 @@
 const DBName = "financeDB";
-let DBVersion = 2;
+let DBVersion = 3;
 let DB;
 let isReadyPromise = new Promise((resolve) => {});
 
@@ -21,6 +21,7 @@ const LocalDB = new class {
 
         DB.createObjectStore("transactions");
         DB.createObjectStore("tags");
+        DB.createObjectStore("budgets");
       }
 
       request.onsuccess = function(_e) {
