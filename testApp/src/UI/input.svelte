@@ -4,6 +4,7 @@
 	
 	export let value;
 	export let placeholder = 'No name...';
+	export let element;
 </script>
 
 <input 
@@ -11,6 +12,7 @@
 	on:change={(_event) => {value = _event.target.value; dispatch('change', value)}}
 	value={value}
  	placeholder={placeholder}
+	bind:this={element}
  >
 
 <style>

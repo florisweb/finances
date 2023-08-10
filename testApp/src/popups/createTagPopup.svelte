@@ -42,6 +42,9 @@
 		TagManager.add(new constructor(curTag));
 		close();
 	}
+
+	let nameInput;
+	$: if (isOpen && nameInput) nameInput.focus();
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false}>
@@ -59,7 +62,7 @@
 	<br>
 	<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
 	<br>
-	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} placeholder='Tag name...'></Input>
+	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} bind:element={nameInput}  placeholder='Tag name...'></Input>
 	<br>
 	<br>
 	<div class='buttonHolder'>
