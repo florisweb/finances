@@ -8,12 +8,12 @@
     import Checkbox from '../checkbox.svelte';
 	export let tag;
 	export let budget = 0;
-	if (budget < 0) {budget = -budget; isIncome = true};
 
 	export let isSumRow = false;
 	export let sum = 0;
 
-	let isIncome = false;
+	let isIncome = budget > 0;
+	if (budget < 0) budget = -budget;
 	let absBudget = budget;
 	$: budget = absBudget * (isIncome ? 1 : -1);
 </script>
