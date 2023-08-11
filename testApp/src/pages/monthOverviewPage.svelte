@@ -7,6 +7,8 @@
 	import Page from "../UI/page.svelte";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
     import Button from '../UI/button.svelte';
+    import BudgetManager from "../data/budgetManager";
+    import { openPageByIndex } from "../App";
 
 	export let curMonth = new MonthIdentifier();
 	const App = getContext('App');
@@ -54,7 +56,11 @@
 
 		<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
 			<div class='buttonWrapper'>
-				<Button name='Budgetter'></Button>
+				<Button name='Active Budget' on:click={() => {
+					let budget = BudgetManager.getByMonth(curMonth);
+					if (!budget) return openPageByIndex(3);
+					App.createBudgetPopup.openEdit(budget);
+				}}></Button>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class='buttonWrapper assignTransactions' on:click={() => {

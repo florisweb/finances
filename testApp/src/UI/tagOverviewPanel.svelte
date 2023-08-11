@@ -12,7 +12,6 @@
 	export let income = 0;
 	export let expenses = 0;
 	export let budget = false;
-	console.warn('budget', budget);
 </script>
 
 

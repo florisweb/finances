@@ -7,7 +7,6 @@
 
 	export let isSumRow = false;
 	export let sum = 0;
-	console.warn('sum', sum);
 </script>
 
 
