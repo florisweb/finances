@@ -8,7 +8,7 @@
     import MonthInput from "../UI/monthInput.svelte";
     import PopupBox from "./popupBox.svelte";
 	
-	import { Budget, MonthIdentifier } from "../types";
+	import { Budget, BudgetSection as _BudgetSection, MonthIdentifier } from "../types";
 	import TagManager from "../data/tagManager";
     import TagBudgetOverviewRow from "../UI/budgetter/tagBudgetOverviewRow.svelte";
     
@@ -22,11 +22,10 @@
 		inEditMode = false;
 		curBudget = new Budget({
 			startMonthId: new MonthIdentifier(),
-			sections: [
-				{
+			sections: [new _BudgetSection({
 					name: 'default', 
 					tagBudgetSets: []
-				}
+				})
 			]
 		});
 		window.b = curBudget
@@ -38,23 +37,23 @@
 	export function openEdit(_budget) {
 		isOpen = true;
 		inEditMode = true;
-		curBudget = Object.assign({}, _budget);
+		curBudget = new Budget(Object.assign({}, _budget));
 	}
 
 	function save() {
 		if (curBudget.endMonthId &&
 			curBudget.startMonthId.date.getTime() > curBudget.endMonthId.date.getTime()
 		) return alert('Invalid date-order');
-		BudgetManager.add(new Budget(curBudget));
+		BudgetManager.add(curBudget);
 		close();
 	}
 
 
 	function addBudgetSection() {
-		let section = {
+		let section = new _BudgetSection({
 			name: null, 
 			tagBudgetSets: [],
-		}
+		});
 		curBudget.sections = [...curBudget.sections, section];
 	}
 
@@ -70,6 +69,16 @@
 
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
+
+	let sumTags = [];
+	$: {
+		sumTags = tags.map((_tag) => {
+			return {
+				tag: _tag,
+				budget: curBudget.sections.map((_sec) => _sec.getTagBudgetById(_tag.id)).reduce((a, b) => a + b, 0)
+			}
+		})
+	}
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateBudgetPopup'>
@@ -83,7 +92,7 @@
 
 	<div class='sectionHolder'>
 		{#each curBudget.sections as section}
-			<BudgetSection section={section} on:delete={() => removeSection(section)}></BudgetSection>
+			<BudgetSection bind:section={section} on:delete={() => removeSection(section)}></BudgetSection>
 		{/each}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class='addSectionButton' on:click={() => addBudgetSection()}>+ Add Section</div>
@@ -102,13 +111,13 @@
 			<table class='tagOverviewTable'>
 				<tr class='tableHeader'>
 					<th scope='col' class='name'>Tag</th>
-					<th scope='col' class=''>Budget</th>
-					<th scope='col' class=''>Average</th>
+					<th scope='col' class='budget'>Budget</th>
+					<!-- <th scope='col' class=''>Average</th> -->
 				</tr>
-				{#each tags as tag}
-					<TagBudgetOverviewRow tag={tag} budget={0}></TagBudgetOverviewRow>
+				{#each sumTags as sumTag}
+					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget}></TagBudgetOverviewRow>
 				{/each}
-				<TagBudgetOverviewRow isSumRow={true} sum={0}></TagBudgetOverviewRow>
+				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum}></TagBudgetOverviewRow>
 			</table>
 		</div>
 	</PopupBox>
@@ -168,11 +177,6 @@
 
 
 	/* OVERVIEW POPUP */
-	.tagHolder {
-
-
-	}
-
 	.tagOverviewTable {
 		width: 100%;
 		border-collapse: collapse;
@@ -186,5 +190,8 @@
 	}
 	.tableHeader th.name {
 		padding-left: 22px;
+	}
+	.tableHeader th.budget {
+		padding-left: 10px;
 	}
 </style>

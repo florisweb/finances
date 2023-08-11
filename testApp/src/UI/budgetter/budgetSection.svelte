@@ -31,12 +31,6 @@
 		section.tagBudgetSets = section.tagBudgetSets;
 	}
 
-
-	let sectionSum = 0;
-	$: {
-		sectionSum = 0;
-		if (section.tagBudgetSets.length) sectionSum = section.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b);
-	}
 </script>
 
 <div class='section'>
@@ -59,7 +53,7 @@
 
 			<BudgetRow 
 					isSumRow={true}
-					sum={sectionSum} 
+					sum={section.sum} 
 			></BudgetRow>
 
 

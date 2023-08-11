@@ -285,6 +285,9 @@ export class Budget {
 			sections: this.sections.map(s => s.export())
 		}
 	}
+	get sum() {
+		return this.sections.map((_section) => _section.sum).reduce((a, b) => a + b, 0);
+	}
 }
 
 // start = new MonthIdentifier()
@@ -298,7 +301,7 @@ export class Budget {
 // 	}]
 // })
 
-class BudgetSection {
+export class BudgetSection {
 	name = '';
 	tagBudgetSets = [];
 	// { 
@@ -315,5 +318,15 @@ class BudgetSection {
 			name: this.name,
 			tagBudgetSets: this.tagBudgetSets
 		}
+	}
+
+	get sum() {
+		return this.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b, 0);
+	}
+
+	getTagBudgetById(_tagId) {
+		let set = this.tagBudgetSets.find((_set) => _set.tagId === _tagId);
+		if (!set) return 0;
+		return set.budget;
 	}
 }
