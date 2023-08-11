@@ -3,10 +3,14 @@
 	import Header from "../UI/header.svelte";
     import Button from "../UI/button.svelte";
 
-	import { Budget, MonthIdentifier } from "../types";
     import BudgetSection from "../UI/budgetter/budgetSection.svelte";
     import BudgetManager from "../data/budgetManager";
     import MonthInput from "../UI/monthInput.svelte";
+    import PopupBox from "./popupBox.svelte";
+	
+	import { Budget, MonthIdentifier } from "../types";
+	import TagManager from "../data/tagManager";
+    import TagBudgetOverviewRow from "../UI/budgetter/tagBudgetOverviewRow.svelte";
     
 
 	let isOpen = false;
@@ -59,6 +63,13 @@
 		curBudget.sections.splice(_section.index, 1);
 		curBudget.sections = curBudget.sections;
 	}
+
+
+
+
+
+	let tags = [];
+	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateBudgetPopup'>
@@ -82,15 +93,35 @@
 		<Button name='Save' on:click={() => save()}></Button>
 		<Button name='Cancel' filled={false} on:click={() => close()}></Button>
 	</div>
+
+
+
+	<PopupBox slot='extraPopupBoxes' bind:isOpen={isOpen} customClass='overviewPopup'>
+		<Header slot='header' title='Overview'></Header>
+		<div class='tagHolder'>
+			<table class='tagOverviewTable'>
+				<tr class='tableHeader'>
+					<th scope='col' class='name'>Tag</th>
+					<th scope='col' class=''>Budget</th>
+					<th scope='col' class=''>Average</th>
+				</tr>
+				{#each tags as tag}
+					<TagBudgetOverviewRow tag={tag} budget={0}></TagBudgetOverviewRow>
+				{/each}
+				<TagBudgetOverviewRow isSumRow={true} sum={0}></TagBudgetOverviewRow>
+			</table>
+		</div>
+	</PopupBox>
 </Popup>
 
 <style>
+	/* CREATOR POPUP */
 	.buttonHolder {
 		display: flex;
 		flex-direction: row-reverse;
 	}
 
-	.sectionHolder {
+	.sectionHolder, .tagHolder {
 		position: relative;
 		padding-top: 15px;
 
@@ -134,4 +165,26 @@
 		.monthSelectPanel div.monthInput {
 			margin-top: 5px;
 		}
+
+
+	/* OVERVIEW POPUP */
+	.tagHolder {
+
+
+	}
+
+	.tagOverviewTable {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.tableHeader th {
+		font-weight: normal;
+		font-size: 12px;
+		font-style: italic;
+		text-align: left;
+	}
+	.tableHeader th.name {
+		padding-left: 22px;
+	}
 </style>

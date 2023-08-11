@@ -97,7 +97,7 @@
 		width: 100%;
 		height: auto;
 	}
-
+	
 	.table {
 		width: 100%;
 		border-collapse: collapse;

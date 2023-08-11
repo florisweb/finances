@@ -117,11 +117,33 @@ html, body {
 
 
 
-  .popupHolder.TransactionViewerPopup .popup {
+.popupHolder.TransactionViewerPopup .popup {
 	top: 50vh !important;
 	max-width: unset !important;
-  }
+}
 
-  .popupHolder.CreateBudgetPopup .popup {
+
+.popupHolder.CreateBudgetPopup .popup {
+	position: absolute;
+	left: unset;
 	top: 50vh !important;
-  }
+	transform: translateY(-50%);
+}
+.popupHolder.CreateBudgetPopup .popup.hide {
+	transform: scale(.8) translateY(-62.5%);
+}
+
+.popupHolder.CreateBudgetPopup .popup.defaultPopup {
+	left: calc((100vw - 600px - 300px - 50px) / 2);
+}
+.popupHolder.CreateBudgetPopup .popup.overviewPopup {
+	z-index: 999;
+	left: calc((100vw - 600px - 300px - 50px) / 2 + 600px + 50px);
+	width: auto;
+	max-width: 400px;
+}
+
+
+.popupHolder.CreateBudgetPopup .popup.overviewPopup.hide {
+	transform: scale(.8) translate(-70%, -62.5%);	
+}

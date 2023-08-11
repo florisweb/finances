@@ -1,4 +1,5 @@
 <script>
+	import PopupBox from './popupBox.svelte';
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 	export let isOpen = false;
@@ -7,10 +8,11 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class={'popupHolder ' + (!isOpen ? 'hide ' : '') + (customClass || '')} on:click|self={() => dispatch('passiveClose')}>
-	<div class='popup'>
-		<slot name='header'/>
+	<PopupBox bind:isOpen={isOpen} customClass='defaultPopup'>
+		<slot name='header' slot='header'/>
 		<slot/>
-	</div>
+	</PopupBox>
+	<slot name='extraPopupBoxes'/>
 </div>
 <style>
 	.popupHolder {
@@ -28,27 +30,5 @@
 	.popupHolder.hide {
 		opacity: 0;
 		pointer-events: none;
-	}
-
-
-	.popup {
-		position: relative;
-
-		left: 50vw;
-		top: 45vh;
-		transform: translate(-50%, -50%);
-
-		max-width: 600px;
-		width: 90vw;
-		height: auto;
-		padding: 20px 30px;
-
-		background: #fff;
-		box-shadow: 10px 10px 20px rgba(0, 0, 0, .1);
-		transition: transform .3s;
-	}
-
-	.popupHolder.hide .popup {
-		transform: scale(.8) translate(-62.5%, -62.5%);
 	}
 </style>
