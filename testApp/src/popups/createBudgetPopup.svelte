@@ -19,9 +19,7 @@
 			sections: [
 				{
 					name: 'default', 
-					tagBudgetSets: [
-						{tagId: '786165905165', budget: 15}
-					]
+					tagBudgetSets: []
 				}
 			]
 		});
@@ -44,17 +42,16 @@
 	function addBudgetSection() {
 		let section = {
 			name: null, 
-			tagBudgetSets: []
+			tagBudgetSets: [],
 		}
 		curBudget.sections = [...curBudget.sections, section];
 	}
-
+	
+	$: curBudget.sections = curBudget.sections.map((_section, i) => {_section.index = i; return _section});
 	function removeSection(_section) {
-		// let index = section.tagBudgetSets.findIndex(
-			// (_budgetSet) => _budgetSet.tagId === _tagId
-		// );
-		// section.tagBudgetSets.splice(index, 1);
-		// section.tagBudgetSets = section.tagBudgetSets;
+		console.log(curBudget.sections, _section);
+		curBudget.sections.splice(_section.index, 1);
+		curBudget.sections = curBudget.sections;
 	}
 </script>
 

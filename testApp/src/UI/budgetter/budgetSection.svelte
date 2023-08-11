@@ -1,4 +1,7 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+
 	import BudgetRow from './budgetRow.svelte';
 	import TagManager from "../../data/tagManager";
     import Input from '../input.svelte';
@@ -27,15 +30,24 @@
 		section.tagBudgetSets.splice(index, 1);
 		section.tagBudgetSets = section.tagBudgetSets;
 	}
+
+
+	let sectionSum = 0;
+	$: {
+		sectionSum = 0;
+		if (section.tagBudgetSets.length) sectionSum = section.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b);
+	}
+
 </script>
 
 <div class='section'>
 	<div class='budgetSetHolder'>
 		<table class='table'>
-			<tr>
-				<td><Input value={section.name} isInvisibleInput={true} customClass='header'></Input></td>
-				<td></td>
-				<td>X</td>
+			<tr class='tableHeader'>
+				<th scope='col' class='name'><Input value={section.name} isInvisibleInput={true} customClass='header'></Input></th>
+				<th scope='col' class='income'>In</th>
+				<th scope='col' class='budget'>Budget</th>
+				<th scope='col' on:click={() => dispatch('delete')}>X</th>
 			</tr>
 
 			{#each section.tagBudgetSets as budgetSet}
@@ -45,10 +57,17 @@
 					on:delete={() => removeBudgetRow(budgetSet.tagId)}></BudgetRow>
 			{/each}
 
+
+			<BudgetRow 
+					isSumRow={true}
+					sum={sectionSum} 
+			></BudgetRow>
+
+
 			{#if (availableTags.length > 0)}
 				<tr class='addRowButton' >
-					<td class='addText'>+ Add budget for tag</td>
-					<td>
+					<td class='addText'><div>+</div> Add budget for tag</td>
+					<td class='dropDown'>
 						<DropDown options={availableTags.map((_tag) => {
 							return {
 								value: _tag.id,
@@ -59,7 +78,6 @@
 							}
 						})} on:change={(_event) => addBudgetRow(_event.detail)}></DropDown>
 					</td>
-					<td></td>
 				</tr>
 			{/if}
 		</table>
@@ -70,6 +88,7 @@
 
 	.section {
 		padding: 10px;
+		padding-bottom: 0;
 		margin: 10px 0;
 		border: 1px solid #eee;
 	}
@@ -82,7 +101,27 @@
 
 	.table {
 		width: 100%;
+		border-collapse: collapse;
 	}
+
+	.tableHeader th {
+		font-weight: normal;
+		font-size: 12px;
+		font-style: italic;
+	}
+	.tableHeader .name {
+		position: relative;
+		left: -5px;
+	}
+	.tableHeader .budget {
+		width: 90px;
+		padding-right: 10px;
+	}
+	.tableHeader .income {
+		width: 40px;
+		padding-right: 10px;
+	}
+
 
 
 	.addRowButton {
@@ -90,14 +129,22 @@
 		height: 45px;
 		width: 100%;
 		padding-top: 5px;
+	}
+		.addRowButton .addText {
+			color: #444;
+			font-size: 14px;
+			line-height: 35px;
+			padding-left: 5px;
+		}
+		.addRowButton .addText div {
+			float: left;
+			margin-left: -1px;
+			margin-right: 10px;
+		}
 
-		display: flex;
-	}
-	.addRowButton .addText {
-		color: #444;
-		font-size: 14px;
-		line-height: 35px;
-		margin-right: 10px;
-	}
+		.addRowButton .dropDown {
+			padding-top: 5px;
+			position: absolute;
+		}
 	
 </style>

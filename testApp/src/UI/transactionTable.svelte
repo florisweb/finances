@@ -1,5 +1,5 @@
 <script>
-	import Transaction from "./Transaction.svelte";
+	import Transaction from "./transaction.svelte";
 	export let transactions = [];
 </script>
 

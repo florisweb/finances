@@ -1,11 +1,14 @@
 <script>
+	import { newId } from '../polyfill';
+
 	export let checked = false;
 	export let title = '';
+	let checkBoxId = 'checkbox' + newId();
 </script>
 
 <div class='holder'>
-	<input type="checkbox" id="checkbox" checked={checked} on:change={(_event) => checked = _event.target.checked}>
-  	<label for="checkbox">{title}</label>
+	<input type="checkbox" id={checkBoxId} checked={checked} on:change={(_event) => checked = _event.target.checked}>
+  	<label for={checkBoxId}>{title}</label>
 </div>
 
 <style>
