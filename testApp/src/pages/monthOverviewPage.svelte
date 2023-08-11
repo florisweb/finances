@@ -38,8 +38,19 @@
 	}
 
 	$: curMonth && catagorizeTransactions();
-	TagManager.dataStore.subscribe((_tags) => {tags = _tags; catagorizeTransactions()});
+	TagManager.dataStore.subscribe((_tags) => {tags = Object.assign([], _tags); catagorizeTransactions()});
 	TransactionManager.dataStore.subscribe(() => {catagorizeTransactions()});
+
+
+
+	$: {
+		tags.sort((_tagA, _tagB) => {
+			let deltaA = Math.abs(tagsWithMetaData[_tagA.id].in - tagsWithMetaData[_tagA.id].out);
+			let deltaB = Math.abs(tagsWithMetaData[_tagB.id].in - tagsWithMetaData[_tagB.id].out);
+			return deltaA < deltaB;
+		})
+		tags = tags;
+	}
 </script>
 
 <Page>
@@ -73,14 +84,16 @@
 
 	<div class='tagListHolder'>
 		{#each tags as tag}
-			<TagOverviewPanel 
-				{...tag} 
-				income={tagsWithMetaData[tag.id].in} 
-				expenses={tagsWithMetaData[tag.id].out} 
-				totalSavings={0}
-				budget={tag.getBudgetInMonth(curMonth)}
-				on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
-			></TagOverviewPanel>
+			{#if (tagsWithMetaData[tag.id].in !== 0 || tagsWithMetaData[tag.id].out !== 0)}
+				<TagOverviewPanel 
+					{...tag} 
+					income={tagsWithMetaData[tag.id].in} 
+					expenses={tagsWithMetaData[tag.id].out} 
+					totalSavings={0}
+					budget={tag.getBudgetInMonth(curMonth)}
+					on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
+				></TagOverviewPanel>
+			{/if}
 		{/each}
 	</div>
 </Page>
