@@ -37,14 +37,13 @@
 		sectionSum = 0;
 		if (section.tagBudgetSets.length) sectionSum = section.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b);
 	}
-
 </script>
 
 <div class='section'>
 	<div class='budgetSetHolder'>
 		<table class='table'>
 			<tr class='tableHeader'>
-				<th scope='col' class='name'><Input value={section.name} isInvisibleInput={true} customClass='header'></Input></th>
+				<th scope='col' class='name'><Input bind:value={section.name} isInvisibleInput={true} customClass='header'></Input></th>
 				<th scope='col' class='income'>In</th>
 				<th scope='col' class='budget'>Budget</th>
 				<th scope='col' on:click={() => dispatch('delete')}>X</th>
@@ -132,7 +131,7 @@
 	}
 		.addRowButton .addText {
 			color: #444;
-			font-size: 14px;
+			font-size: 12px;
 			line-height: 35px;
 			padding-left: 5px;
 		}

@@ -8,6 +8,7 @@
     import Checkbox from '../checkbox.svelte';
 	export let tag;
 	export let budget = 0;
+	if (budget < 0) {budget = -budget; isIncome = true};
 
 	export let isSumRow = false;
 	export let sum = 0;
@@ -23,12 +24,12 @@
 	<tr class='budgetRow'>
 		<td class='tag'><Tag {...tag}></Tag></td>
 		<td><Checkbox bind:checked={isIncome}></Checkbox></td>
-		<td class='moneyInputHolder'><MoneyInput bind:value={absBudget} placeholder='Expenses...'></MoneyInput></td>
+		<td class='moneyInputHolder'><MoneyInput bind:value={absBudget} placeholder={isIncome ? 'Income...' : 'Expenses...'}></MoneyInput></td>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<td><div class='removeButton' on:click={() => dispatch('delete')}>X</div></td>
 	</tr>
 {:else}
-	<tr class='budgetRow'>
+	<tr class='budgetRow isSumRow'>
 		<td class='sumTitle'>Netto</td>
 		<td></td>
 		<td class='moneySum'>{formatMoneyString(sum)}</td>

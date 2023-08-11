@@ -15,7 +15,7 @@ const BudgetManager = new class extends DataManager {
 		if (typeof _items.length !== 'number') _items = [_items];
 		for (let budget of _items) 
 		{
-			let index = this._data.findIndex((__itemtag) => _item.id === budget.id);
+			let index = this._data.findIndex((_item) => _item.id === budget.id);
 			if (index !== -1) 
 			{
 				this._data[index] = budget;

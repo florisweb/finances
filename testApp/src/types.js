@@ -249,7 +249,7 @@ export class MonthIdentifier {
 		return this.#string;
 	}
 }
-window.MonthIdentifier = MonthIdentifier;
+
 
 
 
@@ -260,6 +260,11 @@ export class Budget {
 	startMonthId;
 	endMonthId = false; // False if still running
 	sections = [];
+
+	get name() {
+		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
+		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : '->');
+	}
 
 	constructor({id, startMonthId, endMonthId, sections}) {
 		this.id = id ?? newId();
@@ -274,6 +279,7 @@ export class Budget {
 
 	export() {
 		return {
+			id: this.id,
 			startMonthId: this.startMonthId.id,
 			endMonthId: this.endMonthId?.id,
 			sections: this.sections.map(s => s.export())
@@ -299,7 +305,6 @@ class BudgetSection {
 	//	tagId:
 	//	budget: (+ = expenses, - = income)
 	// }	
-
 	constructor({name, tagBudgetSets = []}) {
 		this.name = name ?? 'No name';
 		this.tagBudgetSets = tagBudgetSets ?? [];

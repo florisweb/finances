@@ -5,6 +5,8 @@
 
 	import { Budget, MonthIdentifier } from "../types";
     import BudgetSection from "../UI/budgetter/budgetSection.svelte";
+    import BudgetManager from "../data/budgetManager";
+    import MonthInput from "../UI/monthInput.svelte";
     
 
 	let isOpen = false;
@@ -35,6 +37,7 @@
 	}
 
 	function save() {
+		BudgetManager.add(new Budget(curBudget));
 		close();
 	}
 
@@ -46,10 +49,9 @@
 		}
 		curBudget.sections = [...curBudget.sections, section];
 	}
-	
+
 	$: curBudget.sections = curBudget.sections.map((_section, i) => {_section.index = i; return _section});
 	function removeSection(_section) {
-		console.log(curBudget.sections, _section);
 		curBudget.sections.splice(_section.index, 1);
 		curBudget.sections = curBudget.sections;
 	}
@@ -57,11 +59,14 @@
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateBudgetPopup'>
 	<Header slot='header' title={(inEditMode ? 'Edit' : 'Create') + ' Budget'}></Header>
+	<div class='startMonth'><MonthInput></MonthInput>Start</div>
+	<div class='endMonth'><MonthInput></MonthInput>End</div>
+
+
 	<div class='sectionHolder'>
 		{#each curBudget.sections as section}
 			<BudgetSection section={section} on:delete={() => removeSection(section)}></BudgetSection>
 		{/each}
-		<br>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class='addSectionButton' on:click={() => addBudgetSection()}>+ Add Section</div>
 	</div>
@@ -86,5 +91,15 @@
 		height: auto;
 		max-height: calc(90vh - 100px);
 		overflow: auto;
+	}
+
+	.addSectionButton {
+		position: relative;
+		margin-left: 6px;
+		font-size: 12px;
+		color: #444;
+		text-transform: uppercase;
+		padding: 5px 10px;
+		cursor: pointer;
 	}
 </style>

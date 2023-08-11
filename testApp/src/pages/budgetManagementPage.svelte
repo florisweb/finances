@@ -1,25 +1,28 @@
 <script>
 	import Page from "../UI/page.svelte";
+	import BudgetPanel from '../UI/budgetPanel.svelte';
+	
 	// import AddTagPanel from "../UI/addTagPanel.svelte";
 	import { getContext } from 'svelte';
+    import BudgetManager from "../data/budgetManager";
 	const App = getContext('App');
 
-	// let tags = [];
-	// TagManager.dataStore.subscribe((_tags) => tags = _tags);
+	let budgets = [];
+	BudgetManager.dataStore.subscribe((_budgets) => budgets = _budgets);
 </script>
 
 <Page title="Budget Management">
-	<div class='tagListHolder'>
-		<!-- {#each tags as tag} -->
-			<!-- <TagPanel tag={tag} on:click={() => {if (!tag.isNonAssignedTag) App.createTagPopup.openEdit(tag)}}></TagPanel> -->
-		<!-- {/each} -->
+	<div class='listHolder'>
+		{#each budgets as budget}
+			<BudgetPanel budget={budget} on:click={() => App.createBudgetPopup.openEdit(budget)}></BudgetPanel>
+		{/each}
 
 		<!-- <AddTagPanel></AddTagPanel> -->
 	</div>
 </Page>
 
 <style>
-	.tagListHolder {
+	.listHolder {
 		position: relative;
 		margin: 20px;
 
