@@ -19,20 +19,23 @@
 <div class='tagOverviewPanel' on:click={() => dispatch('click')}>
 	<TagPanel tag={{name: name, color: color, isSavingsTag: isSavingsTag, totalSavings: totalSavings}}></TagPanel>
 	<div class='infoHolder'>
-		{#if (income !== 0)}
-			<p>{formatMoneyString(income)} in</p>
+		{#if (income - expenses !== 0)}
+			<p>
+				{formatMoneyString(Math.abs(income - expenses))} 
+				{income > expenses ? 'in' : 'out'}
+			</p>
 		{/if}
-		{#if (expenses !== 0)}
-			<p>{formatMoneyString(expenses)} out</p>
+		{#if (budget !== 0)}
+			<p>
+				{formatMoneyString(Math.abs(budget))} 
+				{budget > 0 ? 'budget as income' : 'budget'}
+			</p>
 		{/if}
 		{#if (income !== 0 || expenses !== 0)}
 			<div class='subtractLine'></div>
 		{/if}
-		<p style={'margin-left: ' + (income - expenses < 0 ? '-3px' : '')}>{
-			formatMoneyString(income - expenses)} netto 
-			{#if (budget)}
-				({formatMoneyString(budget)} budget)
-			{/if}
+		<p class:isTooNegative={income - expenses - budget < -10} class:isTooPositive={income - expenses - budget > 10} style={'margin-left: ' + (income - expenses - budget < 0 ? '-3px;' : '')}>{
+			formatMoneyString(income - expenses - budget)} netto 
 		</p>
 	</div>
 </div>
@@ -75,5 +78,11 @@
 			color: #444;
 			margin: 0;
 			margin-left: 5px;
-		}	
+		}
+		p.isTooNegative {
+			color: #844;
+		}
+		p.isTooPositive {
+			color: #484;
+		}
 </style>
