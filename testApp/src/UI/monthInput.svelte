@@ -1,28 +1,33 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
 	import { MonthIdentifier } from '../types';
 	import Date from '../time';
     import DropDown from './dropDown.svelte';
-	const dispatch = createEventDispatcher();
 	
 	export let value;
 	export let placeholder = 'Month...';
 	export let allowNoDate = true;
 
+	// For displayal only
 	let curMonth = new Date().getMonth();
 	let curYear = new Date().getFullYear();
-
 	$: {
-		if (curMonth === 'NO-DATE') value = false;
-		value = new MonthIdentifier().setFromId((curMonth + 1) + '/' + curYear);
+		if (!value) {curMonth = 'NO-DATE'; break $};
+		curMonth = value.date.getMonth() ?? new Date().getMonth();
+		curYear = value.date.getFullYear() ?? new Date().getFullYear();
 	}
 
 
-	function onInput() {
+	// Actual values
+	let lastMonthVal = curMonth;
+	let lastYearVal = curYear;
+	
+	function onInput(_newVal) {
 		let regex = /[^0-9]/g;
-		value = String(value).replace(regex, '').substr(0, 4);
+		lastYearVal = String(_newVal).replace(regex, '').substr(0, 4);
 	}
 
+
+	// Which options the dropdown contains
 	let monthOptions = new Date().getMonths().map((month, i) => {return {
 		value: i,
 		contentHTML: month.name
@@ -31,12 +36,21 @@
 </script>
 
 <div class='monthInput'>
-	<DropDown options={monthOptions} bind:value={curMonth}></DropDown>
-	{#if (curMonth !== 'NO-DATE')}
+	<DropDown options={monthOptions} value={curMonth} on:change={(_event) => {
+		lastMonthVal = _event.detail;
+		if (_event.detail === 'NO-DATE') return value = false;
+		value = new MonthIdentifier().setFromId((_event.detail + 1) + '/' + lastYearVal);
+	}}></DropDown>
+	{#if (value)}
 		<input 
-			on:input={(_event) => {value = _event.target.value; onInput(); dispatch('input', value)}}
-			on:change={(_event) => {value = _event.target.value; dispatch('change', value)}}
-			bind:value={curYear}
+			on:input={
+				(_event) => {
+					onInput(_event.target.value);
+					if (lastMonthVal === 'NO-DATE') return value = false;
+					value = new MonthIdentifier().setFromId((lastMonthVal + 1) + '/' + lastYearVal);
+				}
+			}
+			value={curYear}
 			placeholder={placeholder}
 		>
 	{/if}

@@ -88,7 +88,7 @@
 	.section {
 		padding: 10px;
 		padding-bottom: 0;
-		margin: 10px 0;
+		margin-bottom: 10px;
 		border: 1px solid #eee;
 	}
 

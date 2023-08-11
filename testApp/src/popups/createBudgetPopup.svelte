@@ -25,6 +25,7 @@
 				}
 			]
 		});
+		window.b = curBudget
 	}
 	export function close() {
 		isOpen = false;
@@ -37,6 +38,9 @@
 	}
 
 	function save() {
+		if (curBudget.endMonthId &&
+			curBudget.startMonthId.date.getTime() > curBudget.endMonthId.date.getTime()
+		) return alert('Invalid date-order');
 		BudgetManager.add(new Budget(curBudget));
 		close();
 	}
@@ -59,9 +63,12 @@
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateBudgetPopup'>
 	<Header slot='header' title={(inEditMode ? 'Edit' : 'Create') + ' Budget'}></Header>
-	<div class='startMonth'><MonthInput></MonthInput>Start</div>
-	<div class='endMonth'><MonthInput></MonthInput>End</div>
-
+	<div class='monthSelectPanel'>
+		<div class='header'>Start</div>
+		<div class='header'>End</div>
+		<div class='monthInput'><MonthInput allowNoDate={false} bind:value={curBudget.startMonthId}></MonthInput></div>
+		<div class='monthInput'><MonthInput bind:value={curBudget.endMonthId}></MonthInput></div>
+	</div>
 
 	<div class='sectionHolder'>
 		{#each curBudget.sections as section}
@@ -85,16 +92,16 @@
 
 	.sectionHolder {
 		position: relative;
-		margin-top: 5px;
 		padding-top: 15px;
 
 		height: auto;
-		max-height: calc(90vh - 100px);
+		max-height: calc(90vh - 160px);
 		overflow: auto;
 	}
 
 	.addSectionButton {
 		position: relative;
+		margin-top: 5px;
 		margin-left: 6px;
 		font-size: 12px;
 		color: #444;
@@ -102,4 +109,29 @@
 		padding: 5px 10px;
 		cursor: pointer;
 	}
+
+	.monthSelectPanel {
+		position: relative;
+		margin-top: 10px;
+		width: 100%;
+		height: auto;
+		padding: 10px;
+		border: 1px solid #eee;
+		
+		display: grid;
+		grid-template-columns: 50% 50%;
+	}
+		.monthSelectPanel div {
+			width: 50%;
+			height: auto;
+		}
+		.monthSelectPanel div.header {
+			font-size: 12px;
+			text-transform: uppercase;
+			font-style: italic;
+			color: #444;
+		}
+		.monthSelectPanel div.monthInput {
+			margin-top: 5px;
+		}
 </style>

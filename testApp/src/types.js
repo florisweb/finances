@@ -263,13 +263,13 @@ export class Budget {
 
 	get name() {
 		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
-		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : '->');
+		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : ' ->');
 	}
 
 	constructor({id, startMonthId, endMonthId, sections}) {
 		this.id = id ?? newId();
-		this.startMonthId = startMonthId;
-		this.endMonthId = endMonthId ?? false;
+		this.startMonthId = typeof startMonthId === 'string' ? new MonthIdentifier().setFromId(startMonthId) : startMonthId;
+		this.endMonthId = typeof endMonthId === 'string' ? new MonthIdentifier().setFromId(endMonthId) : endMonthId ?? false;
 
 		this.sections = sections?.map((_section) => {
 			if (_section instanceof BudgetSection) return _section;
