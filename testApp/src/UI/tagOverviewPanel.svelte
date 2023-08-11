@@ -1,5 +1,4 @@
 <script>
-	import { fade } from 'svelte/transition';
 	import { formatMoneyString } from '../polyfill';
 	import TagPanel from './tagPanel.svelte';
 
@@ -10,9 +9,10 @@
 	export let color;
 	export let isSavingsTag;
 	export let totalSavings;
-	export let income = 15;
-	export let expenses = 50;
-	export let budget = 20;
+	export let income = 0;
+	export let expenses = 0;
+	export let budget = false;
+	console.warn('budget', budget);
 </script>
 
 
@@ -29,7 +29,12 @@
 		{#if (income !== 0 || expenses !== 0)}
 			<div class='subtractLine'></div>
 		{/if}
-		<p style={'margin-left: ' + (income - expenses < 0 ? '-3px' : '')}>{formatMoneyString(income - expenses)} netto ({formatMoneyString(budget)} budget)</p>
+		<p style={'margin-left: ' + (income - expenses < 0 ? '-3px' : '')}>{
+			formatMoneyString(income - expenses)} netto 
+			{#if (budget)}
+				({formatMoneyString(budget)} budget)
+			{/if}
+		</p>
 	</div>
 </div>
 

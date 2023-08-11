@@ -66,16 +66,14 @@
 
 
 
-
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
-
 	let sumTags = [];
 	$: {
 		sumTags = tags.filter((_tag) => !_tag.isNonAssignedTag).map((_tag) => {
 			return {
 				tag: _tag,
-				budget: curBudget.sections.map((_sec) => _sec.getTagBudgetById(_tag.id)).reduce((a, b) => a + b, 0)
+				budget: curBudget.getBudgetForTag(_tag.id)
 			}
 		})
 	}

@@ -11,6 +11,16 @@ const BudgetManager = new class extends DataManager {
 		return this._data.find((_item) => _item.id === _id);
 	}
 
+	getByMonth(_monthId) {
+		for (let budget of this._data)
+		{
+			if (budget.startMonthId.date.getTime() > _monthId.date.getTime()) continue;
+			if (budget.endMonthId && budget.endMonthId.date.getTime() < _monthId.date.getTime()) continue;
+			return budget;
+		}
+		return false;
+	}
+
 	add(_items) {
 		if (typeof _items.length !== 'number') _items = [_items];
 		for (let budget of _items) 

@@ -1,8 +1,9 @@
 import Color from './color';
 import { AvailableColors } from './color';
 import Date from './time';
-import TransactionManager from './data/transactionManager';
 import { newId } from './polyfill';
+import TransactionManager from './data/transactionManager';
+import BudgetManager from './data/budgetManager';
 
 export class Transaction {
 	date;
@@ -55,11 +56,10 @@ export class TransactionTag {
 	expensesBudget = {}; 
 
 	// filter;
-	constructor({name, color, id, filter, expensesBudget = {}}) {
+	constructor({name, color, id, filter}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id ?? newId();
-		// this.expensesBudget = expensesBudget;
 		// this.filter = new TagFilter(filter);
 	}
 
@@ -68,26 +68,12 @@ export class TransactionTag {
 		return this.filter.evaluate(_transaction);
 	}
 
-	
-	setExpensesBudget(_budget) {
-		let curMonthCode = new MonthIdentifier().setFromDate(new Date()).id;
-		this.expensesBudget[curMonthCode] = _budget;
+	getBudgetInMonth(_monthId) {
+		let budget = BudgetManager.getByMonth(_monthId);
+		if (!budget) return false;
+		return budget.getBudgetForTag(this.id);
 	}
 
-	get currentExpensesBudget() {
-		let months = Object.keys(this.expensesBudget);
-		let lastDate = new Date();
-		lastDate.setYear(1970);
-		let curBudget = 0;
-		for (let monthPair of months)
-		{
-			let date = new MonthIdentifier().setFromId(monthPair).date;
-			if (date.getTime() < lastDate.getTime()) continue;
-			lastDate = date;
-			curBudget = this.expensesBudget[monthPair];
-		}
-		return curBudget;
-	}
 
 	get averageExpenses() {
 		let transactions = this.transactions;
@@ -108,17 +94,7 @@ export class TransactionTag {
 
 	getTransactionsByMonth(_monthId) {
 		return TransactionManager.getByMonthAndTag(_monthId, this.id);
-
-		let found = [];
-		for (let transaction of this.transactions)
-		{
-			if (!_monthId.containsDate(transaction.date)) continue;
-			found.push(transaction);
-		}
-		return found;
 	}
-
-
 
 	getPaymentDeficits() {
 		let months = {};
@@ -132,21 +108,6 @@ export class TransactionTag {
 		}
 		return months;
 	}
-
-	// getBudgetDeficits() {
-	// 	let paymentDefs = this.getPaymentDeficits();
-
-
-
-
-	// }
-
-	// getBudgetByMonthId(_id) {
-	// 	if (this.#expensesBudget[_id] !== undefined) return this.#expensesBudget[_id];
-
-
-
-	// }
 
 
 	get totalExpenses() {
@@ -162,7 +123,6 @@ export class TransactionTag {
 			color: this.color.hex,
 			id: this.id,
 			// filter: this.filter.export(),
-			// expensesBudget: this.expensesBudget,
 		}
 	}
 }
@@ -284,6 +244,10 @@ export class Budget {
 			endMonthId: this.endMonthId?.id,
 			sections: this.sections.map(s => s.export())
 		}
+	}
+
+	getBudgetForTag(_tagId) {
+		return this.sections.map((_sec) => _sec.getTagBudgetById(_tagId)).reduce((a, b) => a + b, 0)
 	}
 	get sum() {
 		return this.sections.map((_section) => _section.sum).reduce((a, b) => a + b, 0);
