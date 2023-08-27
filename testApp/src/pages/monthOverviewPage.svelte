@@ -10,7 +10,9 @@
     import BudgetManager from "../data/budgetManager";
     import { openPageByIndex } from "../App";
 
-	export let curMonth = new MonthIdentifier();
+	let lastMonthDate = new Date();
+	lastMonthDate.setDate(-1);
+	export let curMonth = new MonthIdentifier().setFromDate(lastMonthDate);
 	const App = getContext('App');
 	
 	let tags = [];
@@ -89,7 +91,7 @@
 					{...tag} 
 					income={tagsWithMetaData[tag.id].in} 
 					expenses={tagsWithMetaData[tag.id].out} 
-					totalSavings={0}
+					totalSavings={tag.totalSavings}
 					budget={tag.getBudgetInMonth(curMonth)}
 					on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
 				></TagOverviewPanel>

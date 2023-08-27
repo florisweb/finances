@@ -11,7 +11,7 @@
 	import { Budget, BudgetSection as _BudgetSection, MonthIdentifier } from "../types";
 	import TagManager from "../data/tagManager";
     import TagBudgetOverviewRow from "../UI/budgetter/tagBudgetOverviewRow.svelte";
-    
+	import { wait } from '../polyfill';
 
 	let isOpen = false;
 	let inEditMode = false;
@@ -28,23 +28,31 @@
 				})
 			]
 		});
-		window.b = curBudget
 	}
 	export function close() {
 		isOpen = false;
 		inEditMode = false;
 	}
-	export function openEdit(_budget) {
+	export async function openEdit(_budget) {
 		isOpen = true;
 		inEditMode = true;
-		curBudget = new Budget(Object.assign({}, _budget));
+
+		// Required to trigger the update of the sections
+		if (curBudget.sections)
+		{
+			curBudget.sections = [];
+			await wait(0);
+		}
+
+		curBudget = _budget.clone();
 	}
 
 	function save() {
+		// TODO check whether the budget overlaps with another budget: if so, cancel
 		if (curBudget.endMonthId &&
 			curBudget.startMonthId.date.getTime() > curBudget.endMonthId.date.getTime()
 		) return alert('Invalid date-order');
-		BudgetManager.add(curBudget);
+		BudgetManager.add(curBudget.clone());
 		close();
 	}
 
@@ -175,6 +183,9 @@
 
 
 	/* OVERVIEW POPUP */
+	.tagHolder {
+		margin-top: 5px;
+	}
 	.tagOverviewTable {
 		width: 100%;
 		border-collapse: collapse;

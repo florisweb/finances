@@ -75,6 +75,15 @@ Date.prototype.getDateInDays = function(_addYears) {
 	return totalDays;
 }
 
+Date.prototype.getDateInMonths = function() {
+	let months = this.getMonth();
+	for (let i = 1970; i < this.getFullYear(); i++) 
+	{
+		months += 12;
+	}
+	return months;
+}
+
 Date.prototype.setDateFromDays = function(_days, _yearsAdded) {
 	let days = _days;
 	if (_yearsAdded)

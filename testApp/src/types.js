@@ -137,9 +137,14 @@ export class SavingsTransactionTag extends TransactionTag {
 	}
 
 	get totalSavings() {
-		return 0;
-		// let budgetedMoney = new ExpensesBudgetInterface(this.expensesBudget).totalBudget;;
-		// return this.startValue + this.totalExpenses - budgetedMoney;
+		let budgetedMoney = 0;
+		for (let budget of BudgetManager._data)
+		{
+			let budgetPerMonth = budget.getBudgetForTag(this.id);
+			budgetedMoney = budgetPerMonth * budget.lengthInMonths;
+		}
+
+		return this.startValue + this.totalExpenses - budgetedMoney;
 	}
 
 	export() {
@@ -157,6 +162,113 @@ export class NonAssignedTag extends TransactionTag {
 		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class Budget {
+	id;
+	startMonthId;
+	endMonthId = false; // False if still running
+	sections = [];
+
+	get isActive() {
+		if (this.startMonthId.date.getTime() > new Date().getTime()) return false;
+		if (this.endMonthId && this.endMonthId.date.getTime() < new Date().getTime()) return false;;
+		return true;
+	}
+	get lengthInMonths() {
+		let prevMonthDate = new Date(); 
+		prevMonthDate.setDate(-1);
+		let endDate = prevMonthDate;
+		if (this.endMonthId && this.endMonthId.date.getTime() < prevMonthDate.getTime()) endDate = this.endMonthId.date;
+
+		return endDate.getDateInMonths() - this.startMonthId.date.getDateInMonths() + 1;
+	}
+
+	get name() {
+		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
+		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : ' ->');
+	}
+
+	constructor({id, startMonthId, endMonthId, sections}) {
+		this.id = id ?? newId();
+		this.startMonthId = typeof startMonthId === 'string' ? new MonthIdentifier().setFromId(startMonthId) : startMonthId;
+		this.endMonthId = typeof endMonthId === 'string' ? new MonthIdentifier().setFromId(endMonthId) : endMonthId ?? false;
+
+		this.sections = sections?.map((_section) => {
+			if (_section instanceof BudgetSection) return _section;
+			return new BudgetSection(_section);
+		}) || [];
+	}
+
+	clone() {
+		return new Budget(this.export());
+	}
+
+	export() {
+		return {
+			id: this.id,
+			startMonthId: this.startMonthId.id,
+			endMonthId: this.endMonthId?.id,
+			sections: this.sections.map(s => s.export())
+		}
+	}
+
+	getBudgetForTag(_tagId) {
+		return this.sections.map((_sec) => _sec.getTagBudgetById(_tagId)).reduce((a, b) => a + b, 0)
+	}
+	get sum() {
+		return this.sections.map((_section) => _section.sum).reduce((a, b) => a + b, 0);
+	}
+}
+
+
+export class BudgetSection {
+	name = '';
+	tagBudgetSets = [];
+	// { 
+	//	tagId:
+	//	budget: (+ = expenses, - = income)
+	// }	
+	constructor({name, tagBudgetSets = []}) {
+		this.name = name ?? 'No name';
+		this.tagBudgetSets = tagBudgetSets ?? [];
+	}
+
+	export() {
+		return {
+			name: this.name,
+			tagBudgetSets: Object.assign([], this.tagBudgetSets)
+		}
+	}
+
+	get sum() {
+		return this.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b, 0);
+	}
+
+	getTagBudgetById(_tagId) {
+		let set = this.tagBudgetSets.find((_set) => _set.tagId === _tagId);
+		if (!set) return 0;
+		return set.budget;
+	}
+}
+
+
+
+
+
+
 
 
 
@@ -207,90 +319,5 @@ export class MonthIdentifier {
 
 	get id() {
 		return this.#string;
-	}
-}
-
-
-
-
-
-
-export class Budget {
-	id;
-	startMonthId;
-	endMonthId = false; // False if still running
-	sections = [];
-
-	get name() {
-		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
-		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : ' ->');
-	}
-
-	constructor({id, startMonthId, endMonthId, sections}) {
-		this.id = id ?? newId();
-		this.startMonthId = typeof startMonthId === 'string' ? new MonthIdentifier().setFromId(startMonthId) : startMonthId;
-		this.endMonthId = typeof endMonthId === 'string' ? new MonthIdentifier().setFromId(endMonthId) : endMonthId ?? false;
-
-		this.sections = sections?.map((_section) => {
-			if (_section instanceof BudgetSection) return _section;
-			return new BudgetSection(_section);
-		}) || [];
-	}
-
-	export() {
-		return {
-			id: this.id,
-			startMonthId: this.startMonthId.id,
-			endMonthId: this.endMonthId?.id,
-			sections: this.sections.map(s => s.export())
-		}
-	}
-
-	getBudgetForTag(_tagId) {
-		return this.sections.map((_sec) => _sec.getTagBudgetById(_tagId)).reduce((a, b) => a + b, 0)
-	}
-	get sum() {
-		return this.sections.map((_section) => _section.sum).reduce((a, b) => a + b, 0);
-	}
-}
-
-// start = new MonthIdentifier()
-// budget = new Budget({
-// 	startMonthId: start, 
-// 	sections: [{
-// 		name: 'default', 
-// 		tagBudgetSets: [
-// 			{tagId: '786165905165', budget: 15}
-// 		]
-// 	}]
-// })
-
-export class BudgetSection {
-	name = '';
-	tagBudgetSets = [];
-	// { 
-	//	tagId:
-	//	budget: (+ = expenses, - = income)
-	// }	
-	constructor({name, tagBudgetSets = []}) {
-		this.name = name ?? 'No name';
-		this.tagBudgetSets = tagBudgetSets ?? [];
-	}
-
-	export() {
-		return {
-			name: this.name,
-			tagBudgetSets: this.tagBudgetSets
-		}
-	}
-
-	get sum() {
-		return this.tagBudgetSets.map((set) => set.budget).reduce((a, b) => a + b, 0);
-	}
-
-	getTagBudgetById(_tagId) {
-		let set = this.tagBudgetSets.find((_set) => _set.tagId === _tagId);
-		if (!set) return 0;
-		return set.budget;
 	}
 }
