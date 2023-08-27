@@ -39,7 +39,6 @@ export default class DataManager {
 
 	async writeData() {
 		this._setStore(this._data);
-		this.dataCount = this._data.length;
 		this._data.length = this._data.length;
 		return LocalDB.setData(this.type, this._data.map(t => t.export()));
 	}

@@ -53,13 +53,13 @@ export class TransactionTag {
 	name;
 	color;
 	id;
-	expensesBudget = {}; 
-
 	filter;
+
 	constructor({name, color, id, filter}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id ?? newId();
+		console.info(filter);
 		this.filter = new TagFilter(filter);
 	}
 
@@ -124,8 +124,12 @@ export class TransactionTag {
 			name: this.name,
 			color: this.color.hex,
 			id: this.id,
-			// filter: this.filter.export(),
+			filter: this.filter.export(),
 		}
+	}
+
+	clone() {
+		return new TransactionTag(this.export());
 	}
 }
 
@@ -133,7 +137,7 @@ export class SavingsTransactionTag extends TransactionTag {
 	isSavingsTag = true;
 	startValue = 0;
 
-	constructor({name, color, id, filter, expensesBudget, startValue = 0}) {
+	constructor({name, color, id, filter, startValue = 0}) {
 		super(...arguments);
 		this.startValue = startValue;
 	}
@@ -155,13 +159,16 @@ export class SavingsTransactionTag extends TransactionTag {
 		data.startValue = this.startValue;
 		return data;
 	}
+	clone() {
+		return new SavingsTransactionTag(this.export());
+	}
 }
 
 
 export class NonAssignedTag extends TransactionTag {
 	isNonAssignedTag = true;
 	constructor() {
-		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, expensesBudget: {}, startValue: 0});
+		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, startValue: 0});
 	}
 }
 

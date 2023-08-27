@@ -35,12 +35,12 @@
 	export function openEdit(_tag) {
 		isOpen = true;
 		inEditMode = true;
-		curTag = Object.assign({}, _tag);
+		curTag = _tag.clone();
 	}
 
 	function saveTag() {
 		let constructor = curTag.isSavingsTag ? SavingsTransactionTag : TransactionTag;
-		TagManager.add(new constructor(curTag));
+		TagManager.add(new constructor(curTag.export()));
 		close();
 	}
 
@@ -67,8 +67,8 @@
 	<br>
 	<br>
 	<br>
-	<!-- <FilterBuilder bind:filter={curTag.filter}></FilterBuilder> -->
-	<FilterBuilder></FilterBuilder>
+	<FilterBuilder bind:filter={curTag.filter}></FilterBuilder>
+	<!-- <FilterBuilder></FilterBuilder> -->
 	<br>
 	<div class='buttonHolder'>
 		<Button name='Save' on:click={() => saveTag()}></Button>
