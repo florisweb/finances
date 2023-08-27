@@ -81,7 +81,8 @@
 		sumTags = tags.filter((_tag) => !_tag.isNonAssignedTag).map((_tag) => {
 			return {
 				tag: _tag,
-				budget: curBudget.getBudgetForTag(_tag.id)
+				budget: curBudget.getBudgetForTag(_tag.id),
+				averageExpenses: _tag.averageExpensesLast12Months
 			}
 		})
 	}
@@ -118,10 +119,10 @@
 				<tr class='tableHeader'>
 					<th scope='col' class='name'>Tag</th>
 					<th scope='col' class='budget'>Budget</th>
-					<!-- <th scope='col' class=''>Average</th> -->
+					<th scope='col' class=''>Average</th>
 				</tr>
 				{#each sumTags as sumTag}
-					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget}></TagBudgetOverviewRow>
+					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget} averageExpenses={sumTag.averageExpenses}></TagBudgetOverviewRow>
 				{/each}
 				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum}></TagBudgetOverviewRow>
 			</table>

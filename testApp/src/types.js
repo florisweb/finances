@@ -96,19 +96,21 @@ export class TransactionTag {
 		return TransactionManager.getByMonthAndTag(_monthId, this.id);
 	}
 
-	getPaymentDeficits() {
-		let months = {};
-
-		let transactions = this.transactions;
-		for (let transaction of transactions)
-		{
-			let curMonthCode = new MonthIdentifier().setFromDateString(transaction.date).id;
-			if (!months[curMonthCode]) months[curMonthCode] = 0;
-			months[curMonthCode] += transaction.deltaMoney;
-		}
-		return months;
+	getExpensesByMonth(_monthId) {
+		let transactions = this.getTransactionsByMonth(_monthId);
+		return transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 	}
 
+	get averageExpensesLast12Months() {
+		let sum = 0;
+		let curMonthId = new MonthIdentifier();
+		for (let i = 0; i < 12; i++)
+		{
+			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(-1));
+			sum += this.getExpensesByMonth(curMonthId);
+		}
+		return sum / 12;
+	}
 
 	get totalExpenses() {
 		let sum = 0;
@@ -179,7 +181,7 @@ export class NonAssignedTag extends TransactionTag {
 export class Budget {
 	id;
 	startMonthId;
-	endMonthId = false; // False if still running
+	endMonthId = false; // False if still running / doesn't have an end date
 	sections = [];
 
 	get isActive() {
@@ -204,6 +206,9 @@ export class Budget {
 		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
 		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : ' ->');
 	}
+
+
+
 
 	constructor({id, startMonthId, endMonthId, sections}) {
 		this.id = id ?? newId();
