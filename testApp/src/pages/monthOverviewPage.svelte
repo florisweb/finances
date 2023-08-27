@@ -60,26 +60,33 @@
 		<div class={'balanceHolder' + (totalDelta > 0 ? ' positive' : (totalDelta < 0 ? ' negative' : ''))}>{(totalDelta > 0 ? '+' : '') + Math.round(totalDelta)}</div>
 		
 		<div class='monthHolder'>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))}>‹</div> 
 			<div>{curMonth.name}</div>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class='navButton' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))}>›</div> 
 		</div>
 
-		<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
-			<div class='buttonWrapper'>
-				<Button name='Active Budget' on:click={() => {
-					let budget = BudgetManager.getByMonth(curMonth);
-					if (!budget) return openPageByIndex(3);
-					App.createBudgetPopup.openEdit(budget);
-				}}></Button>
+		<div class="floatRightHolder">
+			<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
+				<div class='buttonWrapper'>
+					<Button name='Active Budget' on:click={() => {
+						let budget = BudgetManager.getByMonth(curMonth);
+						if (!budget) return openPageByIndex(3);
+						App.createBudgetPopup.openEdit(budget);
+					}}></Button>
+				</div>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class='buttonWrapper assignTransactions' on:click={() => {
+					App.transactionViewerPopup.open(nonAssignedTransactions, `Assign ${nonAssignedTransactions.length} Transactions`);
+				}}>
+					<Button name={`assign ${nonAssignedTransactions.length} transactions`}></Button>
+				</div>
 			</div>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class='buttonWrapper assignTransactions' on:click={() => {
-				App.transactionViewerPopup.open(nonAssignedTransactions, `Assign ${nonAssignedTransactions.length} Transactions`);
-			}}>
-				<Button name={`assign ${nonAssignedTransactions.length} transactions`}></Button>
+
+			<div class='navigationHolder'>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class='navButton button filled' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))}>‹</div> 
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class='navButton button filled' on:click={() => curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(-1))}>PRESENT</div> 
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class='navButton button filled' on:click={() => curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))}>›</div> 
 			</div>
 		</div>
 	</div>
@@ -151,39 +158,68 @@
 			margin-right: 60px;
 			padding-right: 20px;
 		}
-		.monthHolder .navButton {
-			font-style: normal;
-			color: #999;
-			cursor: pointer;
-			margin: -10px -5px;
-			padding: 10px;
-		}
-
-	
+		
 
 
-		.buttonHolder {
+		.floatRightHolder {
 			position: absolute;
 			float: right;
 			top: 15px;
 			right: 0;
+			height: 80px;
 			display: flex;
-			flex-direction: column;
 		}
-			.buttonHolder .buttonWrapper {
-				margin-bottom: 5px;
-				margin-top: 0;
-				text-align: right;
-				transition: .3s opacity, .3s margin-top;
+		
+			.navigationHolder {
+				position: relative;
+				display: flex;
+				white-space: nowrap;
+				top: 25px;
+				height: 37px;
+				padding-left: 10px;
 			}
-			.buttonHolder.noAssignableTransactions .buttonWrapper:not(.assignTransactions) {
-				margin-top: 25px;
+			.navigationHolder .navButton {
+				font-style: normal;
+				cursor: pointer;
+				font-size: 25px;
+				margin-left: 5px;
+
+				-webkit-touch-callout: none; /* iOS Safari */
+				-webkit-user-select: none; /* Safari */
+				-khtml-user-select: none; /* Konqueror HTML */
+				-moz-user-select: none; /* Firefox */
+					-ms-user-select: none; /* Internet Explorer/Edge */
+						user-select: none; /* Non-prefixed version, currently
+											supported by Chrome and Opera */
 			}
-			.buttonHolder.noAssignableTransactions .buttonWrapper.assignTransactions {
-				opacity: 0;
-				margin-top: -50px;
-				pointer-events: none;
+			.navigationHolder .navButton:not(:nth-child(2)) {
+				line-height: 14px;
 			}
+		
+			.navigationHolder .navButton:nth-child(2) {
+				font-size: 14px;
+			}
+
+		
+
+
+			.buttonHolder {
+				flex-direction: column;
+			}
+				.buttonHolder .buttonWrapper {
+					margin-bottom: 5px;
+					margin-top: 0;
+					text-align: right;
+					transition: .3s opacity, .3s margin-top;
+				}
+				.buttonHolder.noAssignableTransactions .buttonWrapper:not(.assignTransactions) {
+					margin-top: 25px;
+				}
+				.buttonHolder.noAssignableTransactions .buttonWrapper.assignTransactions {
+					opacity: 0;
+					margin-top: -50px;
+					pointer-events: none;
+				}
 
 
 	/* Tag List */
