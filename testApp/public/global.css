@@ -18,7 +18,9 @@ html, body {
 }
 
 
-
+.popupHolder:not(.hide) .clickableWhenPopupOpen {
+	pointer-events: all;
+}
 
 
 
@@ -151,8 +153,6 @@ html, body {
 
 
 
-
-
-.popupHolder:not(.hide) .clickableWhenPopupOpen {
-	pointer-events: all;
+.popupHolder.CreateTagPopup .popup {
+	top: 50vh;
 }

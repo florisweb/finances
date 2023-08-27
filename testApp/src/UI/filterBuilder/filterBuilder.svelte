@@ -27,7 +27,7 @@
 	<div class='header'>Transaction-classifier filter</div>
 	<div class='statementHolder'>
 		{#each filter.value as ANDSet}
-			<FilterSection {ANDSet} on:delete={() => removeSet(ANDSet)}></FilterSection>
+			<FilterSection bind:ANDSet={ANDSet} on:delete={() => removeSet(ANDSet)}></FilterSection>
 		{/each}
 	</div>
 
@@ -39,9 +39,11 @@
 	.header {
 		margin-bottom: 5px;
 		font-size: 12px;
+		text-transform: uppercase;
 	}
 
 	.statementHolder {
 		overflow: auto;
+		max-height: calc(95vh - 400px);
 	}
 </style>

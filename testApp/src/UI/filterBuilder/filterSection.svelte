@@ -28,5 +28,17 @@
 		flex-direction: column;
   		border-left: 3px solid #daf;
   		margin-bottom: 15px;
+		animation: animateIn .3s;
+	}
+	
+	@keyframes animateIn {
+		0% {
+			opacity: 0;
+			margin-top: -50px;
+		}
+		100% {
+			opacity: 1;
+			margin-top: 0;
+		}
 	}
 </style>

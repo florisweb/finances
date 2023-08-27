@@ -48,7 +48,7 @@
 	$: if (isOpen && nameInput) nameInput.focus();
 </script>
 
-<Popup {isOpen} on:passiveClose={() => isOpen = false}>
+<Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateTagPopup'>
 	<Header slot='header' title={(inEditMode ? 'Edit' : 'Create') + ' Tag'}></Header>
 	<br><br>
 	<DropDown on:change={(_event) => curTag.color = _event.detail} value={curTag.color} options={AvailableColors.map((_colorSet) => {
@@ -69,7 +69,6 @@
 	<br>
 	<!-- <FilterBuilder bind:filter={curTag.filter}></FilterBuilder> -->
 	<FilterBuilder></FilterBuilder>
-	<br>
 	<br>
 	<div class='buttonHolder'>
 		<Button name='Save' on:click={() => saveTag()}></Button>

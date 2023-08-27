@@ -1,4 +1,6 @@
 <script>
+    import { slide } from 'svelte/transition';
+
 	import Button from '../button.svelte';
 	import DropDown from '../dropDown.svelte';
 	import Input from '../input.svelte';
@@ -22,7 +24,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class='filterRule' on:click|self={() => dispatch('addRule')}>
+<div class='filterRule' on:click|self={() => dispatch('addRule')} transition:slide>
 	<DropDown options={targetOptions} bind:value={rule[0]} customClass='clickableWhenPopupOpen'></DropDown>
 	<DropDown options={operatorOptions} bind:value={rule[1]} customClass='clickableWhenPopupOpen'></DropDown>
 	<Input bind:value={rule[2]} placeholder='filter...' customClass='clickableWhenPopupOpen'></Input>
@@ -36,10 +38,10 @@
 		pointer-events: none;
 		transition: margin-top .3s, opacity .3s;
 	}
-
 	.filterRule:not(:first-child) {
 		margin-top: 15px;
 	}
+
 		.filterRule:not(:first-child)::before {
 			position: relative;
 			margin-left: 0px;
