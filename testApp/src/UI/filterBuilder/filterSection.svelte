@@ -1,4 +1,6 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
     import FilterRule from './filterRule.svelte';
 	export let ANDSet = [];
 
@@ -11,6 +13,7 @@
 	}
 
 	$: ANDSet = ANDSet.map((_rule, _index) => {_rule.index = _index; return _rule});
+	$: if (ANDSet.length === 0) dispatch('delete');
 </script>
 
 <div class='tagFilterSection'>

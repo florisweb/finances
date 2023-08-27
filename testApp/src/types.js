@@ -297,16 +297,14 @@ export class BudgetSection {
 */
 
 export class TagFilter {
-	#filter = [];
-	get value() {
-		return this.#filter;
-	}
+	value = [];
+
 	constructor(_filter = []) {
-		this.#filter = _filter;
+		this.value = _filter;
 	}
 
 	evaluate(_transaction) {
-		for (let ORStatement of this.#filter) 
+		for (let ORStatement of this.value) 
 		{
 			let foundWrongStatement = false;
 			for (let ANDStatement of ORStatement)
@@ -354,7 +352,7 @@ export class TagFilter {
 	}
 
 	export() {
-		return this.#filter;
+		return Object.assign([], this.value);
 	}
 }
 					
