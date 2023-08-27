@@ -26,8 +26,6 @@
 	let top = 0;
 	let maxHeight = 500;
 	
-	window.setAbove = (x) => openAbove = x;
-	window.update = updatePanelPosition;
 	async function updatePanelPosition() {
 		if (!optionPanel || !button) return;
 		const screenMargin = 20;

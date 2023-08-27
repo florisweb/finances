@@ -55,12 +55,12 @@ export class TransactionTag {
 	id;
 	expensesBudget = {}; 
 
-	// filter;
+	filter;
 	constructor({name, color, id, filter}) {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id ?? newId();
-		// this.filter = new TagFilter(filter);
+		this.filter = new TagFilter(filter);
 	}
 
 	transactionFitsTag(_transaction) {
@@ -279,8 +279,86 @@ export class BudgetSection {
 
 
 
+/* TagFilter
+	[
+		a,
+		OR
+		b
+		OR
+		c,
+	]
 
+	a = [
+		x AND y
+	]
+	x = Property action comperator
+	Property = description | targetName | bankClassification
+	action = == | < | > | contains
+*/
 
+export class TagFilter {
+	#filter = [];
+	get value() {
+		return this.#filter;
+	}
+	constructor(_filter = []) {
+		this.#filter = _filter;
+	}
+
+	evaluate(_transaction) {
+		for (let ORStatement of this.#filter) 
+		{
+			let foundWrongStatement = false;
+			for (let ANDStatement of ORStatement)
+			{
+				if (foundWrongStatement) break;
+
+				let targetType 	= ANDStatement[0];
+				let comperator 	= ANDStatement[1];
+				let comparee 	= ANDStatement[2].toLowerCase();
+				let target = '';
+				switch (targetType)
+				{
+					case "targetName": target = _transaction.targetName; break;
+					case "description": target = _transaction.description; break;
+					case "bankClassification": target = _transaction.bankClassification; break;
+					default: foundWrongStatement = true; break;
+				}
+
+				if (!target) {foundWrongStatement = true; break}
+				target = target.toLowerCase(); 
+
+				switch (comperator)
+				{
+					case "includes": 
+						foundWrongStatement = !target.includes(comparee);
+					break;
+
+					case "==": 
+						foundWrongStatement = !(target == comparee);
+					break;
+					case ">":
+						foundWrongStatement = !(target > comparee);
+					break;
+					case "<": 
+						foundWrongStatement = !(target < comparee);
+					break;
+					default: foundWrongStatement = true; break;
+				}
+			}
+
+			if (!foundWrongStatement) return true;
+		}
+		return false;
+
+	}
+
+	export() {
+		return this.#filter;
+	}
+}
+					
+					
 
 
 

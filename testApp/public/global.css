@@ -147,3 +147,12 @@ html, body {
 .popupHolder.CreateBudgetPopup .popup.overviewPopup.hide {
 	transform: scale(.8) translate(-70%, -62.5%);	
 }
+
+
+
+
+
+
+.popupHolder:not(.hide) .clickableWhenPopupOpen {
+	pointer-events: all;
+}

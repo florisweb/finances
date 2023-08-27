@@ -10,6 +10,7 @@
 	import TagManager from "../data/tagManager";
 	import { TransactionTag, SavingsTransactionTag } from "../types";
 	import { AvailableColors } from '../color';
+    import FilterBuilder from "../UI/filterBuilder/filterBuilder.svelte";
 
 
 	let isOpen = false;
@@ -63,6 +64,11 @@
 	<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
 	<br>
 	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} bind:element={nameInput}  placeholder='Tag name...'></Input>
+	<br>
+	<br>
+	<br>
+	<!-- <FilterBuilder bind:filter={curTag.filter}></FilterBuilder> -->
+	<FilterBuilder></FilterBuilder>
 	<br>
 	<br>
 	<div class='buttonHolder'>
