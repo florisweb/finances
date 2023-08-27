@@ -3,6 +3,7 @@
 	import { CSVFileManager } from '../CSV.js';
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
+    import Button from "../UI/button.svelte";
 
 	const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 	const CSVReader = new CSVFileManager(BankExportRowKeys);
@@ -21,10 +22,8 @@
 
 <Page title="Upload CSV">
 	<input type='file' class='CSVInputField' accept='text/csv' on:input={handleCSVUpload}>
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class='button' on:click={() => TransactionManager.clear()}>
-		Clear Data
-	</div>
+
+	<Button	name="Clear Transactions" on:click={() => TransactionManager.clear()}></Button>
 	<div class='transactionCountHolder textHolder'>
 		Transactions: {transactions.length}
 	</div>
