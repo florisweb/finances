@@ -70,6 +70,7 @@
 	}
 	.budget.isNegative {
 		padding-left: 8px;
+		color: #844;
 	}
 	.budget:not(.isNegative) {
 		color: #484;

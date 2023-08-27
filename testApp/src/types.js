@@ -184,8 +184,12 @@ export class Budget {
 
 	get isActive() {
 		if (this.startMonthId.date.getTime() > new Date().getTime()) return false;
-		if (this.endMonthId && this.endMonthId.date.getTime() < new Date().getTime()) return false;;
-		return true;
+		if (!this.endMonthId) return true;
+		let endOfMonthDate = this.endMonthId.date.moveMonth(1);
+		endOfMonthDate.setDate(0);
+		endOfMonthDate.setHours(24);
+		endOfMonthDate.setMinutes(0);
+		return endOfMonthDate.getTime() >= new Date().getTime();
 	}
 	get lengthInMonths() {
 		let prevMonthDate = new Date(); 
