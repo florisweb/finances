@@ -11,7 +11,10 @@
 	import { TransactionTag, SavingsTransactionTag } from "../types";
 	import { AvailableColors } from '../color';
     import FilterBuilder from "../UI/filterBuilder/filterBuilder.svelte";
-
+    import TransactionManager from "../data/transactionManager";
+	
+	import { getContext } from 'svelte';
+	const App = getContext('App');
 
 	let isOpen = false;
 	let inEditMode = false;
@@ -28,9 +31,11 @@
 			color: AvailableColors[0].color,
 		});
 	}
-	export function close() {
+	export async function close() {
 		isOpen = false;
 		inEditMode = false;
+		let result = await TransactionManager.autoClassifyTransactions();
+		App.statusMessage.open('Classified ' + result.newClassifies + ' new transactions (' + Math.round(result.classifies / TransactionManager.data.length * 1000) / 10 + '% classified)')
 	}
 	export function openEdit(_tag) {
 		isOpen = true;

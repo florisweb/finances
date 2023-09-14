@@ -59,7 +59,6 @@ export class TransactionTag {
 		this.name = name;
 		this.color = typeof color === 'string' ? new Color(color) : color;
 		this.id = id ?? newId();
-		console.info(filter);
 		this.filter = new TagFilter(filter);
 	}
 

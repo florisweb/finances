@@ -32,6 +32,16 @@ const TagManager = new class extends DataManager {
 	_setStore(_tags) {
 		return super._setStore([..._tags, new NonAssignedTag()]);
 	}
+
+
+	autoDetectTransactionTag(_transaction) {
+		for (let tag of this._data)
+		{
+			if (!tag.transactionFitsTag(_transaction)) continue;
+			return tag;
+		}
+		return false;
+	}
 }
 
 export default TagManager;

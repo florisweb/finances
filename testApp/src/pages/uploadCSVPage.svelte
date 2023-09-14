@@ -4,6 +4,10 @@
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
     import Button from "../UI/button.svelte";
+	
+	import { getContext } from 'svelte';
+	const App = getContext('App');
+
 
 	const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 	const CSVReader = new CSVFileManager(BankExportRowKeys);
@@ -13,7 +17,10 @@
 	  	const [firstFile] = _event.target.files
 		let rows = await CSVReader.load(firstFile);
 		let transactions = rows.map(row => new Transaction(row));
-		TransactionManager.add(transactions);
+		await TransactionManager.add(transactions);
+		let result = await TransactionManager.autoClassifyTransactions();
+		console.log('result', result, TransactionManager.data.length);
+		App.statusMessage.open('Classified ' + result.newClassifies + ' new transactions (' + Math.round(result.classifies / TransactionManager.data.length * 1000) / 10 + '% classified)')
 	}
 
 	let transactions = [];
