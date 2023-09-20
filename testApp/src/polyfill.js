@@ -23,3 +23,13 @@ export function wait(_dt) {
 		setTimeout(resolve, _dt);
 	});
 }
+
+
+export function downloadFile(_string, _name = 'output.csv', _type = 'text/csv') {
+	var c = document.createElement("a");
+	c.download = _name;
+
+	var t = new Blob([_string], {type: _type});
+	c.href = window.URL.createObjectURL(t);
+	c.click();
+}

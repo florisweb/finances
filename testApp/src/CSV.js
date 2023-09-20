@@ -1,5 +1,21 @@
 
 
+export function readFile(_file) {
+	return new Promise((resolve, error) => {
+		if (!_file) return error();
+
+		const reader = new FileReader();
+		  reader.onload = async () => {
+			resolve(reader.result);
+		  }
+	  
+		  reader.readAsText(_file)
+	});
+}
+
+
+
+
 export class CSVFileManager {
 	#CSVTemplate = [];
 	rows = [];
@@ -9,19 +25,11 @@ export class CSVFileManager {
 	}
 
 	async load(_file) {
-		return new Promise((resolve, error) => {
-			if (!_file) return error();
+		let result = await readFile(_file);
 
-			const reader = new FileReader();
-		  	reader.onload = async () => {
-		    	const text = reader.result;
-		    	let rows = text.split('\n');
-		    	this.rows = rows.map((string) => new CSVRow(string.split(','), this.#CSVTemplate));
-		    	resolve(this.rows);
-		  	}
-		  
-		  	reader.readAsText(_file)
-		});
+		let rows = result.split('\n');
+		this.rows = rows.map((string) => new CSVRow(string.split(','), this.#CSVTemplate));
+		return this.rows;
 	}
 
 	toCSV(_template = this.#CSVTemplate) {

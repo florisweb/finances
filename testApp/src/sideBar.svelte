@@ -22,7 +22,7 @@
 
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item">
-		<Button name='Upload CSV' on:click={() => openPageByIndex(0)}></Button>
+		<Button name='Data Management' on:click={() => openPageByIndex(0)}></Button>
 	</div>
 </div>
 

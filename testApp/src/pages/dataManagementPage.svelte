@@ -1,8 +1,10 @@
 <script>
 	import Page from "../UI/page.svelte";
-	import { CSVFileManager } from '../CSV.js';
+	import { downloadFile } from '../polyfill';
+	import { CSVFileManager, readFile } from '../CSV.js';
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
+	import Packager from '../data/packager';
     import Button from "../UI/button.svelte";
 	
 	import { getContext } from 'svelte';
@@ -12,25 +14,46 @@
 	const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 	const CSVReader = new CSVFileManager(BankExportRowKeys);
 
-	async function handleCSVUpload(_event) {
+	
+
+	async function handleUpload(_event) {
 		if (!_event.target) throw new Error('null input')
-	  	const [firstFile] = _event.target.files
-		let rows = await CSVReader.load(firstFile);
-		let transactions = rows.map(row => new Transaction(row));
-		await TransactionManager.add(transactions);
+	  	const [file] = _event.target.files;
+		if (!file) return;
+		if (file.type === 'text/csv') {
+			await handleCSVUpload(file);
+		} else await handleFinancePackageUpload(file);
+		
+		if (!TransactionManager.data.length) return;
 		let result = await TransactionManager.autoClassifyTransactions();
-		console.log('result', result, TransactionManager.data.length);
 		App.statusMessage.open('Classified ' + result.newClassifies + ' new transactions (' + Math.round(result.classifies / TransactionManager.data.length * 1000) / 10 + '% classified)')
 	}
+
+	async function handleCSVUpload(_file) {
+		let rows = await CSVReader.load(_file);
+		let transactions = rows.map(row => new Transaction(row));
+		await TransactionManager.add(transactions);
+	}
+	async function handleFinancePackageUpload(_file) {
+		let data = await readFile(_file);
+		await Packager.import(data).then(
+			() => App.statusMessage.open('Succesfully imported the .finance file.'),
+			(_error) => App.statusMessage.open(_error)
+		);
+		
+	}
+
+
 
 	let transactions = [];
 	TransactionManager.dataStore.subscribe((_transactions) => transactions = _transactions)
 </script>
 
-<Page title="Upload CSV">
-	<input type='file' class='CSVInputField' accept='text/csv' on:input={handleCSVUpload}>
+<Page title="Data Management">
+	<input type='file' class='CSVInputField' accept='text/csv, text/finance' on:input={handleUpload}>
 
 	<Button	name="Clear Transactions" on:click={() => TransactionManager.clear()}></Button>
+	<Button	name="Download Package" on:click={() => downloadFile(Packager.export(), 'output.finance', 'text/finance')}></Button>
 	<div class='transactionCountHolder textHolder'>
 		Transactions: {transactions.length}
 	</div>

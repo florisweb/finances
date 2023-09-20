@@ -1,9 +1,11 @@
 import DataManager from "./dataManager";
 import { Transaction, MonthIdentifier } from "../types";
 
+
 const TransactionManager = new class extends DataManager {
 	constructor() {
 		super({type: "transactions", dataToObject: (_transaction) => new Transaction(_transaction)});
+		window.TransactionManager = this;
 	}
 
 	#transactionsPerMonth = {};
@@ -64,24 +66,26 @@ const TransactionManager = new class extends DataManager {
 	}
 
 	async autoClassifyTransactions() {
-		let classifies = 0;
+		let oldClassifies = 0;
 		let newClassifies = 0;
 		for (let trans of this._data)
 		{
-			if (trans.typeCode !== undefined) classifies++;
+			if (trans.typeCode) oldClassifies++;
 			if (trans.classificationState === 2) continue; // Already manually classified
 
 			let type = TagManager.autoDetectTransactionTag(trans);
 			if (type === false) continue;
-			if (trans.typeCode !== type) newClassifies++; // Changed/added the classification
+			if (trans.typeCode !== type.id) newClassifies++; // Changed/added the classification
 
-			trans.typeCode = type;
+			trans.typeCode = type.id;
 			trans.classificationState = 1;
 		}
 		await this.writeData();
 
-		App.statusMessage.open('Classified ' + newClassifies + ' new transactions (' + Math.round(classifies / this._data.length * 1000) / 10 + '% classified)')
-		return classifies;
+		return {
+			newClassifies: newClassifies,
+			classifies: oldClassifies + newClassifies,
+		}
 	}
 
 	writeData() {

@@ -32,8 +32,13 @@ export default class DataManager {
 	async setup() {
 		let response = await LocalDB.getData(this.type);
 		if (!response) return console.warn('An error accured while loading ', this.type, response);		
-		this._data = response.map(dataPoint => this.#dataToObject(dataPoint));
+		this.importData(response, false);
+	}
+
+	importData(_data, _write = true) {
+		this._data = _data.map(dataPoint => this.#dataToObject(dataPoint));
 		this._setStore(this._data);
+		if (_write) return this.writeData();
 	}
 
 
