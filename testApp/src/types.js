@@ -146,7 +146,7 @@ export class SavingsTransactionTag extends TransactionTag {
 		for (let budget of BudgetManager._data)
 		{
 			let budgetPerMonth = budget.getBudgetForTag(this.id);
-			budgetedMoney = budgetPerMonth * budget.lengthInMonths;
+			budgetedMoney += budgetPerMonth * budget.lengthInMonths;
 		}
 
 		return this.startValue + this.totalExpenses - budgetedMoney;

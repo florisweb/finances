@@ -77,6 +77,7 @@
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 	let sumTags = [];
+	let totalAverageExpenses = 0;
 	$: {
 		sumTags = tags.filter((_tag) => !_tag.isNonAssignedTag).map((_tag) => {
 			return {
@@ -84,7 +85,8 @@
 				budget: curBudget.getBudgetForTag(_tag.id),
 				averageExpenses: _tag.averageExpensesLast12Months
 			}
-		})
+		});
+		totalAverageExpenses = sumTags.map(tag => tag.averageExpenses).reduce((a, b) => a + b, 0);
 	}
 </script>
 
@@ -124,7 +126,7 @@
 				{#each sumTags as sumTag}
 					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget} averageExpenses={sumTag.averageExpenses}></TagBudgetOverviewRow>
 				{/each}
-				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum}></TagBudgetOverviewRow>
+				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum} averageExpenses={totalAverageExpenses}></TagBudgetOverviewRow>
 			</table>
 		</div>
 	</PopupBox>
