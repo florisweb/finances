@@ -5,6 +5,7 @@
 	// import AddTagPanel from "../UI/addTagPanel.svelte";
 	import { getContext } from 'svelte';
     import BudgetManager from "../data/budgetManager";
+    import AddBudgetPanel from "../UI/addBudgetPanel.svelte";
 	const App = getContext('App');
 
 	let budgets = [];
@@ -17,7 +18,7 @@
 			<BudgetPanel budget={budget} on:click={() => App.createBudgetPopup.openEdit(budget)}></BudgetPanel>
 		{/each}
 
-		<!-- <AddTagPanel></AddTagPanel> -->
+		<AddBudgetPanel on:click={() => App.createBudgetPopup.open()}></AddBudgetPanel>
 	</div>
 </Page>
 
