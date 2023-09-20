@@ -19,6 +19,7 @@
 		float: bottom;
 		left: 0;
 		bottom: 0;
+		z-index: 100;
 		margin: 20px;
 		width: auto;
 		height: auto;
