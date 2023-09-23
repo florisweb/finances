@@ -3,6 +3,7 @@
 	import MonthOverviewPage from "./pages/monthOverviewPage.svelte";
 	import BudgetManagementPage from './pages/budgetManagementPage.svelte';
     import DataManagementPage from "./pages/dataManagementPage.svelte";
+	import TagPage from './pages/tagPage.svelte';
 </script>
 
 <div id='mainContent'>
@@ -10,6 +11,7 @@
 	<TagManagementPage></TagManagementPage>
 	<MonthOverviewPage></MonthOverviewPage>
 	<BudgetManagementPage></BudgetManagementPage>
+	<TagPage></TagPage>
 </div>
 <style>
 	#mainContent {
