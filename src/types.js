@@ -152,6 +152,28 @@ export class SavingsTransactionTag extends TransactionTag {
 		return this.startValue + this.totalExpenses - budgetedMoney;
 	}
 
+	getSavingsAtStartOfMonth(_monthId) { // Budget is added at the end of the month
+		let transactions = this.transactions;
+		let totalExpensesUntilMonth = transactions.filter(
+			(_t) => new Date().setFromStr(_t.date).getTime() < _monthId.date.getTime()
+		).map((_t) => _t.deltaMoney).reduce((a, b) => a + b, 0);
+
+		let budgetedMoney = 0;
+		for (let budget of BudgetManager._data)
+		{
+			if (budget.startMonthId.date.getTime() > _monthId.date.getTime()) continue;
+			let lengthInMonths = budget.lengthInMonths;
+			if (!budget.endMonthId || budget.endMonthId.date.getTime() > _monthId.date.getTime())
+			{
+				lengthInMonths = _monthId.date.getDateInMonths() - budget.startMonthId.date.getDateInMonths();
+			}
+
+			let budgetPerMonth = budget.getBudgetForTag(this.id);
+			budgetedMoney += budgetPerMonth * lengthInMonths;
+		}
+		return this.startValue + totalExpensesUntilMonth - budgetedMoney;
+	}
+
 	export() {
 		let data = super.export();
 		data.isSavingsTag = true;
@@ -368,7 +390,6 @@ export class TagFilter {
 
 
 
-
 export class MonthIdentifier {
 	#string;
 
@@ -412,3 +433,4 @@ export class MonthIdentifier {
 		return this.#string;
 	}
 }
+window.MonthIdentifier = MonthIdentifier;
