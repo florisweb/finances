@@ -404,7 +404,7 @@ export class BankAccount {
 	name = '';
 	IBAN = '';
 	get transactions() {
-
+		return TransactionManager.getByAccount(this);
 	}
 
 	constructor({IBAN, name}) {

@@ -58,6 +58,11 @@ const TransactionManager = new class extends DataManager {
 		}
 		return found;
 	}
+	getByAccount(_account) {
+		let IBAN = typeof _account === 'string' ? _account : _account.IBAN;
+		return this.data.filter((t) => t.ownIBAN === IBAN);
+	}
+
 
 	getByMonth(_monthId) {
 		return this.#transactionsPerMonth[_monthId.id] || [];

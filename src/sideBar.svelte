@@ -5,6 +5,9 @@
 	import AccountManager from './data/accountManager.js';
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
+
+	import { getContext } from "svelte";
+	const App = getContext('App');
 </script>
 
 <div id='sideBar'>
@@ -24,12 +27,14 @@
 		<Button name='Budgetter' on:click={() => openPageByIndex(3)}></Button>
 	</div>
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
-	<div class="item">
+	<div class="item header">
 		Accounts
 	</div>
 	{#each accounts as account}
-		<div class="item">
-			<Button name={account.name} on:click={() => console.warn('clicked account', account)}></Button>
+		<div class="item account">
+			<Button name={account.name} on:click={
+				() => App.transactionViewerPopup.open(account.transactions, `${account.name}'s Transactions`)
+			}></Button>
 		</div>
 	{/each}
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
@@ -53,6 +58,13 @@
 	.item {
 		margin-bottom: 20px;
 	}
+	.item.header {
+		margin-bottom: 5px;
+		text-transform: uppercase;
+		font-size: 12px;
+		color: #daf;
+		font-style: italic;
+	}
 
 	.item.appLogo {
 		margin-bottom: 40px;
@@ -75,7 +87,11 @@
 		background: #daf;
 	}
 
-	.item .button {
+
+	.item.account {
+		margin-bottom: 10px;
+	}
+	/* .item .button {
 		margin: 0;
 		transition: background .3s, padding-right .3s;
 	}
@@ -95,5 +111,6 @@
 		content: '⚠';
 		opacity: 1;
 		margin-left: 5px;
-	}
+	} */
+	
 </style>
