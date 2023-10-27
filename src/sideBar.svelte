@@ -1,6 +1,10 @@
 <script>
 	import { openPageByIndex } from './App.js';
 	import Button from './UI/button.svelte';
+
+	import AccountManager from './data/accountManager.js';
+	let accounts = [];
+	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
 </script>
 
 <div id='sideBar'>
@@ -19,7 +23,15 @@
 	<div class="item">
 		<Button name='Budgetter' on:click={() => openPageByIndex(3)}></Button>
 	</div>
-
+	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
+	<div class="item">
+		Accounts
+	</div>
+	{#each accounts as account}
+		<div class="item">
+			<Button name={account.name} on:click={() => console.warn('clicked account', account)}></Button>
+		</div>
+	{/each}
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item">
 		<Button name='Data Management' on:click={() => openPageByIndex(0)}></Button>

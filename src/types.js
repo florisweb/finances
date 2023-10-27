@@ -4,10 +4,12 @@ import Date from './time';
 import { newId } from './polyfill';
 import TransactionManager from './data/transactionManager';
 import BudgetManager from './data/budgetManager';
+import AccountManager from './data/accountManager';
 
 export class Transaction {
 	date;
 	typeCode = 0;
+	ownIBAN = '';
 	targetIBAN = '';
 	targetName = '';
 	deltaMoney;
@@ -16,6 +18,9 @@ export class Transaction {
 	bankClassification = '';
 	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
 
+	get isInternalTransfer() {
+		return !!AccountManager.getByIBAN(this.targetIBAN);
+	}
 	constructor(_params) {
 		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
 		_params.balance 	= parseFloat(_params.balance);
@@ -36,6 +41,7 @@ export class Transaction {
 		return {
 			date: this.date, 
 			typeCode: this.typeCode, 
+			ownIBAN: this.ownIBAN || 'NO-IBAN',
 			targetIBAN: this.targetIBAN,
 			targetName: this.targetName,
 			deltaMoney: this.deltaMoney,
@@ -384,7 +390,35 @@ export class TagFilter {
 	}
 }
 					
-					
+			
+
+
+
+
+
+
+
+
+
+export class BankAccount {
+	name = '';
+	IBAN = '';
+	get transactions() {
+
+	}
+
+	constructor({IBAN, name}) {
+		this.IBAN = IBAN;
+		this.name = name;
+	}
+
+	export() {
+		return {
+			name: this.name,
+			IBAN: this.IBAN,
+		}
+	}
+}
 
 
 

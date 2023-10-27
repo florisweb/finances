@@ -4,6 +4,7 @@
 	import { CSVFileManager, readFile } from '../CSV.js';
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
+	import AccountManager from '../data/accountManager';
 	import Packager from '../data/packager';
     import Button from "../UI/button.svelte";
 	
@@ -11,7 +12,7 @@
 	const App = getContext('App');
 
 
-	const BankExportRowKeys = ['date', 'senderIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
+	const BankExportRowKeys = ['date', 'ownIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
 	const CSVReader = new CSVFileManager(BankExportRowKeys);
 
 	
@@ -33,6 +34,7 @@
 		let rows = await CSVReader.load(_file);
 		let transactions = rows.map(row => new Transaction(row));
 		await TransactionManager.add(transactions);
+		AccountManager.reEvaluateAccounts();
 	}
 	async function handleFinancePackageUpload(_file) {
 		let data = await readFile(_file);
@@ -40,7 +42,7 @@
 			() => App.statusMessage.open('Succesfully imported the .finance file.'),
 			(_error) => App.statusMessage.open(_error)
 		);
-		
+		AccountManager.reEvaluateAccounts();
 	}
 
 
