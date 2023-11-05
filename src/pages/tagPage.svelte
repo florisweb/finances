@@ -10,7 +10,7 @@
 	App.tagPage = {
 		open: (_tag) => {
 			curTag = _tag;
-			openPageByIndex(4);
+			openPageByIndex(6);
 		}
 	};
 

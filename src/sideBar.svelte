@@ -16,7 +16,9 @@
 			FinanceManager
 		</div>
 	</div>
-
+	<div class="item">
+		<Button name='Overview' on:click={() => openPageByIndex(4)}></Button>
+	</div>
 	<div class="item">
 		<Button name='Month Overview' on:click={() => openPageByIndex(2)}></Button>
 	</div>
@@ -32,8 +34,8 @@
 	</div>
 	{#each accounts as account}
 		<div class="item account">
-			<Button name={account.name} on:click={
-				() => App.transactionViewerPopup.open(account.transactions, `${account.name}'s Transactions`)
+			<Button name={account.name || 'Unnamed Account'} on:click={
+				() => App.accountPage.open(account)
 			}></Button>
 		</div>
 	{/each}

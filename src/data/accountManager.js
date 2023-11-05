@@ -33,7 +33,7 @@ const AccountManager = new class extends DataManager {
 		for (let IBAN of IBANs)
 		{
 			if (this.getByIBAN(IBAN)) continue;
-			this.add(new BankAccount({IBAN: IBAN, name: IBAN}));
+			this.add(new BankAccount({IBAN: IBAN}));
 		}
 	}
 }

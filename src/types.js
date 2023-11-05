@@ -401,15 +401,27 @@ export class TagFilter {
 
 
 export class BankAccount {
-	name = '';
 	IBAN = '';
+	name = '';
+
+
 	get transactions() {
 		return TransactionManager.getByAccount(this);
+	}
+	get balance() {
+		let transactions = this.transactions;
+		if (transactions.length === 0) return 0;
+		let lastTrans = transactions[transactions.length - 1];
+		return lastTrans.balance + lastTrans.deltaMoney;
 	}
 
 	constructor({IBAN, name}) {
 		this.IBAN = IBAN;
 		this.name = name;
+	}
+
+	clone() {
+		return new BankAccount(this.export());
 	}
 
 	export() {

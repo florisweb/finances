@@ -1,10 +1,13 @@
 
 
-export function formatMoneyString(_money, _addEuroSign = true) {
+export function formatMoneyString(_money, _addEuroSign = true, _ignoreCents = false) {
 	let moneyString = String(Math.round(_money * 100) / 100);
 	let parts = moneyString.split('.');
-	if (parts.length === 1) moneyString += '.00';
-	if (parts.length === 2) moneyString = parts[0] + '.' + (parts[1].length === 1 ? parts[1] + '0' : parts[1]);
+	if (!_ignoreCents)
+	{
+		if (parts.length === 1) moneyString += '.00';
+		if (parts.length === 2) moneyString = parts[0] + '.' + (parts[1].length === 1 ? parts[1] + '0' : parts[1]);
+	} else moneyString = parts[0];
 	if (!_addEuroSign) return moneyString;
 
 	let negativeParts = moneyString.split('-');
