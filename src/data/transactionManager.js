@@ -58,9 +58,9 @@ const TransactionManager = new class extends DataManager {
 		}
 		return found;
 	}
-	getByAccount(_account) {
+	getByAccount(_account, _data = this.data) {
 		let IBAN = typeof _account === 'string' ? _account : _account.IBAN;
-		return this.data.filter((t) => t.ownIBAN === IBAN);
+		return _data.filter((t) => t.ownIBAN === IBAN);
 	}
 
 
@@ -71,6 +71,11 @@ const TransactionManager = new class extends DataManager {
 	getByMonthAndTag(_monthId, _tagId) {
 		return this.getByTag(_tagId, this.getByMonth(_monthId));
 	}
+	getByMonthAndAccount(_monthId, _account) {
+		return this.getByAccount(_account, this.getByMonth(_monthId));
+	}
+
+	
 
 	async autoClassifyTransactions() {
 		let oldClassifies = 0;

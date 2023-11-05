@@ -1,12 +1,50 @@
 <script>
 	import Page from "../UI/page.svelte";	
+	import Graph from "../UI/graph.svelte";
+	import AccountManager from "../data/accountManager";
+	import { AvailableColors } from '../color';
+	import Vector from "../vector";
+
+	let accounts = [];
+	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
+	let graphData = [{color: AvailableColors[0], data: []}];
+
+	
+	$: if (accounts.length)
+	{
+		for (let i = 0; i < AccountManager.data.length + 1; i++)
+		{
+			graphData[i] = {
+				color: AvailableColors[i].color,
+				data: []
+			}
+		}
+
+		let curMonth = new MonthIdentifier();
+		for (let m = 11; m >= 0; m--)
+		{
+			let curTime = curMonth.date.getTime();
+			let sum = 0;
+			for (let i = 0; i < AccountManager.data.length; i++)
+			{
+				let account = AccountManager.data[i];
+				let balance = account.getBalanceAtEndOfMonth(curMonth) || 0;
+				sum += balance;
+				graphData[i + 1].data.push(new Vector(curTime, balance));
+			}
+			graphData[0].data.push(new Vector(curTime, sum));
+			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
+		}
+
+	}
 </script>
 
 <Page>
 	<div class='infoHolder'>
 	</div>
 
-	<div class='tagListHolder'>
+	<div class='dataHolder'>
+		<Graph title='Balance' data={graphData}></Graph>
 	</div>
 </Page>
 
@@ -123,17 +161,5 @@
 					margin-top: -50px;
 					pointer-events: none;
 				}
-
-
-	/* Tag List */
-	.tagListHolder {
-		position: relative;
-		margin: 20px;
-
-		display: grid;
-		grid-template: repeat(10, auto) / repeat(3, calc((100% - 40px * 2) / 3));
-		grid-gap: 40px;
-	}
-
 
 </style>

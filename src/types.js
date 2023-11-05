@@ -415,6 +415,20 @@ export class BankAccount {
 		return lastTrans.balance + lastTrans.deltaMoney;
 	}
 
+	getBalanceAtEndOfMonth(_monthId) {
+		let transactions = this.transactions;
+		if (!transactions.length) return 0;
+		let lastTransactionInMonth = transactions[transactions.length - 1];
+		for (let i = transactions.length - 1; i >= 0; i--)
+		{
+			if (!_monthId.containsDate(transactions[i].date)) continue;
+			lastTransactionInMonth = transactions[i];
+			break;
+		}
+
+		return lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+	}
+
 	constructor({IBAN, name}) {
 		this.IBAN = IBAN;
 		this.name = name;
@@ -460,7 +474,7 @@ export class MonthIdentifier {
 	}
 
 	containsDate(_date) {
-		let date = new Date().setDateFromStr(_date.toString())
+		let date = new Date().setDateFromStr(typeof _date === 'string' ? _date : _date.toString());
 		let ownDate = this.date;
 		return date.dateIsBetween(ownDate, ownDate.copy().moveMonth(1));
 	}

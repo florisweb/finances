@@ -5,8 +5,12 @@
 
 	import { openPageByIndex } from '../App';
 	import { getContext } from 'svelte';
-	const App = getContext('App');
+    import { MonthIdentifier } from "../types";
+    import Graph from "../UI/graph.svelte";
+    import Vector from "../vector";
+    import Color from "../color";
 
+	const App = getContext('App');
 	let curAccount;
 	App.accountPage = {
 		open: (_account) => {
@@ -14,6 +18,22 @@
 			openPageByIndex(5);
 		}
 	};
+
+
+	let graphData = [];
+	let balancePerMonth = [];
+	$: {
+		let curMonth = new MonthIdentifier();
+		for (let i = 11; i >= 0; i--)
+		{
+			balancePerMonth[i] = new Vector(curMonth.date.getTime(), curAccount?.getBalanceAtEndOfMonth(curMonth) || 0);
+			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
+		}
+		graphData = [{
+			color: new Color('#0f0'),
+			data: balancePerMonth
+		}];
+	}
 
 </script>
 
@@ -42,7 +62,8 @@
 		</div>
 	</div>
 
-	<div class='tagListHolder'>
+	<div class='dataHolder'>
+		<Graph title='Balance' data={graphData}></Graph>
 	</div>
 </Page>
 
@@ -102,13 +123,9 @@
 		
 
 
-	/* Tag List */
-	.tagListHolder {
+	.dataHolder {
 		position: relative;
 		margin: 20px;
-
-		display: grid;
-		grid-template: repeat(10, auto) / repeat(3, calc((100% - 40px * 2) / 3));
-		grid-gap: 40px;
+		border: 1px solid red;
 	}
 </style>
