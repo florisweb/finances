@@ -152,8 +152,8 @@
 		}
 
 		Camera.size.value = [
-			(xDomain.value[1] - xDomain.value[0]) * .8, 
-			(yDomain.value[1] - yDomain.value[0]) * .8
+			(xDomain.value[1] - xDomain.value[0]),
+			(yDomain.value[1] - yDomain.value[0])
 		];
 		
 		Camera.position.value = [
@@ -405,11 +405,24 @@
 
 
 <style>
-	canvas {
+	.GraphHolder {
 		position: relative;
 		width: 100%;
 		height: 100%;
 		border: 1px solid #eee;
 		box-shadow: 5px 5px 20px 20px rgba(0, 0, 0, .01);
+	}
+	.titleHolder {
+		position: absolute;
+		left: 0;
+		top: 0;
+		margin-left: 20px;
+		margin-top: 10px;
+		pointer-events: none;
+	}
+	canvas {
+		position: relative;
+		width: 100%;
+		height: 100%;
 	}
 </style>
