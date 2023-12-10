@@ -7,35 +7,28 @@
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
-	let graphData = [{color: AvailableColors[0], data: []}];
+	let graphData = [{color: AvailableColors[0].color, data: []}];
 
 	
 	$: if (accounts.length)
 	{
-		for (let i = 0; i < AccountManager.data.length + 1; i++)
+		for (let i = 1; i < accounts.length + 1; i++)
 		{
+			console.log(accounts[i]);
 			graphData[i] = {
 				color: AvailableColors[i].color,
-				data: []
+				data: accounts[i - 1].generateGraphData(23) || []
 			}
 		}
 
-		let curMonth = new MonthIdentifier();
-		for (let m = 24 - 1; m >= 0; m--)
+		for (let d = 0; d < graphData[1].data.length; d++)
 		{
-			let curTime = curMonth.date.getTime();
-			let sum = 0;
-			for (let i = 0; i < AccountManager.data.length; i++)
-			{
-				let account = AccountManager.data[i];
-				let balance = account.getBalanceAtEndOfMonth(curMonth) || 0;
-				sum += balance;
-				graphData[i + 1].data.push(new Vector(curTime, balance));
+			graphData[0].data[d] = new Vector(graphData[1].data[d].value[0], 0);
+			for (let i = 1; i < accounts.length + 1; i++)
+			{	
+				graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
 			}
-			graphData[0].data.push(new Vector(curTime, sum));
-			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
 		}
-
 	}
 </script>
 
