@@ -3,6 +3,10 @@
 
 	export let title = 'Graph';
 	export let data = [{data: []}];
+	export let config = {
+		drawDotsOnLine: true,
+		enablePointInfoPopup: true,
+	};
 	// Data: 
 	/*[
 		{
@@ -15,8 +19,15 @@
 	let ctx;
 	$: {
 		ctx = canvas?.getContext('2d');
-		if (ctx) render();
+		if (ctx)
+		{
+			ctx.drawCircle = (x, y, radius) => {
+				ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+			}
+			render();
+		}	
 	}
+
 	$: {
 		if (canvas) {
 			onResize();
@@ -46,8 +57,11 @@
 	}
 
 
+	let curHoverPoint = false;
+
 
 	// DRAGGER
+	
 	let dragging = false;
 	let prevDragPos = new Vector(0, 0);
 	function handleDragStart(_e) {
@@ -56,7 +70,7 @@
 	}
 
 	function handleDragMove(_e) {
-		if (!dragging) return;
+		if (!dragging) return handleMouseMove(_e);
 		let dragPos = Camera.pxToWorldCoord(Camera.eventToPxCoord(_e), true);
 		let delta = prevDragPos.copy().subtract(dragPos);
 		prevDragPos = dragPos;
@@ -71,6 +85,40 @@
 
 	function handleDragEnd(_e) {
 		dragging = false;
+	}
+
+	function handleMouseMove(_e) {
+		if (!config.enablePointInfoPopup) return;
+		let dragPos = Camera.eventToPxCoord(_e);
+
+		let points = [];
+		for (let line of data)
+		{
+			for (let point of line.data)
+			{
+				let pos = Camera.worldToPxCoord(point);
+				let distance = pos.difference(dragPos).getSquaredLength();
+				if (distance > 20**2) continue;
+				points.push({
+					distance: distance,
+					line: line,
+					point: point,
+				})
+			}
+		}
+		
+		if (!points.length) {
+			if (curHoverPoint) {
+				curHoverPoint = false; 
+				render();
+			}
+			return;
+		}
+
+		points.sort((a, b) => a.distance > b.distance);
+		if (curHoverPoint === points[0]) return;
+		curHoverPoint = points[0];
+		render();
 	}
 	
 
@@ -119,8 +167,41 @@
 		for (let line of data) renderLine(line);
 		renderYAxis();
 		renderXAxis();
+
+
+		if (!curHoverPoint) return;
+		renderPointInfo(curHoverPoint);
 	}
 
+
+	function renderPointInfo(_point) {
+		const boxSize = new Vector(40, 15);
+		const dotRadius = 5;
+		let coord = Camera.worldToPxCoord(_point.point);
+
+		ctx.fillStyle = _point.line.color.hex;
+		ctx.strokeStyle = '#eee';
+		ctx.beginPath();
+		ctx.drawCircle(coord.value[0], coord.value[1], dotRadius);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
+
+		let boxPos = coord.copy().subtract(new Vector(boxSize.value[0] / 2, boxSize.value[1] + dotRadius));
+		ctx.fillStyle = '#fff';
+		ctx.strokeStyle = _point.line.color.hex;
+		ctx.beginPath();
+		ctx.rect(boxPos.value[0], boxPos.value[1], boxSize.value[0], boxSize.value[1]);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.fillStyle = _point.line.color.hex;
+		ctx.beginPath();
+		ctx.fillText(Math.round(_point.point.value[1]), boxPos.value[0] + boxSize.value[0] / 2, boxPos.value[1]);
+		ctx.closePath();
+		ctx.fill();
+	}
 
 	
 	function renderLine(_line) {
@@ -147,6 +228,19 @@
 		}
 		ctx.closePath();
 		ctx.stroke();
+
+		if (!config.drawDotsOnLine) return;
+		for (let p = 0; p < _line.data.length; p++)
+		{
+			let coord = Camera.worldToPxCoord(_line.data[p]);
+			ctx.fillStyle = '#fff';
+			ctx.strokeStyle = _line.color.hex;;
+			ctx.beginPath();
+			ctx.drawCircle(coord.value[0], coord.value[1], 2);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+		}
 	}
 
 	function renderXAxis() {

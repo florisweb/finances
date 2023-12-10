@@ -7,17 +7,16 @@
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
-	let graphData = [{color: AvailableColors[0].color, data: []}];
+	let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}];
 
 	
-	$: if (accounts.length)
-	{
+	$: if (accounts.length) {
 		for (let i = 1; i < accounts.length + 1; i++)
 		{
-			console.log(accounts[i]);
 			graphData[i] = {
 				color: AvailableColors[i].color,
-				data: accounts[i - 1].generateGraphData(23) || []
+				data: accounts[i - 1].generateGraphData(23) || [],
+				doNotInterpolate: true,
 			}
 		}
 

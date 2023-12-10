@@ -60,8 +60,11 @@ export default function Vector(x, y) {
 	}
 
 
+	this.getSquaredLength = function() {
+		return this.dotProduct(this);
+	}
 	this.getLength = function() {
-		return Math.sqrt(this.dotProduct(this));
+		return Math.sqrt(this.squaredLength());
 	}
 	
 	this.setLength = function(_length) {

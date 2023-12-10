@@ -431,7 +431,6 @@ export class BankAccount {
 	}
 
 	generateGraphData(_range = 11) {
-		console.time('generate');
 		let transactions = this.transactions;
 		let balancePerMonth = [];
 		if (!transactions.length) return balancePerMonth;
@@ -453,7 +452,6 @@ export class BankAccount {
 			balancePerMonth[i] = new Vector(curMonth.date.getTime(), balance || 0);
 			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
 		}
-		console.timeEnd('generate');
 		return balancePerMonth;
 	}
 
