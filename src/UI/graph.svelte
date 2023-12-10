@@ -15,6 +15,9 @@
 	]
 	*/
 
+
+
+
 	let canvas;
 	let ctx;
 	$: {
@@ -57,10 +60,8 @@
 	}
 
 
+	// Interface for user
 	let curHoverPoint = false;
-
-
-	// DRAGGER
 	
 	let dragging = false;
 	let prevDragPos = new Vector(0, 0);
@@ -151,8 +152,8 @@
 		}
 
 		Camera.size.value = [
-			(xDomain.value[1] - xDomain.value[0]), 
-			(yDomain.value[1] - yDomain.value[0])
+			(xDomain.value[1] - xDomain.value[0]) * .8, 
+			(yDomain.value[1] - yDomain.value[0]) * .8
 		];
 		
 		Camera.position.value = [
@@ -164,10 +165,10 @@
 	function render() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		for (let line of data) renderLine(line);
 		renderYAxis();
 		renderXAxis();
 
+		for (let line of data) renderLine(line);
 
 		if (!curHoverPoint) return;
 		renderPointInfo(curHoverPoint);
@@ -341,7 +342,7 @@
 	const Camera = new class {
 		position = new Vector(0, 0);
 		size = new Vector(200, 200);
-		labelMargin = new Vector(40, 20);
+		labelMargin = new Vector(45, 25);
 		
 		// World:
 		// /\ - size
@@ -408,7 +409,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		padding: 10px;
-		border: 1px solid red;
+		border: 1px solid #eee;
+		box-shadow: 5px 5px 20px 20px rgba(0, 0, 0, .01);
 	}
 </style>
