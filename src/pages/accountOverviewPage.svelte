@@ -126,6 +126,5 @@
 	.dataHolder {
 		position: relative;
 		margin: 20px;
-		border: 1px solid red;
 	}
 </style>

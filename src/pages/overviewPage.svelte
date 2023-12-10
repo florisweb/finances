@@ -21,7 +21,7 @@
 		}
 
 		let curMonth = new MonthIdentifier();
-		for (let m = 11; m >= 0; m--)
+		for (let m = 24 - 1; m >= 0; m--)
 		{
 			let curTime = curMonth.date.getTime();
 			let sum = 0;
