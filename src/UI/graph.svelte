@@ -38,7 +38,6 @@
 		if (data) {
 			if (JSON.stringify(data) !== prevData)
 			{
-				console.warn('data changed');
 				prevData = JSON.stringify(data);
 				calcDomains();
 				if (ctx) render();
@@ -102,8 +101,6 @@
 				if (point.value[1] > yDomain.value[1]) yDomain.value[1] = point.value[1];
 			}
 		}
-
-		console.info('domains', xDomain.value, yDomain.value, data);
 
 		Camera.size.value = [
 			(xDomain.value[1] - xDomain.value[0]), 

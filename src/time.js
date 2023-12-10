@@ -185,18 +185,20 @@ Date.prototype.getFirstDayDate = function(_dayIndex) {// 0 = Sunday
 
 
 Date.prototype.compareDate = function(_date) {
-	return _date.getDateInDays(true) == this.getDateInDays(true);
+	return _date.getDateInDays(true) === this.getDateInDays(true);
 }
 
 
 Date.prototype.dateIsBetween = function(_min, _max) {
 	if (typeof _min == "string") _min = new Date().setDateFromStr(_min);
 	if (typeof _max == "string") _max = new Date().setDateFromStr(_max);
+	
 	let minDays = _min.getDateInDays(true);
-	let maxDays = _max.getDateInDays(true);
 	let targetDays = this.getDateInDays(true);
-
-	return minDays <= targetDays && targetDays <= maxDays;
+	
+	if (minDays > targetDays) return false;
+	let maxDays = _max.getDateInDays(true);
+	return targetDays <= maxDays;
 }
 
 

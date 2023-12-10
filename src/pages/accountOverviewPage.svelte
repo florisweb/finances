@@ -21,17 +21,10 @@
 
 
 	let graphData = [];
-	let balancePerMonth = [];
 	$: {
-		let curMonth = new MonthIdentifier();
-		for (let i = 11; i >= 0; i--)
-		{
-			balancePerMonth[i] = new Vector(curMonth.date.getTime(), curAccount?.getBalanceAtEndOfMonth(curMonth) || 0);
-			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
-		}
 		graphData = [{
 			color: new Color('#0f0'),
-			data: balancePerMonth
+			data: curAccount?.generateGraphData(11) || []
 		}];
 	}
 

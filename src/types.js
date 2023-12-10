@@ -2,6 +2,7 @@ import Color from './color';
 import { AvailableColors } from './color';
 import Date from './time';
 import { newId } from './polyfill';
+import Vector from './vector';
 import TransactionManager from './data/transactionManager';
 import BudgetManager from './data/budgetManager';
 import AccountManager from './data/accountManager';
@@ -427,6 +428,33 @@ export class BankAccount {
 		}
 
 		return lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+	}
+
+	generateGraphData(_range = 11) {
+		console.time('generate');
+		let transactions = this.transactions;
+		let balancePerMonth = [];
+		if (!transactions.length) return balancePerMonth;
+
+		let curMonth = new MonthIdentifier();
+		let lastTransactionInMonthIndex = transactions.length - 1;
+
+		for (let i = _range; i >= 0; i--)
+		{
+			for (let x = lastTransactionInMonthIndex; x >= 0; x--)
+			{
+				if (!curMonth.containsDate(transactions[x].date)) continue;
+				lastTransactionInMonthIndex = x;
+				break;
+			}
+			
+			let lastTransactionInMonth = transactions[lastTransactionInMonthIndex];
+			let balance = lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+			balancePerMonth[i] = new Vector(curMonth.date.getTime(), balance || 0);
+			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
+		}
+		console.timeEnd('generate');
+		return balancePerMonth;
 	}
 
 	constructor({IBAN, name}) {
