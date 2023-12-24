@@ -8,6 +8,7 @@
     import { MonthIdentifier } from "../types";
     import PieChart from "../UI/pieChart.svelte";
     import TagManager from "../data/tagManager";
+    import Tag from "../UI/tag.svelte";
 
 
 	let curDate = new Date();
@@ -111,7 +112,7 @@
 			incomeData.push({
 				value: income,
 				color: tag.color.hex,
-				name: tag.name + ' ' + formatMoneyString(income, true, true)
+				name: tag.name + '\n' + formatMoneyString(income, true, true)
 			});
 		}
 
@@ -128,13 +129,12 @@
 			<div>{formatMoneyString(curBalance, true, true)} Balance</div>
 			<div class="subInfoHolder">at end of {curMonth.id}</div>
 		</div>
-
 		<Graph data={miniGraphData} customClass='miniGraph' config={{renderLabels: false}}></Graph>
 	</div>
 
 	<div class='dataHolder'>
-		<Graph data={graphData}></Graph>
 		<div class='section distribution'>
+			<div class='sectionHeader'>Overview</div>
 			<PieChart 
 				title={'Income ' + formatMoneyString(incomeData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
 				data={incomeData}
@@ -152,15 +152,33 @@
 			></PieChart>
 		</div>
 
-
-		<div class="section account">
-		</div>
-
-		<div class="section savings">
-		</div>
 		<div class="section tags">
+			<div class='sectionHeader'>Tags</div>
+			<table class='tagTable'>
+				<thead>
+					<tr class='header'>
+						<th scope='col'></th>
+						<th scope='col'>Expenses</th>
+						<th scope='col'>Budget</th>
+						<th scope='col'>Savings</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each tags as tag}
+						<tr>
+							<td><Tag {...tag}></Tag></td>
+							<td class='moneyString'>{formatMoneyString(tag.averageExpensesLast12Months, true)}</td>
+							<td class='moneyString'>{tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tag.getBudgetInMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString'>{tag.isSavingsTag ? formatMoneyString(tag.getSavingsAtStartOfMonth(new MonthIdentifier()), true) : '-'}</td>
+						</tr>	
+					{/each}
+				</tbody>
+			</table>
 		</div>
-		<div class="section budget"></div>
+		<div class="section budget">
+			<div class='sectionHeader'>Property</div>
+			<Graph data={graphData}></Graph>
+		</div>
 	</div>
 </Page>
 
@@ -268,29 +286,55 @@
 		display: grid;
 		grid-template: 
 			'distribution distribution'
-			'account savings'
+			'tags savings'
 			'tags budget';
 		grid-template-columns: 50% 50%;
 	}
 
 	.dataHolder .section {
-		border: 1px solid red;
-		min-height: 50px;
 	}
-	.dataHolder .section.account {
-		grid-area: account;
+	.dataHolder .section > .sectionHeader {
+		position: relative;
+		text-transform: uppercase;
 	}
+
+
+
+
+
+
+
+
+
 	.dataHolder .section.savings {
 		grid-area: savings;
 	}
+	
+	
+	
 	.dataHolder .section.tags {
 		grid-area: tags;
 	}
+		.section.tags .tagTable {
+			font-size: 13px;
+		}	
+		.section.tags .tagTable.header th {
+			font-size: 13px;
+		}
+		
+
+
 	.dataHolder .section.budget {
 		grid-area: budget;
 	}
+
+
+	.dataHolder .section.distribution > .sectionHeader {
+		position: absolute;
+	}
 	.dataHolder .section.distribution {
-		grid-area: distribution;;
+		grid-area: distribution;
 		display: flex;
+		border-bottom: 1px solid #eee;
 	}
 </style>

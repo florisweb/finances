@@ -193,4 +193,6 @@ html, body {
 
 .overviewPage .GraphHolder.distributionGraph {
 	width: calc(100% / 3);
+	padding: 30px;
+	padding-bottom: 0;
 }

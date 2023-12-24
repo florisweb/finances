@@ -134,11 +134,10 @@
 		position: relative;
 		width: auto;
 		height: auto;
-		aspect-ratio: 1;
 	}
-	
+
 	.titleHolder {
-		position: absolute;
+		position: relative;
 		width: 100%;
 		left: 0;
 		top: 0;
@@ -150,6 +149,6 @@
 	canvas {
 		position: relative;
 		width: 100%;
-		height: 100%;
+		height: auto;
 	}
 </style>
