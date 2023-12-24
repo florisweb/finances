@@ -125,7 +125,6 @@
 
 	<div class='dataHolder'>
 		<div class='section distribution'>
-			<div class='sectionHeader'>Overview</div>
 			<PieChart 
 				title={'Income ' + formatMoneyString(incomeData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
 				data={incomeData}
@@ -320,9 +319,6 @@
 	}
 
 
-	.dataHolder .section.distribution > .sectionHeader {
-		position: absolute;
-	}
 	.dataHolder .section.distribution {
 		grid-area: distribution;
 		display: flex;
