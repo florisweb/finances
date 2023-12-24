@@ -104,7 +104,7 @@ export class TransactionTag {
 
 	getExpensesByMonth(_monthId) {
 		let transactions = this.getTransactionsByMonth(_monthId);
-		return transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
+		return -transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 	}
 
 	get averageExpensesLast12Months() {

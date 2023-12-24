@@ -88,7 +88,7 @@
 		ctx.fill();
 
 		if (deltaAngle < Math.PI / 180 * 20) return;
-		let textPos = centre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, pieRadius * .5));
+		let textPos = centre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, pieRadius * .6));
 
 		ctx.fillStyle = '#fff';
 		ctx.font = '15px arial';
@@ -118,7 +118,7 @@
 			canvas.width,
 			canvas.height
 		);
-		pieRadius = canvas.width * .4;
+		pieRadius = canvas.width * .45;
 	}
 </script>
 
@@ -132,18 +132,20 @@
 <style>
 	.GraphHolder {
 		position: relative;
-		width: 100%;
-		height: 100%;
-		border: 1px solid #eee;
-		box-shadow: 5px 5px 20px 20px rgba(0, 0, 0, .01);
+		width: auto;
+		height: auto;
+		aspect-ratio: 1;
 	}
+	
 	.titleHolder {
 		position: absolute;
+		width: 100%;
 		left: 0;
 		top: 0;
-		margin-left: 20px;
-		margin-top: 10px;
 		pointer-events: none;
+		text-align: center;
+		font-size: 18px;
+		z-index: 100;
 	}
 	canvas {
 		position: relative;

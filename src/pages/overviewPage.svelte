@@ -68,19 +68,54 @@
 				balanceDistributionData[0].value -= balance;
 				continue;
 			};
+
+			let name = savingTags[i].name;
+			if (name.length > 10) name = name.substring(0, 10) + '...';
 			balanceDistributionData.push(
 				{
 					value: balance,
 					color: savingTags[i].color.hex,
-					name: savingTags[i].name + ' ' + formatMoneyString(balance, true, true)
+					name: name + ' ' + formatMoneyString(balance, true, true)
 				}
 			)
 		}
 
 		balanceDistributionData.sort((a, b) => a.value < b.value);
+	}
 
 
-		console.log('savings tags', savingTags, balanceDistributionData);
+	let expensesData = [];
+	$: {
+		expensesData = [];
+		for (let tag of tags)
+		{
+			let expenses = tag.averageExpensesLast12Months;
+			if (expenses < 0) continue;
+			expensesData.push({
+				value: expenses,
+				color: tag.color.hex,
+				name: tag.name + ' ' + formatMoneyString(expenses, true, true)
+			});
+		}
+
+		expensesData.sort((a, b) => a.value < b.value);
+	}
+
+	let incomeData = [];
+	$: {
+		incomeData = [];
+		for (let tag of tags)
+		{
+			let income = -tag.averageExpensesLast12Months;
+			if (income < 0) continue;
+			incomeData.push({
+				value: income,
+				color: tag.color.hex,
+				name: tag.name + ' ' + formatMoneyString(income, true, true)
+			});
+		}
+
+		incomeData.sort((a, b) => a.value < b.value);
 	}
 
 
@@ -99,11 +134,32 @@
 
 	<div class='dataHolder'>
 		<Graph data={graphData}></Graph>
-		<div class="section account"></div>
-		<div class="section savings">
-			<PieChart data={balanceDistributionData}></PieChart>
+		<div class='section distribution'>
+			<PieChart 
+				title={'Income ' + formatMoneyString(incomeData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
+				data={incomeData}
+				customClass='distributionGraph'
+			></PieChart>
+			<PieChart 
+				title={'Expenses ' + formatMoneyString(expensesData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
+				data={expensesData}
+				customClass='distributionGraph'
+			></PieChart>
+			<PieChart 
+				title={'Reserved Money ' + formatMoneyString(balanceDistributionData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)}
+				data={balanceDistributionData}
+				customClass='distributionGraph'
+			></PieChart>
 		</div>
-		<div class="section tags"></div>
+
+
+		<div class="section account">
+		</div>
+
+		<div class="section savings">
+		</div>
+		<div class="section tags">
+		</div>
 		<div class="section budget"></div>
 	</div>
 </Page>
@@ -211,6 +267,7 @@
 
 		display: grid;
 		grid-template: 
+			'distribution distribution'
 			'account savings'
 			'tags budget';
 		grid-template-columns: 50% 50%;
@@ -232,5 +289,8 @@
 	.dataHolder .section.budget {
 		grid-area: budget;
 	}
-	
+	.dataHolder .section.distribution {
+		grid-area: distribution;;
+		display: flex;
+	}
 </style>

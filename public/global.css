@@ -190,3 +190,7 @@ html, body {
 	width: 200px;
 	box-shadow: none;
 }
+
+.overviewPage .GraphHolder.distributionGraph {
+	width: calc(100% / 3);
+}
