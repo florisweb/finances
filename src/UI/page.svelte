@@ -4,6 +4,7 @@
 	import Header from './header.svelte';
 	export let title = false;
 	export let isOpen = false;
+	export let customClass = '';
 
 	let self;
 	let ownIndex = -1;
@@ -19,7 +20,7 @@
 	});
 </script>
 
-<div class={'page' + (!isOpen ? ' hide' : '')} bind:this={self}>
+<div class={'page ' + customClass || ''} class:hide={!isOpen} bind:this={self}>
 	{#if (title !== false)}
 		<div class="pageHeader">
 			<Header title={title}></Header>

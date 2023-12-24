@@ -3,13 +3,30 @@
 	import Graph from "../UI/graph.svelte";
 	import AccountManager from "../data/accountManager";
 	import { AvailableColors } from '../color';
+	import { formatMoneyString } from '../polyfill';
 	import Vector from "../vector";
+    import { MonthIdentifier } from "../types";
+    import PieChart from "../UI/pieChart.svelte";
+    import TagManager from "../data/tagManager";
+
+
+	let curDate = new Date();
+	curDate.setDate(0);
+	let curMonth = new MonthIdentifier().setFromDate(curDate);
+
+	let curBalance = 0;
+	$: curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
+
+	window.f = () => {
+		curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
+	}
+
+
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
-	let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}];
-
-	
+	let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}]
+	let miniGraphData = [];
 	$: if (accounts.length) {
 		for (let i = 1; i < accounts.length + 1; i++)
 		{
@@ -28,17 +45,70 @@
 				graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
 			}
 		}
+
+		miniGraphData = [graphData[0]];
 	}
+
+
+
+	let tags = [];
+	TagManager.dataStore.subscribe((_tags) => tags = _tags);
+	let balanceDistributionData = [];
+
+	$: {
+		let savingTags = tags.filter((_tag) => _tag.isSavingsTag);
+		balanceDistributionData = [
+			{value: 0, color: '#f00', name: 'Indebted'}
+		];
+
+		for (let i = 0; i < savingTags.length; i++)
+		{
+			let balance = savingTags[i].getSavingsAtStartOfMonth(curMonth);
+			if (balance < 0) {
+				balanceDistributionData[0].value -= balance;
+				continue;
+			};
+			balanceDistributionData.push(
+				{
+					value: balance,
+					color: savingTags[i].color.hex,
+					name: savingTags[i].name + ' ' + formatMoneyString(balance, true, true)
+				}
+			)
+		}
+
+		balanceDistributionData.sort((a, b) => a.value < b.value);
+
+
+		console.log('savings tags', savingTags, balanceDistributionData);
+	}
+
+
+
 </script>
 
-<Page>
-	<div class='infoHolder'>
+<Page customClass='overviewPage'>
+	<div class='infoHolder'>		
+		<div class='titleHolder'>
+			<div>{formatMoneyString(curBalance, true, true)} Balance</div>
+			<div class="subInfoHolder">at end of {curMonth.id}</div>
+		</div>
+
+		<Graph data={miniGraphData} customClass='miniGraph' config={{renderLabels: false}}></Graph>
 	</div>
 
 	<div class='dataHolder'>
-		<Graph title='Balance' data={graphData}></Graph>
+		<Graph data={graphData}></Graph>
+		<div class="section account"></div>
+		<div class="section savings">
+			<PieChart data={balanceDistributionData}></PieChart>
+		</div>
+		<div class="section tags"></div>
+		<div class="section budget"></div>
 	</div>
 </Page>
+
+
 
 <style>
 	/* INFOHOLDER */
@@ -52,45 +122,26 @@
 		padding: 20px 0;
 		border-bottom: 1px solid #ddd;
 	}
-		
-		.balanceHolder {
+		.titleHolder {
 			position: relative;
-			font-size: 40px;
+			display: flex;
 			height: 70px;
+			margin-right: 60px;
+			padding-right: 20px;
+			
 			line-height: 70px;
 			color: #333;
 			font-style: italic;
-			padding-right: 20px;
+			font-size: 40px;
+			text-transform: uppercase;
 		}
-		.balanceHolder.positive {
-			color: #383;
-		}
-		.balanceHolder.negative {
-			color: #833;
-		}
-
-			.balanceHolder:before {
-				content: 'CHANGE';
+			.titleHolder .subInfoHolder {
 				position: absolute;
 				top: 25px;
-				right: 20px;
+				right: 25px;
 				font-size: 12px;
 				white-space: nowrap;
 			}
-
-
-
-		.monthHolder {
-			position: relative;
-			display: flex;
-			font-size: 40px;
-			height: 70px;
-			line-height: 70px;
-			color: #333;
-			font-style: italic;
-			margin-right: 60px;
-			padding-right: 20px;
-		}
 		
 
 
@@ -154,4 +205,32 @@
 					pointer-events: none;
 				}
 
+
+	.dataHolder {
+		padding-top: 20px;
+
+		display: grid;
+		grid-template: 
+			'account savings'
+			'tags budget';
+		grid-template-columns: 50% 50%;
+	}
+
+	.dataHolder .section {
+		border: 1px solid red;
+		min-height: 50px;
+	}
+	.dataHolder .section.account {
+		grid-area: account;
+	}
+	.dataHolder .section.savings {
+		grid-area: savings;
+	}
+	.dataHolder .section.tags {
+		grid-area: tags;
+	}
+	.dataHolder .section.budget {
+		grid-area: budget;
+	}
+	
 </style>

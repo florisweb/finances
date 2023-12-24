@@ -10,6 +10,10 @@ const AccountManager = new class extends DataManager {
 		window.AccountManager = this;
 	}
 
+	getBalanceAtEndOfMonth(_monthId) {
+		return this._data.map((_account) => _account.getBalanceAtEndOfMonth(_monthId)).reduce((a, b) => a + b, 0);
+	}
+
 	getByIBAN(_IBAN) {
 		return this._data.find((_account) => _account.IBAN === _IBAN);
 	} 

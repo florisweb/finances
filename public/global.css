@@ -170,3 +170,23 @@ html, body {
 .popupHolder.CreateTagPopup .popup {
 	top: 50vh;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.overviewPage .GraphHolder.miniGraph {
+	height: 70px;
+	width: 200px;
+	box-shadow: none;
+}

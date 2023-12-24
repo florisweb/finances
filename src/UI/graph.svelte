@@ -1,12 +1,18 @@
 <script>	
 	import Vector from '../vector';
 
-	export let title = 'Graph';
+	export let title = '';
 	export let data = [{data: []}];
-	export let config = {
+	export let customClass = '';
+	export let config = {};
+	$: config = {
 		drawDotsOnLine: true,
 		enablePointInfoPopup: true,
+		renderLabels: true,
+		...config
 	};
+
+
 	// Data: 
 	/*[
 		{
@@ -281,6 +287,7 @@
 				ctx.fillRect(coord.value[0], 0, 1, canvas.height);
 				ctx.fill();
 			}
+			if (!config.renderLabels) continue;
 
 			// Little extenders
 			ctx.fillStyle = axisColor;
@@ -323,6 +330,7 @@
 			ctx.fillStyle = backgroundAxisColor;
 			ctx.fillRect(0, coord.value[1], canvas.width, 1);
 			ctx.fill();
+			if (!config.renderLabels) continue;
 
 			ctx.fillStyle = axisColor;
 			ctx.fillRect(Camera.labelMargin.value[0] - 5, coord.value[1], 5, 2);
@@ -342,7 +350,11 @@
 	const Camera = new class {
 		position = new Vector(0, 0);
 		size = new Vector(200, 200);
-		labelMargin = new Vector(45, 25);
+		#labelMargin = new Vector(45, 25);
+		get labelMargin() {
+			if (config.renderLabels) return this.#labelMargin;
+			return new Vector(0, 0);
+		}
 		
 		// World:
 		// /\ - size
@@ -397,7 +409,7 @@
 	}
 </script>
 
-<div class='GraphHolder'>
+<div class={'GraphHolder ' + customClass || ''}>
 	<div class='titleHolder'>{title}</div>
 	<canvas bind:this={canvas} width="1000" height="300"></canvas>
 </div>
