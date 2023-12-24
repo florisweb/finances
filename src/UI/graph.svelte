@@ -158,7 +158,6 @@
 				if (point.value[1] > yDomain.value[1]) yDomain.value[1] = point.value[1];
 			}
 		}
-		console.log(xDomain.value[1] - xDomain.value[0], maxWidth);
 		Camera.size.value = [
 			Math.min(xDomain.value[1] - xDomain.value[0], maxWidth),
 			Math.min(yDomain.value[1] - yDomain.value[0], maxheight)

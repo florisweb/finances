@@ -16,7 +16,6 @@ const TransactionManager = new class extends DataManager {
 
 
 	set(_transactions) {
-		console.log('set', _transactions);
 		this._data = [];
 		for (let ts of _transactions) {
 			if (!ts.date || ts.targetIBAN === undefined) continue;
@@ -26,7 +25,6 @@ const TransactionManager = new class extends DataManager {
 	}
 
 	add(_transactions) {
-		console.log('add', _transactions);
 		if (typeof _transactions.length !== 'number') _transactions = [_transactions];
 		for (let ts of _transactions) 
 		{

@@ -1,6 +1,7 @@
 import DataManager from "./dataManager";
 import { TransactionTag, SavingsTransactionTag, NonAssignedTag } from "../types";
 
+
 const TagManager = new class extends DataManager {
 	constructor() {
 		super({type: "tags", dataToObject: function (_tag) {
@@ -26,6 +27,15 @@ const TagManager = new class extends DataManager {
 			}
 			this._data.push(tag);
 		}
+		return this.writeData();
+	}
+
+	remove(_tagId) {
+		let tag = this.getById(_tagId);
+		let transactions = tag.transactions;
+		for (let t of transactions) t.typeCode = 0;
+
+		this._data = this._data.filter((_tag) => _tag.id !== _tagId);
 		return this.writeData();
 	}
 

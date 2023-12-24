@@ -8,11 +8,8 @@
 	import Vector from '../vector';
     import Graph from "../UI/graph.svelte";
     import { MonthIdentifier } from "../types";
-    import { wait } from "../polyfill";
 
 	const App = getContext('App');
-
-
 	let curTag;
 	App.tagPage = {
 		open: (_tag) => {
@@ -40,7 +37,6 @@
 			let curMonth = new MonthIdentifier().setFromDate(firstTransactionDate);
 			while (curMonth.date.getTime() < new MonthIdentifier().date.getTime())
 			{	
-				console.log(curMonth.id);
 				graphData[0].data.push(new Vector(
 					curMonth.date.getTime(),
 					curTag.getSavingsAtStartOfMonth(curMonth)
@@ -56,6 +52,7 @@
 <Page title={curTag?.name}>
 	<Button on:click={() => App.transactionViewerPopup.open(transactions)} name={`All transactions [${transactions.length}]`}></Button>
 	<Button on:click={() => App.createTagPopup.openEdit(curTag)} name='Edit'></Button>
+	<Button on:click={async () => {await TagManager.remove(curTag.id); openPageByIndex(1)}} name='Remove'></Button>
 
 	<Graph data={graphData} maxWidth={1000 * 60 * 60 * 24 * 365.25}></Graph>
 </Page>
