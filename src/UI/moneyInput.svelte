@@ -6,20 +6,25 @@
 	export let placeholder = '€0';
 	export let canBeNegative = false;
 	export let element;
+	let moneyValue = value;
 
-	function onInput() {
+	function onInput(_value) {
 		let regex = /[^0-9.,]/g;
 		if (canBeNegative) regex = /[^0-9.,-]/g;
-		let parts = String(value).replace(regex, '').replace(',', '.').split('.').splice(0, 2);
-		let string = parts[0];
-		if (parts.length === 1) return value = string;
-		value = string + '.' + parts[1].substr(0, 2);
+		let string = String(_value).replace(regex, '').replace(',', '.');
+		let parts = string.split('.').splice(0, 2);
+		
+		if (parts.length === 1)
+		{
+			element.value = parseInt(parts[0]) || parts[0];
+		} else element.value = parts[0] + '.' + parts[1].substr(0, 2);
+		moneyValue = parseFloat(element.value) || 0;
 	}
 </script>
 
 <input 
-	on:input={(_event) => {value = _event.target.value; onInput(); dispatch('input', value)}}
-	on:change={(_event) => {value = _event.target.value; dispatch('change', value)}}
+	on:input={(_event) => {onInput( _event.target.value); dispatch('input', moneyValue)}}
+	on:change={(_event) => {onInput( _event.target.value); dispatch('change', moneyValue)}}
 	value={value}
  	placeholder={placeholder}
 	bind:this={element}

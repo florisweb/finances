@@ -14,6 +14,7 @@
     import TransactionManager from "../data/transactionManager";
 	
 	import { getContext } from 'svelte';
+    import MoneyInput from "../UI/moneyInput.svelte";
 	const App = getContext('App');
 
 	let isOpen = false;
@@ -45,7 +46,9 @@
 
 	function saveTag() {
 		let constructor = curTag.isSavingsTag ? SavingsTransactionTag : TransactionTag;
-		TagManager.add(new constructor(curTag.export()));
+		let data = curTag.export();
+		data.startValue = curTag.startValue;
+		TagManager.add(new constructor(data));
 		close();
 	}
 
@@ -66,14 +69,21 @@
 		}
 	})}></DropDown>
 	<br>
-	<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
+
+	<div class='savingsTagHolder'>
+		<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
+		<div class='startValueHolder' class:hide={!curTag?.isSavingsTag}>
+			<div class='startValueHeader'>Start value</div>
+			<MoneyInput on:input={(_event) => curTag.startValue = parseInt(_event.detail) || 0} value={curTag?.startValue || 0} canBeNegative={true}></MoneyInput>
+		</div>
+	</div>
+
 	<br>
 	<Input on:input={(_event) => curTag.name = _event.detail} value={curTag.name} bind:element={nameInput}  placeholder='Tag name...'></Input>
 	<br>
 	<br>
 	<br>
 	<FilterBuilder bind:filter={curTag.filter}></FilterBuilder>
-	<!-- <FilterBuilder></FilterBuilder> -->
 	<br>
 	<div class='buttonHolder'>
 		<Button name='Save' on:click={() => saveTag()}></Button>
@@ -85,5 +95,28 @@
 	.buttonHolder {
 		display: flex;
 		flex-direction: row-reverse;
+	}
+
+
+	.savingsTagHolder {
+		margin-left: -8px;
+	}
+	.startValueHolder {
+		margin-left: 8px;
+		margin-bottom: 10px;
+		padding-left: 12px;
+		border-left: 3px solid #daf;
+		transition: margin-top .3s, opacity .3s;
+	}
+	.startValueHolder.hide {
+		opacity: 0;
+		margin-top: -60px;
+		pointer-events: none;
+	}
+	.startValueHolder .startValueHeader {
+		font-size: 12px;
+		text-transform: uppercase;
+		color: #444;
+		margin-bottom: 2px;
 	}
 </style>

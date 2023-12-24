@@ -24,7 +24,7 @@
 	<tr class='budgetRow'>
 		<td class='tag'><Tag {...tag}></Tag></td>
 		<td><Checkbox bind:checked={isIncome}></Checkbox></td>
-		<td class='moneyInputHolder'><MoneyInput bind:value={absBudget} placeholder={isIncome ? 'Income...' : 'Expenses...'}></MoneyInput></td>
+		<td class='moneyInputHolder'><MoneyInput on:input={(_event) => absBudget = _event.detail || 0} value={absBudget} placeholder={isIncome ? 'Income...' : 'Expenses...'}></MoneyInput></td>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<td><div class='removeButton' on:click={() => dispatch('delete')}>X</div></td>
 	</tr>
