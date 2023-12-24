@@ -74,7 +74,7 @@
 		<Checkbox title='Is savings tag' bind:checked={curTag.isSavingsTag}></Checkbox>
 		<div class='startValueHolder' class:hide={!curTag?.isSavingsTag}>
 			<div class='startValueHeader'>Start value</div>
-			<MoneyInput on:input={(_event) => curTag.startValue = parseInt(_event.detail) || 0} value={curTag?.startValue || 0} canBeNegative={true}></MoneyInput>
+			<MoneyInput on:input={(_event) => curTag.startValue = _event.detail || 0} value={curTag?.startValue || 0} canBeNegative={true}></MoneyInput>
 		</div>
 	</div>
 

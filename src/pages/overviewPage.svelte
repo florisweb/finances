@@ -16,7 +16,7 @@
 	let curMonth = new MonthIdentifier().setFromDate(curDate);
 
 	let curBalance = 0;
-	$: curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
+	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
 
 	window.f = () => {
 		curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
@@ -27,7 +27,6 @@
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
 	let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}]
-	let miniGraphData = [];
 	$: if (accounts.length) {
 		for (let i = 1; i < accounts.length + 1; i++)
 		{
@@ -46,8 +45,6 @@
 				graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
 			}
 		}
-
-		miniGraphData = [graphData[0]];
 	}
 
 
@@ -129,7 +126,6 @@
 			<div>{formatMoneyString(curBalance, true, true)} Balance</div>
 			<div class="subInfoHolder">at end of {curMonth.id}</div>
 		</div>
-		<Graph data={miniGraphData} customClass='miniGraph' config={{renderLabels: false}}></Graph>
 	</div>
 
 	<div class='dataHolder'>
