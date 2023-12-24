@@ -40,6 +40,7 @@
 			let curMonth = new MonthIdentifier().setFromDate(firstTransactionDate);
 			while (curMonth.date.getTime() < new MonthIdentifier().date.getTime())
 			{	
+				console.log(curMonth.id);
 				graphData[0].data.push(new Vector(
 					curMonth.date.getTime(),
 					curTag.getSavingsAtStartOfMonth(curMonth)

@@ -18,11 +18,6 @@
 	let curBalance = 0;
 	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
 
-	window.f = () => {
-		curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
-	}
-
-
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
@@ -165,7 +160,7 @@
 							<td><Tag {...tag}></Tag></td>
 							<td class='moneyString'>{formatMoneyString(tag.averageExpensesLast12Months, true)}</td>
 							<td class='moneyString'>{tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tag.isSavingsTag ? formatMoneyString(tag.getSavingsAtStartOfMonth(new MonthIdentifier()), true) : '-'}</td>
+							<td class='moneyString'>{tag.isSavingsTag ? formatMoneyString(tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
 						</tr>	
 					{/each}
 				</tbody>

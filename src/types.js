@@ -231,10 +231,11 @@ export class Budget {
 	get lengthInMonths() {
 		let prevMonthDate = new Date(); 
 		prevMonthDate.setDate(-1);
-		let endDate = prevMonthDate;
-		if (this.endMonthId && this.endMonthId.date.getTime() < prevMonthDate.getTime()) endDate = this.endMonthId.date;
-
-		return endDate.getDateInMonths() - this.startMonthId.date.getDateInMonths() + 1;
+		if (this.endMonthId && this.endMonthId.date.getTime() < prevMonthDate.getTime())
+		{
+			return this.endMonthId.date.getDateInMonths() - this.startMonthId.date.getDateInMonths() + 1;	
+		} 
+		return prevMonthDate.getDateInMonths() - this.startMonthId.date.getDateInMonths();
 	}
 
 	get name() {
