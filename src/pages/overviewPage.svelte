@@ -62,13 +62,12 @@
 				continue;
 			};
 
-			let name = savingTags[i].name;
-			if (name.length > 10) name = name.substring(0, 10) + '...';
+			
 			balanceDistributionData.push(
 				{
 					value: balance,
 					color: savingTags[i].color.hex,
-					name: name + ' ' + formatMoneyString(balance, true, true)
+					name: moneyNameAndValueToString(savingTags[i].name, balance)
 				}
 			)
 		}
@@ -87,7 +86,7 @@
 			expensesData.push({
 				value: expenses,
 				color: tag.color.hex,
-				name: tag.name + ' ' + formatMoneyString(expenses, true, true)
+				name: moneyNameAndValueToString(tag.name, expenses)
 			});
 		}
 
@@ -104,7 +103,7 @@
 			incomeData.push({
 				value: income,
 				color: tag.color.hex,
-				name: tag.name + '\n' + formatMoneyString(income, true, true)
+				name: moneyNameAndValueToString(tag.name, income)
 			});
 		}
 
@@ -113,6 +112,10 @@
 
 
 
+	function moneyNameAndValueToString(_name, _value) {
+		if (_name.length > 10) _name = _name.substring(0, 10) + '...';
+		return _name + ' ' + formatMoneyString(_value, true, true);
+	}
 </script>
 
 <Page customClass='overviewPage'>

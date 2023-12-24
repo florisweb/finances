@@ -64,7 +64,7 @@ export default function Vector(x, y) {
 		return this.dotProduct(this);
 	}
 	this.getLength = function() {
-		return Math.sqrt(this.squaredLength());
+		return Math.sqrt(this.getSquaredLength());
 	}
 	
 	this.setLength = function(_length) {
