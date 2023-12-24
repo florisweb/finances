@@ -4,6 +4,8 @@
 	export let title = '';
 	export let data = [{data: []}];
 	export let customClass = '';
+	export let maxWidth = Infinity;
+	export let maxheight = Infinity;
 	export let config = {};
 	$: config = {
 		drawDotsOnLine: true,
@@ -156,14 +158,14 @@
 				if (point.value[1] > yDomain.value[1]) yDomain.value[1] = point.value[1];
 			}
 		}
-
+		console.log(xDomain.value[1] - xDomain.value[0], maxWidth);
 		Camera.size.value = [
-			(xDomain.value[1] - xDomain.value[0]),
-			(yDomain.value[1] - yDomain.value[0])
+			Math.min(xDomain.value[1] - xDomain.value[0], maxWidth),
+			Math.min(yDomain.value[1] - yDomain.value[0], maxheight)
 		];
 		
 		Camera.position.value = [
-			xDomain.value[0],
+			xDomain.value[1] - Camera.size.value[0],
 			yDomain.value[0] + Camera.size.value[1],
 		];
 	}

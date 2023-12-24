@@ -492,6 +492,7 @@ export class MonthIdentifier {
 		return this;
 	}
 	setFromDate(_date) {
+		if (!(_date instanceof Date)) _date = new Date().setDateFromStr(_date);
 		this.#string = (_date.getMonth() + 1) + '/' + _date.getFullYear();
 		return this;
 	}
