@@ -35,6 +35,7 @@
 
 
 	let canvasSize = new Vector(500, 500);
+	let canvasCentre = canvasSize.copy().scale(.5);
 	let pieRadius = 200;
 
 	$: {
@@ -58,7 +59,7 @@
 	
 	function handleMouseMove(_e) {
 		let pos = new Vector(_e.offsetX, _e.offsetY);
-		let delta = canvasSize.copy().scale(.5).difference(pos);
+		let delta = canvasCentre.copy().difference(pos);
 		if (delta.getLength() > pieRadius) {curHoverPiece = false; render(); return;}
 		let angle = delta.getAngle();
 		angle += .5 * Math.PI;
@@ -125,8 +126,6 @@
 		let nameArr = _piece.name;
 		if (typeof nameArr === 'string') nameArr = [nameArr];
 
-
-		let centre = canvasSize.copy().scale(.5);
 		let deltaAngle = _stopAngle - _startAngle;
 
 		ctx.strokeStyle = '#fff';
@@ -143,16 +142,15 @@
 		}
 
 		ctx.beginPath();
-		ctx.moveTo(centre.value[0], centre.value[1]);
-		ctx.arc(centre.value[0], centre.value[1], radius, _startAngle, _stopAngle);
-		ctx.lineTo(centre.value[0], centre.value[1]);
+		ctx.moveTo(canvasCentre.value[0], canvasCentre.value[1]);
+		ctx.arc(canvasCentre.value[0], canvasCentre.value[1], radius, _startAngle, _stopAngle);
+		ctx.lineTo(canvasCentre.value[0], canvasCentre.value[1]);
 		ctx.closePath();
 		ctx.stroke();
 		ctx.fill();
 
 		
-		let deltaFromCentre = new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6);
-		let textPos = centre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6));
+		let textPos = canvasCentre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6));
 		ctx.fillStyle = '#fff';
 		ctx.font = '15px arial';
 		ctx.textBaseline = 'middle';
@@ -215,7 +213,7 @@
 		if (flipped) rotateAngle -= Math.PI;
 
 		ctx.save();
-		ctx.translate(centre.value[0], centre.value[1]);
+		ctx.translate(canvasCentre.value[0], canvasCentre.value[1]);
 		ctx.rotate(rotateAngle);
 		ctx.fillStyle = '#fff';
 		ctx.textAlign = 'right';
@@ -261,15 +259,20 @@
 
 	window.addEventListener('resize', () => onResize())
 	function onResize() {
+		const padding = 20;
+		const extraTopPadding = 10;
+
 		canvas.width = canvas.offsetWidth;
-		canvas.height = canvas.width;
+		canvas.height = canvas.width + extraTopPadding;
 
 		canvasSize = new Vector(
 			canvas.width,
 			canvas.height
 		);
-		pieRadius = canvas.width * .45;
+		pieRadius = (canvas.width - 2 * padding) / 2;
+		canvasCentre = new Vector(canvas.width / 2, (canvas.height - extraTopPadding) / 2 + extraTopPadding);
 	}
+
 </script>
 
 <div class={'GraphHolder ' + customClass || ''}>
@@ -287,7 +290,7 @@
 	}
 
 	.titleHolder {
-		position: relative;
+		position: absolute;
 		width: 100%;
 		left: 0;
 		top: 0;
