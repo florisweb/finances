@@ -174,8 +174,6 @@
 			const requiredWidth = ctx.measureText(fullName).width + 2 * padding;
 			let realWidth = Math.min(requiredWidth, canvas.width);
 			const maxBoxWidth = Math.min(textPos.value[0], canvas.width - textPos.value[0]) * 2;
-
-			console.log(requiredWidth, maxBoxWidth, realWidth);
 			
 			let xPos = textPos.value[0];
 			if (maxBoxWidth < realWidth) {

@@ -46,6 +46,39 @@
 
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
+
+	let incomeTagData = [];
+	let expensesTagData = [];
+	$: {
+		for (let tag of tags)
+		{
+			let expenses = tag.averageExpensesLast12Months;
+			console.log(tag, expenses);
+			if (expenses > 0)
+			{
+				incomeTagData.push({
+					tag: tag,
+					expenses: expenses,
+				})
+			} else {
+				expensesTagData.push({
+					tag: tag,
+					expenses: expenses,
+				})
+			}
+		}
+		incomeTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
+		expensesTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
+		// Force Svelte to update
+		incomeTagData = incomeTagData;
+		expensesTagData = expensesTagData;
+	}
+
+
+
+
+
+
 	let balanceDistributionData = [];
 
 	$: {
@@ -150,19 +183,30 @@
 				<thead>
 					<tr class='header'>
 						<th scope='col'></th>
-						<th scope='col'>Expenses</th>
-						<th scope='col'>Budget</th>
+						<th scope='col'>Average</th>
+						<th scope='col'>Budgeted</th>
 						<th scope='col'>Savings</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each tags as tag}
+					<div>Expenses</div>
+					{#each incomeTagData as tagData}
 						<tr>
-							<td><Tag {...tag}></Tag></td>
-							<td class='moneyString'>{formatMoneyString(tag.averageExpensesLast12Months, true)}</td>
-							<td class='moneyString'>{tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tag.isSavingsTag ? formatMoneyString(tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
+							<td><Tag {...tagData.tag}></Tag></td>
+							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
+							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
 						</tr>	
+					{/each}
+					<hr>
+					<div>Income</div>
+					{#each expensesTagData as tagData}
+						<tr>
+							<td><Tag {...tagData.tag}></Tag></td>
+							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
+							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
+						</tr>
 					{/each}
 				</tbody>
 			</table>
