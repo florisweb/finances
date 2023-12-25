@@ -50,9 +50,11 @@
 	let incomeTagData = [];
 	let expensesTagData = [];
 	$: {
+		incomeTagData = [];
+		expensesTagData = [];
 		for (let tag of tags)
 		{
-			let expenses = tag.averageExpensesLast12Months;
+			let expenses = tag.getAverageExpensesInLastXMonths(12);
 			if (expenses > 0)
 			{
 				incomeTagData.push({
@@ -68,9 +70,6 @@
 		}
 		incomeTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
 		expensesTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
-		// Force Svelte to update
-		incomeTagData = incomeTagData;
-		expensesTagData = expensesTagData;
 	}
 
 
@@ -88,7 +87,7 @@
 
 		for (let i = 0; i < savingTags.length; i++)
 		{
-			let balance = savingTags[i].getSavingsAtStartOfMonth(curMonth);
+			let balance = savingTags[i].getSavingsAtEndOfMonth(curMonth);
 			if (balance < 0) {
 				balanceDistributionData[0].value -= balance;
 				continue;
@@ -113,7 +112,7 @@
 		expensesData = [];
 		for (let tag of tags)
 		{
-			let expenses = tag.averageExpensesLast12Months;
+			let expenses = tag.getAverageExpensesInLastXMonths(12);
 			if (expenses < 0) continue;
 			expensesData.push({
 				value: expenses,
@@ -130,7 +129,7 @@
 		incomeData = [];
 		for (let tag of tags)
 		{
-			let income = -tag.averageExpensesLast12Months;
+			let income = -tag.getAverageExpensesInLastXMonths(12);
 			if (income < 0) continue;
 			incomeData.push({
 				value: income,
@@ -194,7 +193,7 @@
 							<td><Tag {...tagData.tag}></Tag></td>
 							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
 							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'}</td>
 						</tr>	
 					{/each}
 					<hr>
@@ -204,7 +203,7 @@
 							<td><Tag {...tagData.tag}></Tag></td>
 							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
 							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtStartOfMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'}</td>
 						</tr>
 					{/each}
 				</tbody>

@@ -97,6 +97,12 @@ export class TransactionTag {
 	get transactions() {
 		return TransactionManager.getByTag(this.id);
 	}
+	get firstTransactionDate() {
+		let transactions = this.transactions;
+		let first = transactions[0];
+		if (!first) return false;
+		return new Date().setDateFromStr(first.date);
+	}
 
 	getTransactionsByMonth(_monthId) {
 		return TransactionManager.getByMonthAndTag(_monthId, this.id);
@@ -105,6 +111,27 @@ export class TransactionTag {
 	getExpensesByMonth(_monthId) {
 		let transactions = this.getTransactionsByMonth(_monthId);
 		return -transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
+	}
+	
+	getAverageExpensesInLastXMonths(_months = 12) {
+		let firstDate = this.firstTransactionDate;
+		if (!firstDate) return 0;
+		
+		let firstMonthId = new MonthIdentifier().setFromDate(firstDate);
+		let curMonthId = new MonthIdentifier().setFromDate(new Date().moveMonth(-_months));
+		if (curMonthId.date.getTime() < firstMonthId.date.getTime()) curMonthId.setFromDate(firstMonthId.date);
+
+		let sum = 0;
+		let addedMonths = 0;
+		let maxDate = new Date();
+		maxDate.setDate(0);
+		while (curMonthId.date.getTime() < maxDate.getTime())
+		{
+			sum += this.getExpensesByMonth(curMonthId);
+			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(1));
+			addedMonths++;
+		}
+		return sum / addedMonths;
 	}
 
 	get averageExpensesLast12Months() {
@@ -159,24 +186,20 @@ export class SavingsTransactionTag extends TransactionTag {
 		return this.startValue + this.totalExpenses - budgetedMoney;
 	}
 
-	getSavingsAtStartOfMonth(_monthId) { // Budget is added at the end of the month
+	getSavingsAtEndOfMonth(_monthId) { // Budget is added at the end of the month
+		let firstDayOfNextMonth = _monthId.date.moveMonth(1);
+		
 		let transactions = this.transactions;
 		let totalExpensesUntilMonth = transactions.filter(
-			(_t) => new Date().setFromStr(_t.date).getTime() < _monthId.date.getTime()
+			(_t) => new Date().setFromStr(_t.date).getTime() < firstDayOfNextMonth.getTime()
 		).map((_t) => _t.deltaMoney).reduce((a, b) => a + b, 0);
 
 		let budgetedMoney = 0;
 		for (let budget of BudgetManager._data)
 		{
-			if (budget.startMonthId.date.getTime() > _monthId.date.getTime()) continue;
-			let lengthInMonths = budget.lengthInMonths;
-			if (!budget.endMonthId || budget.endMonthId.date.getTime() > _monthId.date.getTime())
-			{
-				lengthInMonths = _monthId.date.getDateInMonths() - budget.startMonthId.date.getDateInMonths();
-			}
-
+			if (budget.startMonthId.date.getTime() > _monthId.date.getTime()) continue; // Budget starts after the requested month
 			let budgetPerMonth = budget.getBudgetForTag(this.id);
-			budgetedMoney += budgetPerMonth * lengthInMonths;
+			budgetedMoney += budgetPerMonth * budget.getLengthInStartedMonthsOnDate(_monthId.date);
 		}
 		return this.startValue + totalExpensesUntilMonth - budgetedMoney;
 	}
@@ -229,14 +252,18 @@ export class Budget {
 		return endOfMonthDate.getTime() >= new Date().getTime();
 	}
 	get lengthInMonths() {
-		let prevMonthDate = new Date(); 
-		prevMonthDate.setDate(-1);
-		if (this.endMonthId && this.endMonthId.date.getTime() < prevMonthDate.getTime())
+		return this.getLengthInStartedMonthsOnDate(new Date());
+	}
+
+	getLengthInStartedMonthsOnDate(_date) { // MONTHS WHICH HAVE STARTED: so 2 december -> december
+		let monthId = new MonthIdentifier().setFromDate(_date);
+		if (this.endMonthId && this.endMonthId.date.getTime() < monthId.date.getTime())
 		{
 			return this.endMonthId.date.getDateInMonths() - this.startMonthId.date.getDateInMonths() + 1;	
 		} 
-		return prevMonthDate.getDateInMonths() - this.startMonthId.date.getDateInMonths();
+		return monthId.date.getDateInMonths() - this.startMonthId.date.getDateInMonths() + 1;
 	}
+
 
 	get name() {
 		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');

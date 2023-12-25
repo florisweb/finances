@@ -98,7 +98,7 @@
 					{...tag} 
 					income={tagsWithMetaData[tag.id].in} 
 					expenses={tagsWithMetaData[tag.id].out} 
-					totalSavings={tag.isSavingsTag ? tag.getSavingsAtStartOfMonth(curMonth) : -1}
+					totalSavings={tag.isSavingsTag ? tag.getSavingsAtEndOfMonth(curMonth) : -1}
 					budget={tag.getBudgetInMonth(curMonth)}
 					on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
 				></TagOverviewPanel>

@@ -39,7 +39,7 @@
 			{	
 				graphData[0].data.push(new Vector(
 					curMonth.date.getTime(),
-					curTag.getSavingsAtStartOfMonth(curMonth)
+					curTag.getSavingsAtEndOfMonth(curMonth)
 				));
 				curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))
 			}

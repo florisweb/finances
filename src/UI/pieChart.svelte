@@ -124,8 +124,8 @@
 
 
 
-	const padding = 5;
-	const height = 20;
+	const padding = 6;
+	const height = 18;
 	const circlePadding = 5;
 	function renderPiece(_piece, _startAngle, _stopAngle, _hoveredOn) {
 		let nameArr = _piece.name;
