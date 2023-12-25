@@ -116,8 +116,16 @@
 		renderPiece(curHoverPiece, hoverStartAngle - Math.PI / 2, hoverStartAngle + hoverDAngle - Math.PI / 2, true);
 	}
 
-	
+
+
+	const padding = 5;
+	const height = 20;
+	const circlePadding = 5;
 	function renderPiece(_piece, _startAngle, _stopAngle, _hoveredOn) {
+		let nameArr = _piece.name;
+		if (typeof nameArr === 'string') nameArr = [nameArr];
+
+
 		let centre = canvasSize.copy().scale(.5);
 		let deltaAngle = _stopAngle - _startAngle;
 
@@ -142,33 +150,106 @@
 		ctx.stroke();
 		ctx.fill();
 
-		if (deltaAngle < Math.PI / 180 * 20 && !_hoveredOn) return;
+		
+		let deltaFromCentre = new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6);
 		let textPos = centre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6));
-
-		if (_hoveredOn)
-		{
-			let width = ctx.measureText(_piece.name).width + 10;
-			let height = 30;
-			ctx.fillStyle = _piece.color;
-			ctx.strokeStyle = '#fff';
-			ctx.beginPath();
-			ctx.fillRect(textPos.value[0] - width / 2, textPos.value[1] - height / 2, width, height);
-			ctx.closePath();
-			ctx.fill();
-			ctx.stroke();
-		}
-
-
 		ctx.fillStyle = '#fff';
 		ctx.font = '15px arial';
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
+		
+		
+		
+
+
+
+		const innerRadius = height / deltaAngle;
+		let maxWidth = radius - circlePadding - innerRadius;
+
+		let maxName = getMaxFittableName(nameArr, maxWidth)
+		if (!maxName && !_hoveredOn) return;
+
+
+		if (_hoveredOn)
+		{
+			let fullName = nameArr.join(' ');
+			const requiredWidth = ctx.measureText(fullName).width + 2 * padding;
+			let realWidth = Math.min(requiredWidth, canvas.width);
+			const maxBoxWidth = Math.min(textPos.value[0], canvas.width - textPos.value[0]) * 2;
+
+			console.log(requiredWidth, maxBoxWidth, realWidth);
+			
+			let xPos = textPos.value[0];
+			if (maxBoxWidth < realWidth) {
+				if (xPos < canvas.width / 2)
+				{
+					xPos -= (maxBoxWidth - realWidth) / 2;
+				} else xPos += (maxBoxWidth - realWidth) / 2;
+			} 
+		
+
+			const boxHeight = height + 2 * padding;
+			let name = fullName;
+			name = getMaxFittableName(nameArr, realWidth - 2 * padding);
+
+			ctx.fillStyle = _piece.color;
+			ctx.strokeStyle = '#fff';
+			ctx.beginPath();
+			ctx.fillRect(xPos - realWidth / 2, textPos.value[1] - boxHeight / 2 , realWidth, boxHeight);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.fillStyle = '#fff';
+			ctx.beginPath();
+			ctx.fillText(name, xPos, textPos.value[1]);
+			ctx.closePath();
+			ctx.fill();
+			return;
+		}
+
+
+
+		let rotateAngle = _startAngle / 2 + _stopAngle / 2;
+		let flipped = rotateAngle > 0.5 * Math.PI;
+		if (flipped) rotateAngle -= Math.PI;
+
+		ctx.save();
+		ctx.translate(centre.value[0], centre.value[1]);
+		ctx.rotate(rotateAngle);
+		ctx.fillStyle = '#fff';
+		ctx.textAlign = 'right';
+		if (flipped) ctx.textAlign = 'left';
 		ctx.beginPath();
-		ctx.fillText(_piece.name, textPos.value[0], textPos.value[1]);
+		let xPos = radius - circlePadding;
+		if (flipped) xPos *= -1;
+		ctx.fillText(maxName, xPos, 0);
 		ctx.closePath();
 		ctx.fill();
+		ctx.restore();
 	}
 
+	function getMaxFittableName(_name, _maxWidth) {
+		let maxName = _name.join(' ');
+
+		let width = ctx.measureText(maxName).width;
+		if (_name.length === 1)
+		{
+			while (width > _maxWidth)
+			{
+				maxName = maxName.substring(0, maxName.length - 1);
+				if (maxName.length < 5) return false;
+				width = ctx.measureText(maxName).width;
+			}
+
+			return maxName;
+		}
+		
+		let newNameArr = Object.assign([], _name);
+		newNameArr.pop();
+		if (width > _maxWidth) return getMaxFittableName(newNameArr, _maxWidth);
+		return maxName;
+	}
 
 
 

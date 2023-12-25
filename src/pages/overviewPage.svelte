@@ -113,8 +113,7 @@
 
 
 	function moneyNameAndValueToString(_name, _value) {
-		if (_name.length > 10) _name = _name.substring(0, 10) + '...';
-		return _name + ' ' + formatMoneyString(_value, true, true);
+		return [_name, formatMoneyString(_value, true, true)];
 	}
 </script>
 
