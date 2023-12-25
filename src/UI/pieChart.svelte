@@ -98,10 +98,13 @@
 		
 		let hoverStartAngle = 0;
 		let hoverDAngle = 0;
+
+		let validPieces = 0;
 		for (let piece of data) 
 		{
 			let perc = piece.value / data.map(a => a.value).reduce((a, b) => a + b, 0);
 			if (isNaN(perc)) continue;
+			validPieces++;
 			let dAngle = perc * 2 * Math.PI;
 			renderPiece(piece, curAngle - Math.PI / 2, curAngle + dAngle - Math.PI / 2);
 			
@@ -112,6 +115,8 @@
 			}
 			curAngle += dAngle;
 		}
+
+		if (validPieces === 0) renderPiece({name: '', value: 1, color: "#f7f7f7"}, 0, Math.PI * 2);
 
 		if (!curHoverPiece) return;
 		renderPiece(curHoverPiece, hoverStartAngle - Math.PI / 2, hoverStartAngle + hoverDAngle - Math.PI / 2, true);

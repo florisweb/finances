@@ -53,7 +53,6 @@
 		for (let tag of tags)
 		{
 			let expenses = tag.averageExpensesLast12Months;
-			console.log(tag, expenses);
 			if (expenses > 0)
 			{
 				incomeTagData.push({

@@ -22,7 +22,6 @@
 		{
 			pages = [...pages, transactions.slice(i, i + transactionsPerPage)];
 		}
-		console.log('pages', pages);
 	}
 
 	$: curPageTransactions = pages[curPageIndex] || [];
