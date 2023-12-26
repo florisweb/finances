@@ -1,4 +1,5 @@
 <script>	
+    import { MonthIdentifier } from '../types';
 	import Vector from '../vector';
 
 	export let title = '';
@@ -13,7 +14,7 @@
 		renderLabels: true,
 		...config
 	};
-
+	console.warn(config);
 
 	// Data: 
 	/*[
@@ -168,6 +169,13 @@
 			yDomain.value[0] + Camera.size.value[1],
 		];
 	}
+
+
+
+	const textColor = '#777';
+	const axisColor = '#ccc';
+	const backgroundAxisColor = '#eee';
+	const axisThickness = 1;
 	
 	function render() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -252,11 +260,6 @@
 	}
 
 	function renderXAxis() {
-		const textColor = '#777';
-		const axisColor = '#ccc';
-		const backgroundAxisColor = '#eee';
-		const axisThickness = 1;
-		
 		ctx.clearRect(0, canvas.height - Camera.labelMargin.value[1], canvas.width, Camera.labelMargin.value[1]);
 
 		ctx.fillStyle = axisColor;
@@ -266,47 +269,63 @@
 		const xLabelCount = canvas.width / 100;
 		let stepSize = Camera.size.value[0] / xLabelCount;
 		let stepOrder = 0.25 * 10**(String(stepSize).split('.')[0].length);
-
 		let startVal = Math.floor(Camera.position.value[0] / stepOrder) * stepOrder;
-		for (let x = startVal; x < Camera.position.value[0] + Camera.size.value[0] + stepOrder; x += stepOrder)
+
+		const isDateAxis = startVal > 10000000;
+		if (!isDateAxis) 
 		{
+			for (let x = startVal; x < Camera.position.value[0] + Camera.size.value[0] + stepOrder; x += stepOrder)
+			{
+				let coord = Camera.worldToPxCoord(new Vector(x, 0));
+				renderXLabel(x, coord);
+			}
+			return;
+		}
+
+
+		// Fix the startValue to the start of the month
+		const dayLength = 1000 * 60 * 60 * 24; 
+		const firstMonthId = new MonthIdentifier().setFromDate(new Date(startVal));
+		startVal = firstMonthId.date.getTime();
+
+		let x = startVal;
+		while (x < Camera.position.value[0] + Camera.size.value[0] + dayLength)
+		{
+			let monthId = new MonthIdentifier().setFromDate(new Date(x));
 			let coord = Camera.worldToPxCoord(new Vector(x, 0));
-			ctx.textBaseline = 'top';
-			ctx.textAlign = 'center';
 
-			let label = x;
-			if (x > 10000000) 
-			{
-				let date = new Date(x);
-				label = date.getMonths()[date.getMonth()].name.substr(0, 3) + ' ' + date.getFullYear();
-			}
 
-			// Vertical axis
-			if (coord.value[0] >= Camera.labelMargin.value[0])
-			{
-				ctx.fillStyle = backgroundAxisColor;
-				ctx.fillRect(coord.value[0], 0, 1, canvas.height);
-				ctx.fill();
-			}
-			if (!config.renderLabels) continue;
+			let label = monthId.date.getMonths()[monthId.date.getMonth()].name.substr(0, 3) + ' ' + monthId.date.getFullYear();
+			renderXLabel(label, coord);
 
-			// Little extenders
-			ctx.fillStyle = axisColor;
-			ctx.fillRect(coord.value[0], canvas.height - Camera.labelMargin.value[1], 2, 5);
-			ctx.fill();
-
-			ctx.fillStyle = textColor;
-			ctx.fillText(label, coord.value[0], canvas.height - Camera.labelMargin.value[1] + 5);
-			ctx.fill();
+			x = monthId.date.moveMonth(1).getTime();
 		}
 	}
 
+	function renderXLabel(_label, _coord) {
+		ctx.textBaseline = 'top';
+		ctx.textAlign = 'center';
+
+		// Vertical axis
+		if (_coord.value[0] >= Camera.labelMargin.value[0])
+		{
+			ctx.fillStyle = backgroundAxisColor;
+			ctx.fillRect(_coord.value[0], 0, 1, canvas.height);
+			ctx.fill();
+		}
+
+		if (!config.renderLabels) return;
+		// Little extenders
+		ctx.fillStyle = axisColor;
+		ctx.fillRect(_coord.value[0], canvas.height - Camera.labelMargin.value[1], 2, 5);
+		ctx.fill();
+
+		ctx.fillStyle = textColor;
+		ctx.fillText(_label, _coord.value[0], canvas.height - Camera.labelMargin.value[1] + 5);
+		ctx.fill();
+	}
+
 	function renderYAxis() {
-		const textColor = '#777';
-		const axisColor = '#ddd';
-		const backgroundAxisColor = '#eee';
-		const axisThickness = 1;
-		
 		ctx.clearRect(0, 0, Camera.labelMargin.value[0], canvas.height);
 
 		// Y-Axis

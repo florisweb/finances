@@ -5,6 +5,7 @@
 	import { getContext } from 'svelte';
     import TagManager from "../data/tagManager";
 	import { AvailableColors } from '../color';
+	import Color from '../color';
 	import Vector from '../vector';
     import Graph from "../UI/graph.svelte";
     import { MonthIdentifier } from "../types";
@@ -28,22 +29,44 @@
 		graphData = [{
 			color: AvailableColors[0].color,
 			data: [],
+		}, { // Expenses
+			color: new Color('#f00'),
+			data: [],
+			doNotInterpolate: true,
+		}, { // Income
+			color: new Color('#0a0'),
+			data: [],
+			doNotInterpolate: true,
 		}];
-		if (curTag.isSavingsTag)
-		{
-			let firstTransaction = curTag.transactions[0];
-			let firstTransactionDate = firstTransaction?.date || new Date();
 
-			let curMonth = new MonthIdentifier().setFromDate(firstTransactionDate);
-			while (curMonth.date.getTime() < new MonthIdentifier().date.getTime())
-			{	
+		let firstTransactionDate = curTag.firstTransactionDate || new Date();
+		let curMonth = new MonthIdentifier().setFromDate(firstTransactionDate);
+		while (curMonth.date.getTime() < new MonthIdentifier().date.getTime())
+		{	
+			if (curTag.isSavingsTag) {;
 				graphData[0].data.push(new Vector(
 					curMonth.date.getTime(),
 					curTag.getSavingsAtEndOfMonth(curMonth)
 				));
-				curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))
 			}
+
+			let moneyTransactions = curTag.getTransactionsByMonth(curMonth).map((_transaction) => _transaction.deltaMoney);
+			let expenses = 0;
+			let income = 0;
+			for (let expense of moneyTransactions)
+			{
+				if (expense < 0) 
+				{
+					expenses -= expense;
+				} else income += expense
+			}
+
+			graphData[1].data.push(new Vector(curMonth.date.getTime(), expenses));
+			graphData[2].data.push(new Vector(curMonth.date.getTime(), income));
+
+			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))
 		}
+		console.warn(window.d = graphData);
 	}
 
 

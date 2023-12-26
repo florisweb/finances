@@ -541,6 +541,9 @@ export class MonthIdentifier {
 		date.setFullYear(parseInt(parts[1]));
 		date.setMonth(parseInt(parts[0]) - 1);
 		date.setDate(1);
+		date.setHours(0);
+		date.setMinutes(0);
+		date.setMilliseconds(0);
 		return date;
 	}
 

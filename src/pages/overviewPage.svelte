@@ -21,26 +21,26 @@
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
-	let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}]
-	$: if (accounts.length) {
-		for (let i = 1; i < accounts.length + 1; i++)
-		{
-			graphData[i] = {
-				color: AvailableColors[i].color,
-				data: accounts[i - 1].generateGraphData(23) || [],
-				doNotInterpolate: true,
-			}
-		}
+	// let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}]
+	// $: if (accounts.length) {
+	// 	for (let i = 1; i < accounts.length + 1; i++)
+	// 	{
+	// 		graphData[i] = {
+	// 			color: AvailableColors[i].color,
+	// 			data: accounts[i - 1].generateGraphData(23) || [],
+	// 			doNotInterpolate: true,
+	// 		}
+	// 	}
 
-		for (let d = 0; d < graphData[1].data.length; d++)
-		{
-			graphData[0].data[d] = new Vector(graphData[1].data[d].value[0], 0);
-			for (let i = 1; i < accounts.length + 1; i++)
-			{	
-				graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
-			}
-		}
-	}
+	// 	for (let d = 0; d < graphData[1].data.length; d++)
+	// 	{
+	// 		graphData[0].data[d] = new Vector(graphData[1].data[d].value[0], 0);
+	// 		for (let i = 1; i < accounts.length + 1; i++)
+	// 		{	
+	// 			graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
+	// 		}
+	// 	}
+	// }
 
 
 
@@ -108,37 +108,31 @@
 
 
 	let expensesData = [];
+	let incomeData = [];
 	$: {
+		incomeData = [];
 		expensesData = [];
 		for (let tag of tags)
 		{
 			let expenses = tag.getAverageExpensesInLastXMonths(12);
-			if (expenses < 0) continue;
-			expensesData.push({
-				value: expenses,
-				color: tag.color.hex,
-				name: moneyNameAndValueToString(tag.name, expenses)
-			});
-		}
-
-		expensesData.sort((a, b) => a.value < b.value);
-	}
-
-	let incomeData = [];
-	$: {
-		incomeData = [];
-		for (let tag of tags)
-		{
-			let income = -tag.getAverageExpensesInLastXMonths(12);
-			if (income < 0) continue;
-			incomeData.push({
-				value: income,
-				color: tag.color.hex,
-				name: moneyNameAndValueToString(tag.name, income)
-			});
+			if (expenses > 0)
+			{
+				expensesData.push({
+					value: expenses,
+					color: tag.color.hex,
+					name: moneyNameAndValueToString(tag.name, expenses)
+				});
+			} else {
+				incomeData.push({
+					value: -expenses,
+					color: tag.color.hex,
+					name: moneyNameAndValueToString(tag.name, -expenses)
+				});
+			}
 		}
 
 		incomeData.sort((a, b) => a.value < b.value);
+		expensesData.sort((a, b) => a.value < b.value);
 	}
 
 
@@ -210,8 +204,8 @@
 			</table>
 		</div>
 		<div class="section budget">
-			<div class='sectionHeader'>Property</div>
-			<Graph data={graphData}></Graph>
+			<!-- <div class='sectionHeader'>Property</div> -->
+			<!-- <Graph data={graphData}></Graph> -->
 		</div>
 	</div>
 </Page>
