@@ -109,7 +109,13 @@
 
 	let expensesData = [];
 	let incomeData = [];
+
+	let averageExpenses = 0;
+	let averageIncome = 0;
 	$: {
+		averageExpenses = 0;
+		averageIncome = 0;
+
 		incomeData = [];
 		expensesData = [];
 		for (let tag of tags)
@@ -117,12 +123,14 @@
 			let expenses = tag.getAverageExpensesInLastXMonths(12);
 			if (expenses > 0)
 			{
+				averageExpenses += expenses;
 				expensesData.push({
 					value: expenses,
 					color: tag.color.hex,
 					name: moneyNameAndValueToString(tag.name, expenses)
 				});
 			} else {
+				averageIncome -= expenses;
 				incomeData.push({
 					value: -expenses,
 					color: tag.color.hex,
@@ -140,10 +148,16 @@
 	function moneyNameAndValueToString(_name, _value) {
 		return [_name, formatMoneyString(_value, true, true)];
 	}
+
+
 </script>
 
 <Page customClass='overviewPage'>
-	<div class='infoHolder'>		
+	<div class='infoHolder'>	
+		<div class='deltaHolder' class:negative={averageIncome < averageExpenses} class:positive={averageIncome > averageExpenses}>
+			<img src={averageIncome > averageExpenses ? 'images/arrowRisingIcon.png' : 'images/arrowFallingIcon.png'} class='deltaIcon'>
+			<div class="deltaMoney">{formatMoneyString(Math.abs(averageIncome - averageExpenses), true, true)}</div>
+		</div>	
 		<div class='titleHolder'>
 			<div>{formatMoneyString(curBalance, true, true)} Balance</div>
 			<div class="subInfoHolder">at end of {curMonth.id}</div>
@@ -153,12 +167,12 @@
 	<div class='dataHolder'>
 		<div class='section distribution'>
 			<PieChart 
-				title={'Income ' + formatMoneyString(incomeData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
+				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
 				data={incomeData}
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
-				title={'Expenses ' + formatMoneyString(expensesData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)} 
+				title={'Expenses ' + formatMoneyString(averageExpenses, true, true)} 
 				data={expensesData}
 				customClass='distributionGraph'
 			></PieChart>
@@ -228,8 +242,7 @@
 			position: relative;
 			display: flex;
 			height: 70px;
-			margin-right: 60px;
-			padding-right: 20px;
+			margin-right: 10px;
 			
 			line-height: 70px;
 			color: #333;
@@ -240,11 +253,60 @@
 			.titleHolder .subInfoHolder {
 				position: absolute;
 				top: 25px;
-				right: 25px;
+				right: 0;
 				font-size: 12px;
 				white-space: nowrap;
 			}
 		
+
+		.deltaHolder {
+			position: relative;
+			display: flex;
+			margin-top: 6px;
+			margin-right: 15px;
+			
+			height: 60px;
+			flex-direction: row;
+			background-color: #ccc;
+			border-radius: 5px;
+			padding: 0 10px;
+			color: #fff;
+		}
+		
+		.deltaHolder.positive {
+			background-color: #3c3;
+		}
+		.deltaHolder.negative {
+			background-color: #f00;
+		}
+
+		.deltaHolder .deltaIcon {
+			height: 60px;
+			padding: 10px 0;
+			margin-right: 5px;
+		}
+		.deltaHolder .deltaMoney {
+			position: relative;
+			display: flex;
+			height: 50px;
+			
+			line-height: 45px;
+			font-style: italic;
+			font-size: 30px;
+		}
+
+		.deltaHolder .deltaMoney:before {
+			content: 'PER MONTH';
+			position: absolute;
+			top: 25px;
+			right: 2px;
+			font-size: 12px;
+			white-space: nowrap;
+		}
+
+
+
+
 
 
 		.floatRightHolder {
