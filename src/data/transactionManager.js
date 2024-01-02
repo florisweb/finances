@@ -1,6 +1,6 @@
 import DataManager from "./dataManager";
 import { Transaction, MonthIdentifier } from "../types";
-
+import { openPageByIndex } from "../App";
 
 const TransactionManager = new class extends DataManager {
 	constructor() {
@@ -12,6 +12,7 @@ const TransactionManager = new class extends DataManager {
 	async setup() {
 		await super.setup();
 		this.#catagorizeTransactionsByMonth();
+		if (this.data.length === 0) openPageByIndex(0);
 	}
 
 

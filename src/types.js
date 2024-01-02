@@ -110,7 +110,6 @@ export class TransactionTag {
 
 	getExpensesByMonth(_monthId) {
 		let transactions = this.getTransactionsByMonth(_monthId);
-		console.info('transactions', _monthId.id, transactions);
 		return -transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 	}
 	
