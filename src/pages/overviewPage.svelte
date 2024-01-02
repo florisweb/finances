@@ -289,6 +289,7 @@
 			position: relative;
 			display: flex;
 			height: 50px;
+			min-width: 75px;
 			
 			line-height: 45px;
 			font-style: italic;
