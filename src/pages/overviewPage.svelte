@@ -1,10 +1,7 @@
 <script>
 	import Page from "../UI/page.svelte";	
-	import Graph from "../UI/graph.svelte";
 	import AccountManager from "../data/accountManager";
-	import { AvailableColors } from '../color';
 	import { formatMoneyString } from '../polyfill';
-	import Vector from "../vector";
     import { MonthIdentifier } from "../types";
     import PieChart from "../UI/pieChart.svelte";
     import TagManager from "../data/tagManager";
@@ -14,6 +11,7 @@
 	let curDate = new Date();
 	curDate.setDate(0);
 	let curMonth = new MonthIdentifier().setFromDate(curDate);
+	window.setCurMonth = (m) => curMonth = m;
 
 	let curBalance = 0;
 	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
@@ -78,8 +76,10 @@
 
 
 	let balanceDistributionData = [];
+	let reservedMoney = 0;
 
 	$: {
+		reservedMoney = 0;
 		let savingTags = tags.filter((_tag) => _tag.isSavingsTag);
 		balanceDistributionData = [
 			{value: 0, color: '#f00', name: 'Indebted'}
@@ -93,7 +93,7 @@
 				continue;
 			};
 
-			
+			reservedMoney += balance;			
 			balanceDistributionData.push(
 				{
 					value: balance,
@@ -102,7 +102,7 @@
 				}
 			)
 		}
-
+		balanceDistributionData[0].name = moneyNameAndValueToString('Indebted', -balanceDistributionData[0].value);
 		balanceDistributionData.sort((a, b) => a.value < b.value);
 	}
 
@@ -177,7 +177,7 @@
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
-				title={'Reserved Money ' + formatMoneyString(balanceDistributionData.map(r => r.value).reduce((a, b) => a + b, 0), true, true)}
+				title={'Reserved Money ' + formatMoneyString(reservedMoney, true, true)}
 				data={balanceDistributionData}
 				customClass='distributionGraph'
 			></PieChart>
