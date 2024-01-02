@@ -352,7 +352,7 @@ export class BudgetSection {
 	export() {
 		return {
 			name: this.name,
-			tagBudgetSets: Object.assign([], this.tagBudgetSets)
+			tagBudgetSets: this.tagBudgetSets.map(set => Object.assign({}, set))
 		}
 	}
 

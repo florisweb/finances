@@ -1,13 +1,21 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-    import ColoredMoneyString from './coloredMoneyString.svelte';
 	const dispatch = createEventDispatcher();
-	export let budget;
+
+	import BudgetManager from '../data/budgetManager';
+	let copyableBudget = false;
+
+	BudgetManager.dataStore.subscribe((_budget) => {
+		copyableBudget = BudgetManager.activeBudget;
+	});
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class='panel' on:click={(_event) => dispatch('click', _event)}>
-	<div class='title'>+ Add Budget</div>
+	<div class='title'>Add Budget</div>
+	{#if copyableBudget}
+		<div class='copyActiveButton' on:click={(_event) => dispatch('clickButton', _event)}>&#x1f4cb;</div>
+	{/if}
 </div>
 
 
@@ -16,6 +24,8 @@
 	.panel {
 		position: relative;
 		padding: 20px;
+		padding-left: 60px;
+		padding-bottom: 10px;
 		background: #fefefe;
 
 		border: 1px solid #eee;
@@ -28,14 +38,49 @@
 		animation: panelFadeIn .45s;
 		animation-fill-mode: forwards;
 	}
+	.panel::after {
+		position: absolute;
+		left: 15px;
+		top: 23px;
+		width: 30px;
+		height: 30px;
+		
+		content: '+';
+		line-height: 29px;
+		font-size: 20px;
+		font-weight: bold;
+		color: #bbb;
+		text-align: center;
+
+		background-color: #fafafa;
+		border: 2px solid #ccc;
+		border-radius: 100%;
+	}
+
 
 
 	.panel .title {
 		position: relative;
 		color: #444;
-		height: 20px;
-		line-height: 20px;
+		height: 50px;
+		line-height: 40px;
 		text-transform: uppercase;
 		white-space: nowrap;
+	}
+
+	.panel .copyActiveButton {
+		position: absolute;
+		right: 0;
+		top: 0;
+		height: 100%;
+		aspect-ratio: 1;
+		width: auto;
+
+		background-color: rgba(0, 0, 0, .05);
+		
+		text-align: center;
+		line-height: 100%;
+		vertical-align: middle;
+		font-size: 30px;
 	}
 </style>

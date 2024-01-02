@@ -6,10 +6,20 @@
 	import { getContext } from 'svelte';
     import BudgetManager from "../data/budgetManager";
     import AddBudgetPanel from "../UI/addBudgetPanel.svelte";
+    import { Budget, MonthIdentifier } from "../types";
 	const App = getContext('App');
 
 	let budgets = [];
 	BudgetManager.dataStore.subscribe((_budgets) => budgets = _budgets);
+
+	function duplicateActiveBudget() {
+		let newBudget = new Budget({
+			startMonthId: new MonthIdentifier(), 
+			sections: BudgetManager.activeBudget.sections.map(s => s.export())
+		});
+		console.warn(window.newBudget = newBudget);
+		App.createBudgetPopup.openEdit(newBudget);
+	}
 </script>
 
 <Page title="Budget Management">
@@ -18,7 +28,7 @@
 			<BudgetPanel budget={budget} on:click={() => App.createBudgetPopup.openEdit(budget)}></BudgetPanel>
 		{/each}
 
-		<AddBudgetPanel on:click={() => App.createBudgetPopup.open()}></AddBudgetPanel>
+		<AddBudgetPanel on:click={() => App.createBudgetPopup.open()} on:clickButton={() => duplicateActiveBudget()}></AddBudgetPanel>
 	</div>
 </Page>
 
