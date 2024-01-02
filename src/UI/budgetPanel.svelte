@@ -6,11 +6,23 @@
 
 	let averageExpenses = 0;
 	$: averageExpenses = budget.averageExpenses;
+
+	let finishedPositive = false;
+	$: finishedPositive = budget.hasFinished && budget.sum < averageExpenses - 10;
+	let finishedNegative = false;
+	$: finishedNegative = budget.hasFinished && budget.sum > averageExpenses + 10;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class='panel' class:active={budget.isActive} on:click={(_event) => dispatch('click', _event)}>
-	<div class='title'>{budget.name}</div>
+<div 
+	class='panel' 
+	class:active={budget.isActive} 
+	class:finishedPositive={finishedPositive} 
+	class:finishedNegative={finishedNegative} 
+	class:finished={budget.hasFinished}
+	on:click={(_event) => dispatch('click', _event)}
+	>
+	<div class='title'>{budget.shortName}</div>
 	<div class='moneyInfoHolder'>
 		Netto: <ColoredMoneyString money={budget.sum}></ColoredMoneyString> 
 		{#if typeof averageExpenses !== 'symbol'}
@@ -39,6 +51,46 @@
 	}
 	.panel.active {
 		border-bottom: 3px solid #daf;
+	}
+	.panel.finished {
+		padding-left: 60px;
+	}
+	.panel.finished::after {
+		position: absolute;
+		left: 15px;
+		top: 23px;
+		width: 30px;
+		height: 30px;
+		
+		content: '-';
+		line-height: 29px;
+		font-size: 20px;
+		font-weight: bold;
+		color: #bbb;
+		text-align: center;
+
+
+		background-color: #fafafa;
+		border: 2px solid #ccc;
+		border-radius: 100%;
+	}
+	.panel.finishedPositive::after {
+		content: '✓';
+		background-color: #efe;
+		border: 2px solid #7a7;
+		font-weight: normal;
+		line-height: 30px;
+		font-size: 15px;
+		color: #7a7;
+	}
+	.panel.finishedNegative::after {
+		content: 'x';
+		background-color: #fee;
+		border: 2px solid #f77;
+		font-weight: normal;
+		line-height: 29px;
+		font-size: 17px;
+		color: #f77;
 	}
 
 	.panel .title {

@@ -251,6 +251,12 @@ export class Budget {
 		endOfMonthDate.setMinutes(0);
 		return endOfMonthDate.getTime() >= new Date().getTime();
 	}
+	get hasFinished() {
+		let prevMonth = new Date();
+		prevMonth.setDate(0);
+		return !this.isActive && this.endMonthId && this.endMonthId.date.getTime() <= new MonthIdentifier().setFromDate(prevMonth).date.getTime();
+	}
+
 	get lengthInMonths() {
 		return this.getLengthInStartedMonthsOnDate(new Date());
 	}
@@ -288,6 +294,11 @@ export class Budget {
 	get name() {
 		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.name : ' - ->');
 		return this.startMonthId.name + (this.endMonthId ? ' - ' + this.endMonthId.name : ' ->');
+	}
+
+	get shortName() {
+		if (typeof this.startMonthId !== 'object') return '<-' + (this.endMonthId ? ' - ' + this.endMonthId.shortName : ' - ->');
+		return this.startMonthId.shortName + (this.endMonthId ? ' - ' + this.endMonthId.shortName : ' ->');
 	}
 
 
@@ -529,6 +540,9 @@ export class MonthIdentifier {
 
 	get name() {
 		return this.date.getMonths()[this.date.getMonth()].name + ' ' + this.date.getFullYear();
+	}
+	get shortName() {
+		return this.date.getMonths()[this.date.getMonth()].name.substr(0, 3) + ' ' + this.date.getFullYear();
 	}
 
 	constructor() {
