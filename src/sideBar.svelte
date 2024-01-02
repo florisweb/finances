@@ -32,10 +32,12 @@
 	<div class="item">
 		<Button name='Budgetter' customClass={activeBudget ? '' : 'warning'} on:click={() => openPageByIndex(3)}></Button>
 	</div>
-	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
-	<div class="item header">
-		Accounts
-	</div>
+	{#if accounts.length}
+		<hr>
+		<div class="item header">
+			Accounts
+		</div>
+	{/if}
 	{#each accounts as account}
 		<div class="item account">
 			<Button name={account.name || 'Unnamed Account'} on:click={
@@ -43,7 +45,7 @@
 			}></Button>
 		</div>
 	{/each}
-	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
+	<hr>
 	<div class="item">
 		<Button name='Data Management' on:click={() => openPageByIndex(0)}></Button>
 	</div>
@@ -96,5 +98,10 @@
 
 	.item.account {
 		margin-bottom: 10px;
+	}
+
+	hr {
+		border-top: 1px solid #daf; 
+		margin-bottom: 20px;
 	}
 </style>

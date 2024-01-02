@@ -52,6 +52,10 @@
 </script>
 
 <Page title="Data Management">
+	<div class='message'>
+		Download your transactions as .csv on your banks' website and upload them here. <br>Alternatively, upload a previously downloaded .finance-file.
+	</div>
+
 	<input type='file' class='CSVInputField' accept='text/csv, text/finance' on:input={handleUpload}>
 
 	<Button	name="Clear Transactions" on:click={() => TransactionManager.clear()}></Button>
@@ -71,5 +75,11 @@
 		text-align: center;
 		padding: 50px;
 		border: 1px solid #daf;
+	}
+
+	.message {
+		width: 100%;
+		color: #444;
+		text-align: center;
 	}
 </style>
