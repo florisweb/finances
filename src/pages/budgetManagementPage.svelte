@@ -10,7 +10,10 @@
 	const App = getContext('App');
 
 	let budgets = [];
-	BudgetManager.dataStore.subscribe((_budgets) => budgets = _budgets);
+	BudgetManager.dataStore.subscribe((_budgets) => {
+		budgets = _budgets
+		budgets.sort((a, b) => a.startMonthId.date.getTime() > b.startMonthId.date.getTime());
+	});
 
 	function duplicateActiveBudget() {
 		let newBudget = new Budget({

@@ -121,7 +121,7 @@
 				<tr class='tableHeader'>
 					<th scope='col' class='name'>Tag</th>
 					<th scope='col' class='budget'>Budget</th>
-					<th scope='col' class=''>Average</th>
+					<th scope='col' class='average'>Average</th>
 				</tr>
 				{#each sumTags as sumTag}
 					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget} averageExpenses={sumTag.averageExpenses}></TagBudgetOverviewRow>
@@ -203,7 +203,7 @@
 	.tableHeader th.name {
 		padding-left: 22px;
 	}
-	.tableHeader th.budget {
-		padding-left: 10px;
+	.tableHeader th.budget, .tableHeader th.average {
+		padding-left: 15px;
 	}
 </style>

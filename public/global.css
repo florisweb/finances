@@ -157,6 +157,7 @@ html, body {
 	left: calc((100vw - 600px - 300px - 50px) / 2 + 600px + 50px);
 	width: auto;
 	max-width: 400px;
+	padding-right: 5px;
 }
 
 
