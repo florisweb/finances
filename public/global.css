@@ -197,3 +197,27 @@ html, body {
 	max-width: 250px;
 	margin: 0 auto;
 }
+
+
+
+#sideBar .item .button {
+	margin: 0;
+	transition: background .3s, padding-right .3s;
+}
+#sideBar .item .button:after { 
+	position: absolute;
+	content: '⚠';
+	opacity: 0;
+	margin-left: -30px;
+	transition: opacity .3s;
+}
+
+#sideBar .item .button.warning {
+	background: var(--warningColor);
+	padding-right: 30px;
+}
+#sideBar .item .button.warning:after {
+	content: '⚠';
+	opacity: 1;
+	margin-left: 5px;
+}

@@ -2,6 +2,10 @@
 	import { openPageByIndex } from './App.js';
 	import Button from './UI/button.svelte';
 
+	import BudgetManager from './data/budgetManager.js';
+	let activeBudget;
+	BudgetManager.dataStore.subscribe((_budgets) => activeBudget = BudgetManager.activeBudget);
+
 	import AccountManager from './data/accountManager.js';
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
@@ -26,7 +30,7 @@
 		<Button name='Tags' on:click={() => openPageByIndex(1)}></Button>
 	</div>
 	<div class="item">
-		<Button name='Budgetter' on:click={() => openPageByIndex(3)}></Button>
+		<Button name='Budgetter' customClass={activeBudget ? '' : 'warning'} on:click={() => openPageByIndex(3)}></Button>
 	</div>
 	<hr style='border-top: 1px solid #daf; margin-bottom: 20px;'>
 	<div class="item header">
@@ -93,26 +97,4 @@
 	.item.account {
 		margin-bottom: 10px;
 	}
-	/* .item .button {
-		margin: 0;
-		transition: background .3s, padding-right .3s;
-	}
-	.item .button:after { 
-		position: absolute;
-		content: '⚠';
-		opacity: 0;
-		margin-left: -30px;
-		transition: opacity .3s;
-	}
-
-	.item .button.warning {
-		background: var(--warningColor);
-		padding-right: 30px;
-	}
-	.item .button.warning:after {
-		content: '⚠';
-		opacity: 1;
-		margin-left: 5px;
-	} */
-	
 </style>
