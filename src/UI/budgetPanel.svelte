@@ -3,14 +3,19 @@
     import ColoredMoneyString from './coloredMoneyString.svelte';
 	const dispatch = createEventDispatcher();
 	export let budget;
+
+	let averageExpenses = 0;
+	$: averageExpenses = budget.averageExpenses;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class='panel' class:active={budget.isActive} on:click={(_event) => dispatch('click', _event)}>
 	<div class='title'>{budget.name}</div>
 	<div class='moneyInfoHolder'>
-		Netto: <ColoredMoneyString money={budget.sum}></ColoredMoneyString> -  
-		Reality: <ColoredMoneyString money={budget.averageExpenses}></ColoredMoneyString>
+		Netto: <ColoredMoneyString money={budget.sum}></ColoredMoneyString> 
+		{#if typeof averageExpenses !== 'symbol'}
+			- Reality: <ColoredMoneyString money={averageExpenses}></ColoredMoneyString>
+		{/if}
 	</div>
 </div>
 

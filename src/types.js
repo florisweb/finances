@@ -255,6 +255,26 @@ export class Budget {
 		return this.getLengthInStartedMonthsOnDate(new Date());
 	}
 
+	get averageExpenses() { // Excludes current month
+		let lastFinishedMonthDate = new Date();
+		lastFinishedMonthDate.setDate(0);
+		
+		let endMonthId = this.endMonthId || new MonthIdentifier().setFromDate(lastFinishedMonthDate);
+		let curMonthId = this.startMonthId.copy();
+		if (endMonthId.date.getTime() < curMonthId.date.getTime()) return Symbol('Budget not started yet');
+		
+		let sum = 0;
+		let months = 0;
+		while (curMonthId.date.getTime() <= endMonthId.date.getTime())
+		{
+			let transactions = TransactionManager.getByMonth(curMonthId);
+			months += 1;
+			sum += transactions.map(a => a.deltaMoney).reduce((a, b) => a + b, 0);
+			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(1));
+		}
+		return sum / months;
+	}
+
 	getLengthInStartedMonthsOnDate(_date) { // MONTHS WHICH HAVE STARTED: so 2 december -> december
 		let monthId = new MonthIdentifier().setFromDate(_date);
 		if (this.endMonthId && this.endMonthId.date.getTime() < monthId.date.getTime())
@@ -513,6 +533,10 @@ export class MonthIdentifier {
 
 	constructor() {
 		this.setFromDate(new Date());
+	}
+
+	copy() {
+		return new MonthIdentifier().setFromId(this.id);
 	}
 
 	setFromId(_id) {

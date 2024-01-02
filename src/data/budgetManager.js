@@ -4,6 +4,7 @@ import { Budget } from '../types';
 const BudgetManager = new class extends DataManager {
 	constructor() {
 		super({type: "budgets", dataToObject: (_budget) => new Budget(_budget)});
+		window.BudgetManager = this;
 	}
 	getById(_id) {
 		return this._data.find((_item) => _item.id === _id);
