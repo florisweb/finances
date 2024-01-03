@@ -14,7 +14,9 @@
 <div class='panel' on:click={(_event) => dispatch('click', _event)}>
 	<div class='title'>Add Budget</div>
 	{#if copyableBudget}
-		<div class='copyActiveButton' on:click={(_event) => dispatch('clickButton', _event)}>&#x1f4cb;</div>
+		<div class='copyActiveButton' on:click={(_event) => dispatch('clickButton', _event)} title='Copy the active budget'>
+			<img src='images/copyIcon.png'>
+		</div>
 	{/if}
 </div>
 
@@ -76,11 +78,23 @@
 		aspect-ratio: 1;
 		width: auto;
 
-		background-color: rgba(0, 0, 0, .05);
+		/* background-color: rgba(0, 0, 0, .05); */
+		background-color: #daf;
 		
 		text-align: center;
 		line-height: 100%;
 		vertical-align: middle;
 		font-size: 30px;
+
+	}
+
+	.panel .copyActiveButton img {
+		height: 100%;
+		width: auto;
+		padding: 20px;
+		transition: .3s opacity;
+	}
+	.panel .copyActiveButton:hover img {
+		opacity: .5;
 	}
 </style>
