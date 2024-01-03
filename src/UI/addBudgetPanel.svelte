@@ -78,14 +78,12 @@
 		aspect-ratio: 1;
 		width: auto;
 
-		/* background-color: rgba(0, 0, 0, .05); */
 		background-color: #daf;
 		
 		text-align: center;
 		line-height: 100%;
 		vertical-align: middle;
 		font-size: 30px;
-
 	}
 
 	.panel .copyActiveButton img {

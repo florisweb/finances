@@ -66,7 +66,6 @@
 
 			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(1))
 		}
-		console.warn(window.d = graphData);
 	}
 
 

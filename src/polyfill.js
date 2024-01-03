@@ -36,3 +36,24 @@ export function downloadFile(_string, _name = 'output.csv', _type = 'text/csv') 
 	c.href = window.URL.createObjectURL(t);
 	c.click();
 }
+
+
+export function isDescendant(parent, child) {
+	if (typeof parent.length !== "number") return _isDescendant(parent, child);
+	for (let i = 0; i < parent.length; i++)
+	{
+	  if (_isDescendant(parent[i], child)) return true;
+	}
+  
+	function _isDescendant(parent, child) {
+	  if (parent == child) return true;
+	  
+	   var node = child.parentNode;
+	   while (node != null) 
+	   {
+		   if (node == parent) return true;
+		   node = node.parentNode;
+	   }
+	   return false;
+	}
+  }

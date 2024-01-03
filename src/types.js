@@ -131,7 +131,6 @@ export class TransactionTag {
 			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(1));
 			addedMonths++;
 		}
-		console.warn(this.name, sum, addedMonths);
 		return sum / addedMonths;
 	}
 

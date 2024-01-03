@@ -7,6 +7,7 @@
     import BudgetManager from "../data/budgetManager";
     import AddBudgetPanel from "../UI/addBudgetPanel.svelte";
     import { Budget, MonthIdentifier } from "../types";
+    import Button from "../UI/button.svelte";
 	const App = getContext('App');
 
 	let activeBudget;
@@ -22,18 +23,25 @@
 			startMonthId: new MonthIdentifier(), 
 			sections: BudgetManager.activeBudget.sections.map(s => s.export())
 		});
-		console.warn(window.newBudget = newBudget);
 		App.createBudgetPopup.openEdit(newBudget);
 	}
+
+	let budgetRemoverModeEnabled = false;
 </script>
 
-<Page title="Budget Management">
+<Page title="Budget Management" customClass='budgetPage'>
+	<Button name='Toggle budget remover' customClass='removeButton' on:click={() =>budgetRemoverModeEnabled = !budgetRemoverModeEnabled}></Button>
 	{#if !activeBudget}
 		<div class='message warning'>No budget active, please add one below.</div>
 	{/if}
 	<div class='listHolder'>
 		{#each budgets as budget}
-			<BudgetPanel budget={budget} on:click={() => App.createBudgetPopup.openEdit(budget)}></BudgetPanel>
+			<BudgetPanel 
+				budget={budget} 
+				on:click={() => App.createBudgetPopup.openEdit(budget)} 
+				on:clickButton={(_e) => {BudgetManager.remove(budget.id); budgetRemoverModeEnabled = false}}
+				showRemoveButton={budgetRemoverModeEnabled}
+			></BudgetPanel>
 		{/each}
 
 		<AddBudgetPanel on:click={() => App.createBudgetPopup.open()} on:clickButton={() => duplicateActiveBudget()}></AddBudgetPanel>

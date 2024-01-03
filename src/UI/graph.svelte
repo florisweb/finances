@@ -14,7 +14,6 @@
 		renderLabels: true,
 		...config
 	};
-	console.warn(config);
 
 	// Data: 
 	/*[
