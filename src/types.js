@@ -463,6 +463,7 @@ export class TagFilter {
 export class BankAccount {
 	IBAN = '';
 	name = '';
+	get id() {return this.IBAN}
 
 
 	get transactions() {

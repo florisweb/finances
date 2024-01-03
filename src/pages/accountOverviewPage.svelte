@@ -5,10 +5,9 @@
 
 	import { openPageByIndex } from '../App';
 	import { getContext } from 'svelte';
-    import { MonthIdentifier } from "../types";
     import Graph from "../UI/graph.svelte";
-    import Vector from "../vector";
     import Color from "../color";
+    import AccountManager from "../data/accountManager";
 
 	const App = getContext('App');
 	let curAccount;
@@ -50,6 +49,13 @@
 				<Button name='Edit' 
 					on:click={
 					() => App.createAccountPopup.openEdit(curAccount)
+				}></Button>
+					<Button name='Remove' 
+					on:click={
+					() => {
+						AccountManager.remove(curAccount?.id);
+						openPageByIndex(4);
+					}
 				}></Button>
 			</div>
 		</div>

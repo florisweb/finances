@@ -22,6 +22,12 @@ export default class DataManager {
 		this._data = _data;
 		return this.writeData();
 	}
+	
+	remove(_id) {
+		this._data = this._data.filter((_item) => _item.id !== _id);
+		return this.writeData();
+	}
+
 
 	constructor({type, dataToObject}) {
 		this.type = type;

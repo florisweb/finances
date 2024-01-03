@@ -11,11 +11,6 @@ const BudgetManager = new class extends DataManager {
 		return this.getByMonth(new MonthIdentifier());
 	}
 
-	remove(_id) {
-		this._data = this._data.filter((_budget) => _budget.id !== _id);
-		return this.writeData();
-	}
-
 
 	getById(_id) {
 		return this._data.find((_item) => _item.id === _id);
