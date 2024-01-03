@@ -31,9 +31,7 @@
 
 <Page title="Budget Management" customClass='budgetPage'>
 	<Button name='Toggle budget remover' customClass='removeButton' on:click={() =>budgetRemoverModeEnabled = !budgetRemoverModeEnabled}></Button>
-	{#if !activeBudget}
-		<div class='message warning'>No budget active, please add one below.</div>
-	{/if}
+	<div class='message warning' class:hide={activeBudget} transit>No budget active, please add one below.</div>
 	<div class='listHolder'>
 		{#each budgets as budget}
 			<BudgetPanel 
@@ -61,6 +59,12 @@
 	.message {
 		width: 100%;
 		text-align: center;
+		transition: opacity .3s, margin-top .3s;
+	}
+	.message.hide {
+		opacity: 0;
+		margin-top: -18px;
+		pointer-events: none;
 	}
 	.message.warning {
 		color: var(--warningColor);
