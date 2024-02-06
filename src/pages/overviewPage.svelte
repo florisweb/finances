@@ -53,7 +53,7 @@
 		for (let tag of tags)
 		{
 			let expenses = tag.getAverageExpensesInLastXMonths(12);
-			if (expenses > 0)
+			if (expenses < 0)
 			{
 				incomeTagData.push({
 					tag: tag,
@@ -68,6 +68,7 @@
 		}
 		incomeTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
 		expensesTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
+		console.warn(expensesTagData);
 	}
 
 
@@ -167,13 +168,13 @@
 	<div class='dataHolder'>
 		<div class='section distribution'>
 			<PieChart 
-				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
-				data={incomeData}
+				title={'Expenses ' + formatMoneyString(averageExpenses, true, true)} 
+				data={expensesData}
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
-				title={'Expenses ' + formatMoneyString(averageExpenses, true, true)} 
-				data={expensesData}
+				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
+				data={incomeData}
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
@@ -183,43 +184,59 @@
 			></PieChart>
 		</div>
 
-		<div class="section tags">
-			<div class='sectionHeader'>Tags</div>
+
+		<div class="section expensesTags">
 			<table class='tagTable'>
 				<thead>
 					<tr class='header'>
-						<th scope='col'></th>
+						<th scope='col' class='tableTitle'>Expenses</th>
 						<th scope='col'>Average</th>
 						<th scope='col'>Budgeted</th>
 						<th scope='col'>Savings</th>
 					</tr>
 				</thead>
 				<tbody>
-					<div>Expenses</div>
-					{#each incomeTagData as tagData}
-						<tr>
-							<td><Tag {...tagData.tag}></Tag></td>
-							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
-							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'}</td>
-						</tr>	
-					{/each}
-					<hr>
-					<div>Income</div>
 					{#each expensesTagData as tagData}
 						<tr>
 							<td><Tag {...tagData.tag}></Tag></td>
 							<td class='moneyString'>{formatMoneyString(tagData.expenses, true)}</td>
-							<td class='moneyString'>{tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'}</td>
-							<td class='moneyString'>{tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'}</td>
+							<td class='moneyString' class:placeholder={tagData.tag.getBudgetInMonth(curMonth) === 0}>{
+								tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'
+							}</td>
+							<td class='moneyString' class:placeholder={!tagData.tag.isSavingsTag}>{
+								tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'
+							}</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 		</div>
-		<div class="section budget">
-			<!-- <div class='sectionHeader'>Property</div> -->
-			<!-- <Graph data={graphData}></Graph> -->
+
+		<div class="section incomeTags">
+			<table class='tagTable'>
+				<thead>
+					<tr class='header'>
+						<th scope='col' class='tableTitle'>Income</th>
+						<th scope='col'>Average</th>
+						<th scope='col'>Budgeted</th>
+						<th scope='col'>Savings</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each incomeTagData as tagData}
+						<tr>
+							<td><Tag {...tagData.tag}></Tag></td>
+							<td class='moneyString'>{formatMoneyString(-tagData.expenses, true)}</td>
+							<td class='moneyString' class:placeholder={tagData.tag.getBudgetInMonth(curMonth) === 0}>{
+								tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(tagData.tag.getBudgetInMonth(curMonth), true) : '-'
+							}</td>
+							<td class='moneyString' class:placeholder={!tagData.tag.isSavingsTag}>{
+								tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'
+							}</td>
+						</tr>	
+					{/each}
+				</tbody>
+			</table>
 		</div>
 	</div>
 </Page>
@@ -372,57 +389,74 @@
 
 
 	.dataHolder {
-		padding-top: 20px;
+		margin-top: 30px;
+		margin-left: 20px;
+
 
 		display: grid;
 		grid-template: 
 			'distribution distribution'
-			'tags savings'
+			'expensesTags incomeTags'
 			'tags budget';
 		grid-template-columns: 50% 50%;
 	}
 
-	.dataHolder .section {
-	}
-	.dataHolder .section > .sectionHeader {
-		position: relative;
-		text-transform: uppercase;
-	}
-
-
-
-
-
-
-
-
-
-	.dataHolder .section.savings {
-		grid-area: savings;
-	}
-	
-	
-	
-	.dataHolder .section.tags {
-		grid-area: tags;
-	}
-		.section.tags .tagTable {
-			font-size: 13px;
-		}	
-		.section.tags .tagTable.header th {
-			font-size: 13px;
-		}
-		
-
-
-	.dataHolder .section.budget {
-		grid-area: budget;
-	}
-
-
 	.dataHolder .section.distribution {
 		grid-area: distribution;
 		display: flex;
+		justify-content: space-between;
 		border-bottom: 1px solid #eee;
 	}
+	
+
+
+
+
+
+	
+	.dataHolder .section.expensesTags {
+		margin-top: 20px;
+		grid-area: expensesTags;
+	}
+	.dataHolder .section.incomeTags {
+		margin-top: 20px;
+		grid-area: incomeTags;
+
+	}
+
+
+		.section.incomeTags {
+			padding-left: 30px;
+		}
+
+		.section.expensesTags .tagTable,
+		.section.incomeTags .tagTable {
+			font-size: 13px;
+			width: 100%;
+		}	
+
+		
+		.section.expensesTags .tagTable {
+			border-right: 1px solid #eee;
+			padding-right: 30px;
+		}
+	
+
+		.section .tagTable .tableTitle {
+			text-transform: uppercase;
+		}
+
+		.section .tagTable .header th {
+			text-align: left;
+			font-size: 13px;
+			padding-bottom: 5px;
+		}
+		
+		.section .tagTable td {
+			line-height: 22px;
+		}
+		.section .tagTable td.placeholder {
+			color: #aaa;
+		}
+		
 </style>
