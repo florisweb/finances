@@ -133,6 +133,7 @@
 			position: relative;
 			font-size: 40px;
 			height: 70px;
+			min-width: 70px;
 			line-height: 70px;
 			color: #333;
 			font-style: italic;
