@@ -16,24 +16,31 @@
 	const App = getContext('App');
 	
 	let tags = [];
-	let tagsWithMetaData = {};
 	let nonAssignedTransactions = [];
+	let visibleTagsWithMetaData = [];
+
 
 	let totalDelta = 0;
 	function catagorizeTransactions() {
-		tagsWithMetaData = {};
+		visibleTagsWithMetaData = [];
 		totalDelta = 0;
 		for (let tag of tags)
 		{
 			let trans = tag.getTransactionsByMonth(curMonth);
 			let income = trans.filter((t) => t.deltaMoney > 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 			let expenses = -trans.filter((t) => t.deltaMoney < 0).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
-			tagsWithMetaData[tag.id] = {
-				in: income,
-				out: expenses,
-				transactions: trans
-			}
 			if (tag.id === 0) nonAssignedTransactions = trans;
+			
+			if (income !== 0 || expenses !== 0)
+			{
+				visibleTagsWithMetaData.push({
+					tag: tag,
+					in: income,
+					out: expenses,
+					transactions: trans
+				});
+			}
+			
 			if (tag.isSavingsTag) continue;
 			totalDelta += income - expenses;
 		}
@@ -43,15 +50,13 @@
 	TagManager.dataStore.subscribe((_tags) => {tags = Object.assign([], _tags); catagorizeTransactions()});
 	TransactionManager.dataStore.subscribe(() => {catagorizeTransactions()});
 
-
-
 	$: {
-		tags.sort((_tagA, _tagB) => {
-			let deltaA = Math.abs(tagsWithMetaData[_tagA.id].in - tagsWithMetaData[_tagA.id].out);
-			let deltaB = Math.abs(tagsWithMetaData[_tagB.id].in - tagsWithMetaData[_tagB.id].out);
+		visibleTagsWithMetaData.sort((a, b) => {
+			let deltaA = Math.abs(a.in - a.out);
+			let deltaB = Math.abs(b.in - b.out);
 			return deltaA < deltaB;
-		})
-		tags = tags;
+		});
+		visibleTagsWithMetaData = visibleTagsWithMetaData;
 	}
 </script>
 
@@ -91,18 +96,22 @@
 		</div>
 	</div>
 
+	<div class='message' class:hide={visibleTagsWithMetaData.length} transit>
+		No expenses in this month, add them via the 
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-missing-attribute -->
+		<a style='color: #daf; cursor: pointer; font-style: italic' on:click={() => openPageByIndex(0)}>data manager.</a>
+	</div>
 	<div class='tagListHolder'>
-		{#each tags as tag}
-			{#if (tagsWithMetaData[tag.id].in !== 0 || tagsWithMetaData[tag.id].out !== 0)}
-				<TagOverviewPanel 
-					{...tag} 
-					income={tagsWithMetaData[tag.id].in} 
-					expenses={tagsWithMetaData[tag.id].out} 
-					totalSavings={tag.isSavingsTag ? tag.getSavingsAtEndOfMonth(curMonth) : -1}
-					budget={tag.getBudgetInMonth(curMonth)}
-					on:click={() => App.transactionViewerPopup.open(tagsWithMetaData[tag.id].transactions, `${tag.name}'s Transactions`)}
-				></TagOverviewPanel>
-			{/if}
+		{#each visibleTagsWithMetaData as data}
+			<TagOverviewPanel 
+				{...data.tag} 
+				income={data.in} 
+				expenses={data.out} 
+				totalSavings={data.tag.isSavingsTag ? data.tag.getSavingsAtEndOfMonth(curMonth) : -1}
+				budget={data.tag.getBudgetInMonth(curMonth)}
+				on:click={() => App.transactionViewerPopup.open(data.transactions, `${data.tag.name}'s Transactions`)}
+			></TagOverviewPanel>
 		{/each}
 	</div>
 </Page>
@@ -233,4 +242,19 @@
 	}
 
 
+
+
+
+	.message {
+		padding-top: 30px;
+		margin-bottom: -20px;
+		width: 100%;
+		text-align: center;
+		transition: opacity .3s, margin-top .3s;
+	}
+	.message.hide {
+		opacity: 0;
+		margin-top: -25px;
+		pointer-events: none;
+	}
 </style>
