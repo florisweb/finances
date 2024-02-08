@@ -7,7 +7,7 @@
 <tr class={'transaction' + (' classificationState_' + transaction.classificationState)}>
 	<td><div class='dateHolder'>{transaction.date}</div></td>
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
-	<td><TagSelectDropDown value={transaction.typeCode} on:change={(_event) => {
+	<td><TagSelectDropDown value={transaction.typeCode} predictedValue={transaction.predictedTag?.id} on:change={(_event) => {
 			transaction.typeCode = _event.detail || transaction.typeCode;
 			transaction.classificationState = 2;
 			transaction.update() // Updates the transaction

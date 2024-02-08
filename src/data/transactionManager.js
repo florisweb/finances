@@ -1,6 +1,7 @@
 import DataManager from "./dataManager";
 import { Transaction, MonthIdentifier } from "../types";
 import { openPageByIndex } from "../App";
+import AIManager from "./AIManager";
 
 const TransactionManager = new class extends DataManager {
 	constructor() {

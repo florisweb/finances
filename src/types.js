@@ -6,6 +6,8 @@ import Vector from './vector';
 import TransactionManager from './data/transactionManager';
 import BudgetManager from './data/budgetManager';
 import AccountManager from './data/accountManager';
+import AIManager from './data/AIManager';
+import TagManager from './data/tagManager';
 
 export class Transaction {
 	date;
@@ -32,6 +34,13 @@ export class Transaction {
 	get id() {
 		return this.date + this.deltaMoney + this.targetIBAN + this.description;
 	}
+	get tag() {
+		return TagManager.getById(this.typeCode);
+	}
+	get predictedTag() {
+		return AIManager.predictTag(this);
+	}
+
 
 	update() {
 		TransactionManager.add(this);
@@ -222,6 +231,7 @@ export class NonAssignedTag extends TransactionTag {
 		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, startValue: 0});
 	}
 }
+window.NonAssignedTag = NonAssignedTag;
 
 
 

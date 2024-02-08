@@ -23,6 +23,7 @@ const LocalDB = new class {
         DB.createObjectStore("tags");
         DB.createObjectStore("budgets");
         DB.createObjectStore("accounts");
+        DB.createObjectStore("neuralNetworks");
       }
 
       request.onsuccess = function(_e) {

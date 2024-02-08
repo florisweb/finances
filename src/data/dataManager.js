@@ -8,6 +8,7 @@ export default class DataManager {
 	_data = [];
 	#dataWriteStore = writable([]);
 	dataStore = readonly(this.#dataWriteStore);
+	isSetup = false;
 
 	get data() {
 		return this._data;
@@ -39,6 +40,7 @@ export default class DataManager {
 		let response = await LocalDB.getData(this.type);
 		if (!response) return console.warn('An error accured while loading ', this.type, response);		
 		this.importData(response, false);
+		this.isSetup = true;
 	}
 
 	importData(_data, _write = true) {
