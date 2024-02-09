@@ -2,13 +2,15 @@ import TagManager from './tagManager';
 import BudgetManager from './budgetManager';
 import TransactionManager from './transactionManager';
 import AccountManager from './accountManager';
+import AIManager from './AIManager';
 
 class FinancePackage {
-	constructor({tags, budgets, transactions, accounts} = {}) {
+	constructor({tags, budgets, transactions, accounts, neuralNetworks} = {}) {
 		this.tags = tags ?? [];
 		this.budgets = budgets ?? [];
 		this.transactions = transactions ?? [];
 		this.accounts = accounts ?? [];
+		this.neuralNetworks = neuralNetworks ?? [];
 	}
 
 	toString() {
@@ -20,6 +22,7 @@ class FinancePackage {
 		this.budgets = data.budgets ?? [];
 		this.transactions = data.transactions ?? [];
 		this.accounts = data.accounts ?? [];
+		this.neuralNetworks = data.neuralNetworks ?? [];
 		return this;
 	}
 }
@@ -34,6 +37,7 @@ const Packager = new class {
 				BudgetManager.importData(pack.budgets);
 				TransactionManager.importData(pack.transactions);
 				AccountManager.importData(pack.accounts);
+				if (pack.neuralNetworks) AIManager.importData(pack.neuralNetworks);
 			} catch (e) {
 				error('Package-import: Invalid JSON:' + e);
 			}
@@ -46,7 +50,8 @@ const Packager = new class {
 			tags: TagManager.data.map(point => point.export()),
 			budgets: BudgetManager.data.map(point => point.export()),
 			transactions: TransactionManager.data.map(point => point.export()),
-			accounts: AccountManager.data.map(point => point.export())
+			accounts: AccountManager.data.map(point => point.export()),
+			neuralNetworks: AIManager.data.map(point => point.export())
 		}).toString();
 	}
 }

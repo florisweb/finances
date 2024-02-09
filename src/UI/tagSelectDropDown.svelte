@@ -5,7 +5,6 @@
 	import { createEventDispatcher } from 'svelte';
 
 	export let value = 0; // cur tag id
-	export let predictedValue;
 	const dispatch = createEventDispatcher();
 	
 	let tags = [];
@@ -17,7 +16,7 @@
 		value: _tag.id,
 		contentHTML: {
 			component: Tag,
-			config: {..._tag, name: predictedValue === _tag.id ? _tag.name + ' ★' : _tag.name}
+			config: _tag
 		}
 	}
 })} bind:value={value} on:change={(_event) => dispatch('change', _event.detail)}></DropDown>

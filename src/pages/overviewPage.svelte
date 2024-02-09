@@ -68,7 +68,6 @@
 		}
 		incomeTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
 		expensesTagData.sort((a, b) => Math.abs(a.expenses) < Math.abs(b.expenses))
-		console.warn(expensesTagData);
 	}
 
 

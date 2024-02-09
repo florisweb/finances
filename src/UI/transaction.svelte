@@ -2,17 +2,25 @@
 	import { formatMoneyString } from '../polyfill';
 	import TagSelectDropDown from './tagSelectDropDown.svelte';
 	export let transaction;
+	let tagPrediction;
+	$: tagPrediction = transaction.predictedTag;
+	function selectTag(_typeCode) {
+		transaction.typeCode = _typeCode;
+		transaction.classificationState = 2;
+		transaction.update() // Updates the transaction
+	}
 </script>
 
 <tr class={'transaction' + (' classificationState_' + transaction.classificationState)}>
 	<td><div class='dateHolder'>{transaction.date}</div></td>
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
-	<td><TagSelectDropDown value={transaction.typeCode} predictedValue={transaction.predictedTag?.id} on:change={(_event) => {
-			transaction.typeCode = _event.detail || transaction.typeCode;
-			transaction.classificationState = 2;
-			transaction.update() // Updates the transaction
-		}
-	}></TagSelectDropDown></td>
+	<td class='tagSelector'>
+		<TagSelectDropDown value={transaction.typeCode} on:change={(_event) => selectTag(_event.detail || transaction.typeCode)}></TagSelectDropDown>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class='predictedTagButton' style={'color: ' + tagPrediction?.tag.color.hex} on:click={() => selectTag(tagPrediction?.tag.id)}>
+			{tagPrediction ? ((tagPrediction.tag.id === transaction.typeCode ? '✓ ' : '★ ') + tagPrediction.tag.name) : ''}
+		</div>
+	</td>
 	<td>{transaction.targetName + (transaction.targetIBAN ? ` (${transaction.targetIBAN})` : '')}</td>
 	<td>{transaction.description}</td>
 </tr>
@@ -39,6 +47,24 @@
 	td.moneyTD {
 		white-space: nowrap;
 		overflow-wrap: unset;
+	}
+
+	td.tagSelector {
+		display: flex;
+		flex-direction: row;
+	}
+	td.tagSelector .predictedTagButton {
+		height: 35px;
+		padding: 7.5px;
+		padding-left: 10px;
+		padding-right: 5px;
+
+		line-height: 20px;
+		white-space: nowrap;
+		cursor: pointer;
+		max-width: 140px;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 
