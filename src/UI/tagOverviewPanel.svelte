@@ -28,7 +28,7 @@
 		{#if (budget !== 0)}
 			<p>
 				{formatMoneyString(Math.abs(budget))} 
-				{budget > 0 ? 'budget as income' : 'budget'}
+				{budget > 0 ? 'budgetted as income' : 'budgetted as expense'}
 			</p>
 		{/if}
 		{#if (income !== 0 || expenses !== 0)}
@@ -46,7 +46,7 @@
 		position: relative;
 		background: #fff;
 		box-shadow: 5px 5px 20px 10px rgba(0, 0, 0, .03);
-
+		overflow: hidden;
 		cursor: pointer;
 	}
 	.infoHolder {
@@ -56,7 +56,6 @@
 		padding: 20px;
 		height: auto;
 
-		border: 1px solid #eee;
 		border-top: none;
 	}
 

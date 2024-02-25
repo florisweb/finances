@@ -1,6 +1,8 @@
 <script>
 	import { MonthIdentifier } from "../types";
 	import { getContext }from 'svelte';
+	import { formatMoneyString } from '../polyfill';
+
 	import TagManager from '../data/tagManager';
 	import TransactionManager from '../data/transactionManager.js';
 
@@ -9,6 +11,7 @@
     import Button from '../UI/button.svelte';
     import BudgetManager from "../data/budgetManager";
     import { openPageByIndex } from "../App";
+	
 
 	let lastMonthDate = new Date();
 	lastMonthDate.setDate(-1);
@@ -62,8 +65,11 @@
 
 <Page>
 	<div class='infoHolder'>
-		<div class={'balanceHolder' + (totalDelta > 0 ? ' positive' : (totalDelta < 0 ? ' negative' : ''))}>{(totalDelta > 0 ? '+' : '') + Math.round(totalDelta)}</div>
-		
+		<div class='deltaHolder' class:negative={totalDelta < 0} class:positive={totalDelta > 0}>
+			<img src={totalDelta > 0 ? 'images/arrowRisingIcon.png' : 'images/arrowFallingIcon.png'} class='deltaIcon' alt='Money change visualization.'>
+			<div class="deltaMoney">{formatMoneyString(Math.abs(Math.round(totalDelta)), true, true)}</div>
+		</div>	
+
 		<div class='monthHolder'>
 			<div>{curMonth.name}</div>
 		</div>
@@ -128,32 +134,46 @@
 		padding: 20px 0;
 		border-bottom: 1px solid #ddd;
 	}
-		
-		.balanceHolder {
+
+
+		.deltaHolder {
 			position: relative;
-			font-size: 40px;
-			height: 70px;
-			min-width: 70px;
-			line-height: 70px;
-			color: #333;
-			font-style: italic;
-			padding-right: 20px;
+			display: flex;
+			margin-top: 6px;
+			margin-right: 15px;
+			
+			height: 60px;
+			flex-direction: row;
+			background-color: #ccc;
+			border-radius: 5px;
+			padding: 0 10px;
+			color: #fff;
 		}
-		.balanceHolder.positive {
-			color: #383;
+		
+		.deltaHolder.positive {
+			background-color: #3c3;
 		}
-		.balanceHolder.negative {
-			color: #833;
+		.deltaHolder.negative {
+			background-color: #f00;
 		}
 
-			.balanceHolder:before {
-				content: 'CHANGE';
-				position: absolute;
-				top: 25px;
-				right: 20px;
-				font-size: 12px;
-				white-space: nowrap;
-			}
+		.deltaHolder .deltaIcon {
+			height: 60px;
+			padding: 10px 0;
+			margin-right: 5px;
+		}
+		.deltaHolder .deltaMoney {
+			position: relative;
+			display: flex;
+			height: 60px;
+			
+			line-height: 60px;
+			font-style: italic;
+			font-size: 30px;
+		}
+
+
+
 
 
 
