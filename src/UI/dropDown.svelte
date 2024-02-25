@@ -18,40 +18,48 @@
 				)
 		)?.contentHTML || 'No option selected';	
 	}
-	$: if (isOpen) updatePanelPosition();
+
 	
+	let closingPromise;;
 	let optionPanel;
 	let button;
 	let openAbove = false;
 	let top = 0;
-	let maxHeight = 500;
+	let maxHeight = Infinity;
 	
+	$: if (isOpen) updatePanelPosition();
 	async function updatePanelPosition() {
 		if (!optionPanel || !button) return;
-		const screenMargin = 20;
+		await closingPromise;
+		const screenMargin = 5;
 
-		top = 0;
-		openAbove = false;
-		await wait(0);
+		optionPanel.style.top = '0px';
+		let panelTop = optionPanel.getBoundingClientRect().top;
 		let buttonTop = button.getBoundingClientRect().top;
 		let panelHeight = optionPanel.offsetHeight;	
-		let topSpaceLeft = buttonTop - panelHeight - screenMargin;
-		let bottomSpaceLeft = window.innerHeight - (buttonTop + panelHeight) - screenMargin;
 
-		let biggestSpace = Math.max(topSpaceLeft, bottomSpaceLeft);
-		maxHeight = panelHeight + biggestSpace;
-		openAbove = topSpaceLeft === biggestSpace;
+		let spaceAbove = buttonTop;
+		let spaceBelow = window.innerHeight - buttonTop - button.offsetHeight;
+		
+		openAbove = spaceBelow < panelHeight && spaceBelow < spaceAbove;
+		if (openAbove)
+		{
+			maxHeight = spaceAbove - screenMargin;
+		} else maxHeight = spaceBelow - screenMargin;
 
-	
-		let offsetToGetPanelToTopOfButton = buttonTop - optionPanel.getBoundingClientRect().top;
+		top = buttonTop - panelTop;
 		if (openAbove) 
 		{
-			offsetToGetPanelToTopOfButton -= panelHeight - 10;
-		} else {
-			offsetToGetPanelToTopOfButton += button.offsetHeight - 10;
-		}
+			top -= Math.min(maxHeight, panelHeight);
+		} else top += button.offsetHeight;
+	}
 
-		top = offsetToGetPanelToTopOfButton;
+	$: if (!isOpen) closingPromise = onClose();
+	async function onClose() {
+		await wait(300);
+		openAbove = false;
+		top = 0;
+		maxHeight = Infinity;
 	}
 </script>
 
@@ -71,7 +79,7 @@
 	<div 
 		bind:this={optionPanel}
 		class='optionPanel' 
-		style={'top: ' + top + 'px; max-height: ' + maxHeight + 'px'}
+		style={'top: ' + top + 'px; max-height: ' + (maxHeight === Infinity ? 'none' : maxHeight + 'px')}
 	>
 		{#each options as option}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -144,31 +152,31 @@
 	/* OPTIONPANEL */
 	.wrapper .optionPanel {
 		position: fixed;
+		top: 0;
+		z-index: 1000;
+
 		min-width: 120px;
 		height: auto;
-		z-index: 100;
 
 		padding: 10px 15px;
 
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .05);
 		border: 1px solid #eee;
-
-		z-index: 1000;
 		background: #fff;
 
 		transition: opacity .3s, margin-top .3s;
 
 		overflow: auto;
-		margin-top: 10px;
+		/* margin-top: 10px; */
 	}
 	.wrapper.optionPanelOpen.openAbove .optionPanel {
-		margin-top: -10px;
+		/* margin-top: -10px; */
 	}
 
 	.wrapper:not(.optionPanelOpen) .optionPanel {
 		pointer-events: none;
 		opacity: 0;
-		margin-top: 0px;
+		/* margin-top: 0px; */
 	}
 
 	
