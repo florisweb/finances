@@ -119,6 +119,7 @@
 		<div class='tagHolder'>
 			<table class='tagOverviewTable'>
 				<tr class='tableHeader'>
+					<th scope='col' class='name'></th>
 					<th scope='col' class='name'>Tag</th>
 					<th scope='col' class='budget'>Budget</th>
 					<th scope='col' class='average'>Average</th>
@@ -142,6 +143,7 @@
 	.sectionHolder, .tagHolder {
 		position: relative;
 		padding-top: 15px;
+		margin-left: -20px;
 
 		height: auto;
 		max-height: calc(90vh - 160px);

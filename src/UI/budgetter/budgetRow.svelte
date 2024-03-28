@@ -47,7 +47,7 @@
 		padding-bottom: 5px;
 	}
 	.budgetRow:not(:last-child) {
-		border-bottom: 1px solid #ddd;
+		border-bottom: 1px solid #eee;
 	}
 
 

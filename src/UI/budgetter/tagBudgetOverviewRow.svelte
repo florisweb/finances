@@ -8,18 +8,25 @@
 
 	export let isSumRow = false;
 	export let sum = 0;
+	$: console.log(tag?.name, budget, averageExpenses)
 </script>
 
 
 
 {#if (!isSumRow)}
 	<tr class='row'>
+		<td class='budgetFulfilled'>
+			{budget < -averageExpenses ? '✓' : ''}
+		</td>
 		<td class='tag'><Tag {...tag}></Tag></td>
 		<td class='moneyHolder budget' class:isNegative={budget < 0} class:isNull={budget === 0}>{formatMoneyString(budget)}</td>
 		<td class='moneyHolder budget' class:isNegative={averageExpenses > 0} class:isNull={averageExpenses === 0}>{formatMoneyString(-averageExpenses)}</td>
 	</tr>
 {:else}
 	<tr class='row'>
+		<td class='budgetFulfilled'>
+			{sum < -averageExpenses ? '✓' : ''}
+		</td>
 		<td class='sumTitle moneyHolder'>Netto</td>
 		<td class='moneySum moneyHolder budget' class:isNegative={sum < 0} class:isNull={sum === 0}>{formatMoneyString(sum)}</td>
 		<td class='moneySum moneyHolder budget' class:isNegative={averageExpenses > 0} class:isNull={averageExpenses === 0}>{formatMoneyString(-averageExpenses)}</td>
@@ -35,8 +42,8 @@
 		padding-top: 5px;
 		padding-bottom: 5px;
 	}
-	.row:not(:last-child) {
-		border-bottom: 1px solid #ddd;
+	.row:not(:last-child) td:not(.budgetFulfilled) {
+		border-bottom: 1px solid #eee;
 	}
 
 
@@ -44,6 +51,11 @@
 	/* BUDGETROW */
 	td {
 		height: 25px;
+	}
+	td.budgetFulfilled {
+		display: inline;
+		line-height: 35px;
+		color: #999;
 	}
 	td.tag {
 		margin-top: 2px;

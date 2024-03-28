@@ -154,7 +154,7 @@
 			background-color: #3c3;
 		}
 		.deltaHolder.negative {
-			background-color: #f00;
+			background-color: var(--NegativeColor);
 		}
 
 		.deltaHolder .deltaIcon {
