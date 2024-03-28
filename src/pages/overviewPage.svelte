@@ -1,47 +1,37 @@
 <script>
-	import Page from "../UI/page.svelte";	
-	import AccountManager from "../data/accountManager";
 	import { formatMoneyString } from '../polyfill';
-    import { MonthIdentifier } from "../types";
-    import PieChart from "../UI/pieChart.svelte";
-    import TagManager from "../data/tagManager";
+	import { getContext } from 'svelte'
+    import { MonthIdentifier, NonAssignedTag } from "../types";
+    
+	import AccountManager from "../data/accountManager";
+	import TagManager from "../data/tagManager";
+	import TransactionManager from "../data/transactionManager";
+
+	import Page from "../UI/page.svelte";	
+	import PieChart from "../UI/pieChart.svelte";
+	import Button from '../UI/button.svelte';
     import Tag from "../UI/tag.svelte";
+	
 
+	const App = getContext('App')
+	
+	let curMonth = new MonthIdentifier().setFromDate((() => {
+		let curDate = new Date();
+		curDate.setDate(0);
+		return curDate
+	})());
 
-	let curDate = new Date();
-	curDate.setDate(0);
-	let curMonth = new MonthIdentifier().setFromDate(curDate);
-	window.setCurMonth = (m) => curMonth = m;
-
-	let curBalance = 0;
-	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
 
 
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
-	// let graphData = [{color: AvailableColors[0].color, data: [], doNotInterpolate: false}]
-	// $: if (accounts.length) {
-	// 	for (let i = 1; i < accounts.length + 1; i++)
-	// 	{
-	// 		graphData[i] = {
-	// 			color: AvailableColors[i].color,
-	// 			data: accounts[i - 1].generateGraphData(23) || [],
-	// 			doNotInterpolate: true,
-	// 		}
-	// 	}
 
-	// 	for (let d = 0; d < graphData[1].data.length; d++)
-	// 	{
-	// 		graphData[0].data[d] = new Vector(graphData[1].data[d].value[0], 0);
-	// 		for (let i = 1; i < accounts.length + 1; i++)
-	// 		{	
-	// 			graphData[0].data[d].value[1] += graphData[i].data[d].value[1];
-	// 		}
-	// 	}
-	// }
+	let curBalance = 0;
+	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
 
-
-
+	let nonAssignedTransactions = [];
+	TransactionManager.dataStore.subscribe(() => {nonAssignedTransactions = new NonAssignedTag().transactions});
+	
 	let tags = [];
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 
@@ -72,12 +62,8 @@
 
 
 
-
-
-
 	let balanceDistributionData = [];
 	let reservedMoney = 0;
-
 	$: {
 		reservedMoney = 0;
 		let savingTags = tags.filter((_tag) => _tag.isSavingsTag);
@@ -148,8 +134,6 @@
 	function moneyNameAndValueToString(_name, _value) {
 		return [_name, formatMoneyString(_value, true, true)];
 	}
-
-
 </script>
 
 <Page customClass='overviewPage'>
@@ -162,6 +146,18 @@
 			<div>{formatMoneyString(curBalance, true, true)} Balance</div>
 			<div class="subInfoHolder">at end of {curMonth.id}</div>
 		</div>
+
+		<div class="floatRightHolder">
+			<div class={'buttonHolder' + (nonAssignedTransactions.length === 0 ? ' noAssignableTransactions' : '')}>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class='buttonWrapper' on:click={() => {
+					App.transactionViewerPopup.open(nonAssignedTransactions, `Assign ${nonAssignedTransactions.length} Transactions`);
+				}}>
+					<Button name={`assign ${nonAssignedTransactions.length} transactions`}></Button>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 	<div class='dataHolder'>
@@ -325,7 +321,6 @@
 
 
 
-
 		.floatRightHolder {
 			position: absolute;
 			float: right;
@@ -334,57 +329,20 @@
 			height: 80px;
 			display: flex;
 		}
-		
-			.navigationHolder {
+	
+
+			.buttonHolder .buttonWrapper {
 				position: relative;
-				display: flex;
-				white-space: nowrap;
-				top: 25px;
-				height: 37px;
-				padding-left: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				text-align: right;
+				transition: .3s opacity, .3s margin-right;
 			}
-			.navigationHolder .navButton {
-				font-style: normal;
-				cursor: pointer;
-				font-size: 25px;
-				margin-left: 5px;
-
-				-webkit-touch-callout: none; /* iOS Safari */
-				-webkit-user-select: none; /* Safari */
-				-khtml-user-select: none; /* Konqueror HTML */
-				-moz-user-select: none; /* Firefox */
-					-ms-user-select: none; /* Internet Explorer/Edge */
-						user-select: none; /* Non-prefixed version, currently
-											supported by Chrome and Opera */
+			.buttonHolder.noAssignableTransactions .buttonWrapper {
+				opacity: 0;
+				margin-right: -20px;
+				pointer-events: none;
 			}
-			.navigationHolder .navButton:not(:nth-child(2)) {
-				line-height: 14px;
-			}
-		
-			.navigationHolder .navButton:nth-child(2) {
-				font-size: 14px;
-			}
-
-		
-
-
-			.buttonHolder {
-				flex-direction: column;
-			}
-				.buttonHolder .buttonWrapper {
-					margin-bottom: 5px;
-					margin-top: 0;
-					text-align: right;
-					transition: .3s opacity, .3s margin-top;
-				}
-				.buttonHolder.noAssignableTransactions .buttonWrapper:not(.assignTransactions) {
-					margin-top: 25px;
-				}
-				.buttonHolder.noAssignableTransactions .buttonWrapper.assignTransactions {
-					opacity: 0;
-					margin-top: -50px;
-					pointer-events: none;
-				}
 
 
 	.dataHolder {

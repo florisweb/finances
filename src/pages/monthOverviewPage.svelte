@@ -1,6 +1,6 @@
 <script>
 	import { MonthIdentifier } from "../types";
-	import { getContext }from 'svelte';
+	import { getContext } from 'svelte';
 	import { formatMoneyString } from '../polyfill';
 
 	import TagManager from '../data/tagManager';
