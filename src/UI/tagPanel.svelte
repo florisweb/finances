@@ -11,7 +11,10 @@
 <div class='tagPanel' class:savingsTag={tag.isSavingsTag} style={'border-bottom-color: ' + tag.color.hex} on:click={(_event) => dispatch('click', _event)}>
 	<Tag color={tag.color} name={tag.name}></Tag>
 	{#if tag.isSavingsTag}
-		<div class='savingInfoHolder'>Savings: {formatMoneyString(tag.totalSavings)}</div>
+		<div class='savingInfoHolder'>
+			Savings: <div class='valueHolder' class:negative={tag.totalSavings < 0}>{
+				formatMoneyString(tag.totalSavings)
+			}</div></div>
 	{/if}
 	<slot/>
 </div>
@@ -44,6 +47,13 @@
 		color: #444;
 		font-size: 11px;
 		margin-left: 23px;
-		/* margin-top: 2px; */
+		display: flex;
+		flex-direction: row;
+	}
+	.savingInfoHolder .valueHolder {
+		margin-left: 3px;
+	}
+	.savingInfoHolder .valueHolder.negative {
+		color: var(--NegativeColor);
 	}
 </style>

@@ -198,7 +198,7 @@
 							<td class='moneyString' class:placeholder={tagData.tag.getBudgetInMonth(curMonth) === 0}>{
 								tagData.tag.getBudgetInMonth(curMonth) !== 0 ? formatMoneyString(-tagData.tag.getBudgetInMonth(curMonth), true) : '-'
 							}</td>
-							<td class='moneyString' class:placeholder={!tagData.tag.isSavingsTag}>{
+							<td class='moneyString' class:negative={tagData.tag.isSavingsTag && tagData.tag.getSavingsAtEndOfMonth(curMonth) < 0} class:placeholder={!tagData.tag.isSavingsTag}>{
 								tagData.tag.isSavingsTag ? formatMoneyString(tagData.tag.getSavingsAtEndOfMonth(curMonth), true) : '-'
 							}</td>
 						</tr>
@@ -289,7 +289,7 @@
 			background-color: #3c3;
 		}
 		.deltaHolder.negative {
-			background-color: #f00;
+			background-color: var(--NegativeColor);
 		}
 
 		.deltaHolder .deltaIcon {
@@ -414,6 +414,10 @@
 		}
 		.section .tagTable td.placeholder {
 			color: #aaa;
+		}
+
+		.tagTable .moneyString.negative {
+			color: var(--NegativeColor);
 		}
 		
 </style>

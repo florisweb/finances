@@ -1,6 +1,8 @@
 :root {
 	--sideBarWidth: 300px;
 	--warningColor: rgb(237, 112, 122);
+
+	--NegativeColor: #f00;
 }
 
   
