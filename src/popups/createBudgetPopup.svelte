@@ -143,11 +143,13 @@
 	.sectionHolder, .tagHolder {
 		position: relative;
 		padding-top: 15px;
-		margin-left: -20px;
 
 		height: auto;
 		max-height: calc(90vh - 160px);
 		overflow: auto;
+	}
+	.tagHolder {
+		margin-left: -20px;
 	}
 
 	.addSectionButton {
