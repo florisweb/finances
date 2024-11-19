@@ -63,17 +63,16 @@
 
 		background: #daf;
 		border-radius: 20px;
-		opacity: 0;
+		opacity: 0 !important;
 	}
 
 	.holder.disabled label::before, .holder.disabled label::after {
 		filter: grayscale(1);
-		opacity: .5;
+		opacity: .7;
 	}
 
-
 	input[type=checkbox]:checked + label::before {
-		opacity: 1;
+		opacity: 1 !important;
 	}
 
   

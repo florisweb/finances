@@ -19,20 +19,7 @@
 	$: budget = absBudget * (isIncome ? 1 : -1);
 
 
-	export let contributions = [
-		{
-			name: '50',
-			budget: 5
-		},
-		{
-			name: '51',
-			budget: 15
-		},
-		{
-			name: '52',
-			budget: 10
-		}
-	];
+	export let contributions = [];
 
 	$: if (contributions.length)
 	{
@@ -56,6 +43,8 @@
 				disabled={contributions.length}
 			></MoneyInput>
 		</td>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<td><div class='addContribButton' on:click={() => contributions = [...contributions, {name: null, budget: null}]}>+</div></td>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<td><div class='removeButton' on:click={() => dispatch('delete')}>X</div></td>
 	</tr>
