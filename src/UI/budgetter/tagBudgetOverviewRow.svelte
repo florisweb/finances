@@ -8,7 +8,6 @@
 
 	export let isSumRow = false;
 	export let sum = 0;
-	$: console.log(tag?.name, budget, averageExpenses)
 </script>
 
 

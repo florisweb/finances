@@ -3,11 +3,12 @@
 
 	export let checked = false;
 	export let title = '';
+	export let disabled = false;
 	let checkBoxId = 'checkbox' + newId();
 </script>
 
-<div class='holder'>
-	<input type="checkbox" id={checkBoxId} checked={checked} on:change={(_event) => checked = _event.target.checked}>
+<div class='holder' class:disabled={disabled}>
+	<input type="checkbox" id={checkBoxId} checked={checked} disabled={disabled} on:change={(_event) => checked = _event.target.checked}>
   	<label for={checkBoxId}>{title}</label>
 </div>
 
@@ -63,6 +64,11 @@
 		background: #daf;
 		border-radius: 20px;
 		opacity: 0;
+	}
+
+	.holder.disabled label::before, .holder.disabled label::after {
+		filter: grayscale(1);
+		opacity: .5;
 	}
 
 

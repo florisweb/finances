@@ -6,6 +6,7 @@
 	export let placeholder = '€0';
 	export let canBeNegative = false;
 	export let element;
+	export let disabled = false;
 	let moneyValue = value;
 
 	function onInput(_value) {
@@ -27,6 +28,8 @@
 	on:change={(_event) => {onInput( _event.target.value); dispatch('change', moneyValue)}}
 	value={value}
  	placeholder={placeholder}
+	disabled={disabled}
+	class:disabled={disabled}
 	bind:this={element}
  >
 <style>
@@ -42,5 +45,9 @@
 		border: 1px solid #eee;
 
 		text-align: center;
+	}
+	input.disabled {
+		background: transparent;
+		border-color: transparent;
 	}
 </style>
