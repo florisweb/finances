@@ -67,15 +67,14 @@
 	$: {
 		reservedMoney = 0;
 		let savingTags = tags.filter((_tag) => _tag.isSavingsTag);
-		balanceDistributionData = [
-			{value: 0, color: '#f00', name: 'Indebted'}
-		];
+		balanceDistributionData = [];
+		let debts = [];
 
 		for (let i = 0; i < savingTags.length; i++)
 		{
 			let balance = savingTags[i].getSavingsAtEndOfMonth(curMonth);
 			if (balance < 0) {
-				balanceDistributionData[0].value -= balance;
+				debts.push({value: -balance, color: '#f00', name: moneyNameAndValueToString(savingTags[i].name, balance)})
 				continue;
 			};
 
@@ -88,8 +87,10 @@
 				}
 			)
 		}
-		balanceDistributionData[0].name = moneyNameAndValueToString('Indebted', -balanceDistributionData[0].value);
+
 		balanceDistributionData.sort((a, b) => a.value < b.value);
+		debts.sort((a, b) => a.value < b.value);
+		balanceDistributionData = [...balanceDistributionData, ...debts];
 	}
 
 
