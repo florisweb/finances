@@ -12,14 +12,12 @@
 
 	export let isSumRow = false;
 	export let sum = 0;
+	export let contributions = [];
 
 	let isIncome = budget > 0;
 	if (budget < 0) budget = -budget;
 	let absBudget = budget;
 	$: budget = absBudget * (isIncome ? 1 : -1);
-
-
-	export let contributions = [];
 
 	$: if (contributions.length)
 	{
@@ -28,13 +26,16 @@
 		absBudget = Math.abs(trueTotal);
 	}
 
+	let collapseContributions = true;
+
 </script>
 
 
 
 {#if (!isSumRow)}
 	<tr class='budgetRow'>
-		<td class='tag'><Tag {...tag}></Tag></td>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<td class='tag' on:click={() => collapseContributions = !collapseContributions}><Tag {...tag}></Tag></td>
 		<td><Checkbox bind:checked={isIncome} disabled={contributions.length}></Checkbox></td>
 		<td class='moneyInputHolder'>
 			<MoneyInput 
@@ -44,20 +45,23 @@
 			></MoneyInput>
 		</td>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<td><div class='addContribButton' on:click={() => contributions = [...contributions, {name: null, budget: null}]}>+</div></td>
+		<td><div class='addContribButton' on:click={() => {contributions = [...contributions, {name: null, budget: null}]; collapseContributions = false}}>+</div></td>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<td><div class='removeButton' on:click={() => dispatch('delete')}>X</div></td>
 	</tr>
-	{#each contributions as contrib}
-		<BudgetContribRow 
-			bind:name={contrib.name} 
-			bind:budget={contrib.budget} 
-			isLast={contributions[contributions.length - 1] === contrib}
-			on:delete={() => {
-				contributions = contributions.filter((_contrib) => _contrib !== contrib);
-			}}
-		></BudgetContribRow>
-	{/each}
+
+	{#if (!collapseContributions)}
+		{#each contributions as contrib}
+			<BudgetContribRow 
+				bind:name={contrib.name} 
+				bind:budget={contrib.budget} 
+				isLast={contributions[contributions.length - 1] === contrib}
+				on:delete={() => {
+					contributions = contributions.filter((_contrib) => _contrib !== contrib);
+				}}
+			></BudgetContribRow>
+		{/each}
+	{/if}
 {:else}
 	<tr class='budgetRow isSumRow'>
 		<td class='sumTitle'>Netto</td>
