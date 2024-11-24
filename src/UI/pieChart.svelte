@@ -18,8 +18,6 @@
 	*/
 
 
-
-
 	let canvas;
 	let ctx;
 	$: {
@@ -46,7 +44,7 @@
 	$: {
 		if (canvas) {
 			onResize();
-			canvas.addEventListener('mousemove', handleMouseMove);
+			window.addEventListener('mousemove', handleMouseMove);
 		}
 	}
 
@@ -58,6 +56,17 @@
 	
 	
 	function handleMouseMove(_e) {
+		let bounds = canvas.getBoundingClientRect();
+		if (
+			_e.pageX < bounds.left || _e.pageX > bounds.left + bounds.width ||
+			_e.pageY < bounds.top || _e.pageY > bounds.top + bounds.height
+		) { // Not within bounding box
+			if (!curHoverPiece) return;
+			curHoverPiece = false;
+			render();
+			return;
+		}; 
+
 		let pos = new Vector(_e.offsetX, _e.offsetY);
 		let delta = canvasCentre.copy().difference(pos);
 		if (delta.getLength() > pieRadius) {curHoverPiece = false; render(); return;}
