@@ -40,6 +40,7 @@
 				<th scope='col' class='name'><Input bind:value={section.name} isInvisibleInput={true} customClass='header'></Input></th>
 				<th scope='col' class='income'>In</th>
 				<th scope='col' class='budget'>Budget</th>
+				<th scope='col'></th>
 				<th scope='col' on:click={() => dispatch('delete')}>X</th>
 			</tr>
 
@@ -47,6 +48,7 @@
 				<BudgetRow 
 					tag={TagManager.getById(budgetSet.tagId)} 
 					bind:budget={budgetSet.budget} 
+					bind:contributions={budgetSet.contributions}
 					on:delete={() => removeBudgetRow(budgetSet.tagId)}></BudgetRow>
 			{/each}
 

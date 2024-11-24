@@ -350,19 +350,19 @@ export class Budget {
 export class BudgetSection {
 	name = '';
 	tagBudgetSets = [];
-	// { 
-	//	tagId:
-	//	budget: (+ = expenses, - = income)
-	// }	
+		
 	constructor({name, tagBudgetSets = []}) {
 		this.name = name ?? 'No name';
-		this.tagBudgetSets = tagBudgetSets ?? [];
+		this.tagBudgetSets = tagBudgetSets.map((_set) => {
+			if (_set instanceof TagBudgetSet) return _set;
+			return new TagBudgetSet(_set);
+		}) ?? [];
 	}
 
 	export() {
 		return {
 			name: this.name,
-			tagBudgetSets: this.tagBudgetSets.map(set => Object.assign({}, set))
+			tagBudgetSets: this.tagBudgetSets.map(set => set.export())
 		}
 	}
 
@@ -375,6 +375,29 @@ export class BudgetSection {
 		if (!set) return 0;
 		return set.budget;
 	}
+}
+
+export class TagBudgetSet {
+	tagId;
+	budget = 0; // + = expenses, - = income
+	contributions = [];
+
+
+	constructor({tagId, budget, contributions}) {
+		this.tagId = tagId;
+		this.budget = budget;
+		this.contributions = contributions || [];
+	}
+	
+	export() {
+		return {
+			tagId: this.tagId,
+			budget: this.budget,
+			contributions: this.contributions
+		}
+	}
+
+
 }
 
 

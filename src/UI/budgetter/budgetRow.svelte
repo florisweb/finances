@@ -23,7 +23,7 @@
 
 	$: if (contributions.length)
 	{
-		let trueTotal = contributions.map(r => r.budget).reduce((a, b) => a + b, 0);
+		let trueTotal = Math.round(contributions.map(r => r.budget).reduce((a, b) => a + b, 0) * 100)/100;
 		isIncome = trueTotal > 0;
 		absBudget = Math.abs(trueTotal);
 	}
