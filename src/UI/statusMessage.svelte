@@ -2,10 +2,15 @@
 	let isOpen = false;
 	let message = '';
 
-	export function open(_text) {
-		isOpen = true;
-		message = _text;
-		setTimeout(() => isOpen = false, 300 * _text.length);
+	export function open(_text, _maxDuration = false) {
+		return new Promise((resolve) => {
+			isOpen = true;
+			message = _text;
+			setTimeout(() => {
+				isOpen = false;
+				resolve();
+			}, _maxDuration || 300 * _text.length);
+		});
 	}
 </script>
 

@@ -1,21 +1,75 @@
 <script>
 	import Page from "../UI/page.svelte";
-	import { downloadFile } from '../polyfill';
+	import { downloadFile, wait } from '../polyfill';
 	import { CSVFileManager, readFile } from '../CSV.js';
 	import { Transaction } from '../types.js';
 	import TransactionManager from '../data/transactionManager';
 	import AccountManager from '../data/accountManager';
 	import Packager from '../data/packager';
     import Button from "../UI/button.svelte";
-	
+
 	import { getContext } from 'svelte';
 	const App = getContext('App');
 
 
-	const BankExportRowKeys = ['date', 'ownIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]
-	const CSVReader = new CSVFileManager(BankExportRowKeys);
+	class CSVReader { 
+		fileManager;
+		constructor(_rowKeys) {
+			this.fileManager = new CSVFileManager(_rowKeys);
+		}
 
-	
+		async read(_file) {
+			let rows = await this.fileManager.load(_file);
+			let	transactions = rows.map(row => new Transaction(row));
+			return transactions;
+		}
+
+		async canRead(_file) {
+			return true;
+		}
+	}
+
+	class ASNReader extends CSVReader {
+		constructor() {
+			super(['date', 'ownIBAN', 'targetIBAN', 'targetName', null, null, null, 'unit', 'balance', 'unit2', 'deltaMoney', 'date2', 'date3', 'bankClassification', null, null, null, 'description', null]);
+		}
+		async canRead(_file) {
+			let rows = await this.fileManager.load(_file);
+			if (!rows.length) return false;
+			if (rows[0].date && rows[0].balance && rows[0].deltaMoney && rows[0].description) return true;
+			return false
+		}
+	}
+
+	class RevolutReader extends CSVReader {
+		constructor() {
+			super([null, null, 'Started Date', 'date', 'description', 'deltaMoney', 'Fee', 'Currency', 'State', 'balance']);
+		}
+
+		async read(_file) {
+			let rows = await this.fileManager.load(_file);
+			rows = rows.filter(row => row.State === "COMPLETED"); // filter out all the reverted/not-yet completed transactions
+			let	transactions = rows.map(row => new Transaction(row));
+			for (let transaction of transactions) 
+			{
+				transaction.ownIBAN = 'Revolut';
+				transaction.date = new Date(transaction.date).toString(); // Reformat the date
+			}
+			return transactions.splice(1, Infinity); // Split of the header
+		}
+
+		async canRead(_file) {
+			let rows = await this.fileManager.load(_file);
+			if (!rows.length) return false;
+			if (rows[0].date && rows[0].balance && rows[0].deltaMoney && rows[0].description) return true;
+			return false;
+		}
+	}
+
+	const CSVReaders = {
+		ASN: new ASNReader,
+		Revolut: new RevolutReader
+	}
 
 	async function handleUpload(_event) {
 		if (!_event.target) throw new Error('null input')
@@ -30,12 +84,25 @@
 		App.statusMessage.open('Classified ' + result.newClassifies + ' new transactions (' + Math.round(result.classifies / TransactionManager.data.length * 1000) / 10 + '% classified)')
 	}
 
+	async function findSuitableReader(_file) {
+		for (let key in CSVReaders)
+		{
+			if (await CSVReaders[key].canRead(_file)) return key;
+		}
+		return false;
+	}
+
 	async function handleCSVUpload(_file) {
-		let rows = await CSVReader.load(_file);
-		let transactions = rows.map(row => new Transaction(row));
+		let readerType = await findSuitableReader(_file)
+		if (!readerType) return App.statusMessage.open('This type of bank-output-file is not supported');
+		await App.statusMessage.open(`Detected CSV-file from ${readerType}.`, 500);
+		let reader = CSVReaders[readerType];
+		let transactions = await reader.read(_file);
+
 		await TransactionManager.add(transactions);
 		AccountManager.reEvaluateAccounts();
 	}
+
 	async function handleFinancePackageUpload(_file) {
 		let data = await readFile(_file);
 		await Packager.import(data).then(
@@ -44,8 +111,6 @@
 		);
 		AccountManager.reEvaluateAccounts();
 	}
-
-
 
 	let transactions = [];
 	TransactionManager.dataStore.subscribe((_transactions) => transactions = _transactions)
