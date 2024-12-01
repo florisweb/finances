@@ -53,7 +53,6 @@
 			for (let transaction of transactions) 
 			{
 				transaction.ownIBAN = 'Revolut';
-				transaction.date = new Date(transaction.date).toString(); // Reformat the date
 				transaction.balance -= transaction.deltaMoney; // Balance is the amount of money at the time of the transaction, revolut gives the amount of money after the transaction has taken place: so revert it.
 			}
 			return transactions.splice(1, Infinity); // Split of the header

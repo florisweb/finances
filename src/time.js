@@ -26,6 +26,8 @@ Date.prototype.setDateFromStr = function(_str) {
 	let timeParts = dateTime[1].split(":");
 	date.setHours(timeParts[0]);
 	date.setMinutes(timeParts[1]);
+	if (timeParts[2]) date.setSeconds(timeParts[2]);
+	date.setMilliseconds(0);
 	
 	return date;
 }
@@ -35,7 +37,7 @@ Date.prototype.setFromStr = Date.prototype.setDateFromStr;
 Date.prototype.toString = function(_addTime = false) {
 	let dateStr = this.getDate() + "-" + (this.getMonth() + 1) + "-" + this.getFullYear();
 	if (!_addTime) return dateStr;
-	return dateStr + " " + this.getHours() + ":" + this.getMinutes();
+	return dateStr + " " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
 }
 
 Date.prototype.getDayName = function() {

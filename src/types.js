@@ -28,11 +28,16 @@ export class Transaction {
 		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
 		_params.balance 	= parseFloat(_params.balance);
 		_params.typeCode 	= _params.typeCode ?? 0;
+		
+		let dateObj = new Date(_params.date);
+		dateObj.setMilliseconds(0);
+		if (isNaN(dateObj)) dateObj = new Date().setFromStr(_params.date);
+		_params.date = dateObj;
 		Object.assign(this, _params);
 	}
 
 	get id() {
-		return this.date + this.deltaMoney + this.targetIBAN + this.description;
+		return this.date.getTime() + '|' + this.deltaMoney + '|' + this.ownIBAN + this.targetIBAN + this.description + this.balance + this.bankClassification;
 	}
 	get tag() {
 		return TagManager.getById(this.typeCode);
@@ -49,7 +54,7 @@ export class Transaction {
 
 	export() {
 		return {
-			date: this.date, 
+			date: this.date.toString(true), 
 			typeCode: this.typeCode, 
 			ownIBAN: this.ownIBAN || 'NO-IBAN',
 			targetIBAN: this.targetIBAN,
