@@ -126,4 +126,19 @@
 		position: relative;
 		margin: 20px;
 	}
+
+
+	.floatRightHolder {
+		position: absolute;
+		float: right;
+		top: 15px;
+		right: 0;
+		height: 80px;
+		display: flex;
+	}
+	
+		.buttonHolder {
+			flex-direction: column;
+			margin-top: 25px;
+		}
 </style>

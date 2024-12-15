@@ -158,8 +158,11 @@ html, body {
 	z-index: 999;
 	left: calc((100vw - 600px - 300px - 50px) / 2 + 600px + 50px);
 	width: auto;
-	max-width: 400px;
+	max-width: 460px;
 	padding-right: 5px;
+}
+.popupHolder.CreateBudgetPopup .popup.overviewPopup .tagHolder {
+	max-height: calc(90vh - 45px);
 }
 
 
@@ -198,8 +201,21 @@ html, body {
 	width: calc(100% / 3);
 	max-width: 250px;
 	margin: 0 auto;
-	/* border: 1px solid red; */
 }
+
+.monthOverviewPage .GraphHolder.distributionGraph {
+	width: 50%;
+	max-width: 250px;
+	margin: 0 auto;
+}
+
+.monthOverviewPage .GraphHolder.barGraph {
+	width: 100%;
+
+}
+
+
+
 
 
 .budgetPage .button.removeButton {

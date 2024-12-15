@@ -5,6 +5,7 @@
 	export let tag;
 	export let budget = 0;
 	export let averageExpenses = 0;
+	export let averageExpensesDuringBudget = 0;
 
 	export let isSumRow = false;
 	export let sum = 0;
@@ -20,6 +21,7 @@
 		<td class='tag'><Tag {...tag}></Tag></td>
 		<td class='moneyHolder budget' class:isNegative={budget < 0} class:isNull={budget === 0}>{formatMoneyString(budget)}</td>
 		<td class='moneyHolder budget' class:isNegative={averageExpenses > 0} class:isNull={averageExpenses === 0}>{formatMoneyString(-averageExpenses)}</td>
+		<td class='moneyHolder budget' class:isNegative={averageExpensesDuringBudget > 0} class:isNull={averageExpensesDuringBudget === 0}>{formatMoneyString(-averageExpensesDuringBudget)}</td>
 	</tr>
 {:else}
 	<tr class='row'>
@@ -29,6 +31,7 @@
 		<td class='sumTitle moneyHolder'>Netto</td>
 		<td class='moneySum moneyHolder budget' class:isNegative={sum < 0} class:isNull={sum === 0}>{formatMoneyString(sum)}</td>
 		<td class='moneySum moneyHolder budget' class:isNegative={averageExpenses > 0} class:isNull={averageExpenses === 0}>{formatMoneyString(-averageExpenses)}</td>
+		<td class='moneySum moneyHolder budget' class:isNegative={averageExpensesDuringBudget > 0} class:isNull={averageExpensesDuringBudget === 0}>{formatMoneyString(-averageExpensesDuringBudget)}</td>
 	</tr>
 {/if}
 

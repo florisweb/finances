@@ -15,7 +15,14 @@
 
 	let isOpen = false;
 	let inEditMode = false;
-	let curBudget = new Budget({});
+	let curBudget = new Budget({
+		startMonthId: new MonthIdentifier(),
+		sections: [new _BudgetSection({
+				name: 'default', 
+				tagBudgetSets: []
+			})
+		]
+	});
 
 	export function open() {
 		isOpen = true;
@@ -78,15 +85,29 @@
 	TagManager.dataStore.subscribe((_tags) => tags = _tags);
 	let sumTags = [];
 	let totalAverageExpenses = 0;
+	let totalAverageExpensesDuringBudget = 0;
 	$: {
+		let monthCount = curBudget.getLengthInStartedMonthsOnDate(new Date().moveMonth(-1)); // Movemonth to get finished months
 		sumTags = tags.filter((_tag) => !_tag.isNonAssignedTag).map((_tag) => {
+			let curMonth = curBudget.startMonthId?.copy();
+			let averageExpensesDuringBudget = 0;
+			for (let i = 0; i < monthCount; i++)
+			{
+				averageExpensesDuringBudget += _tag.getExpensesByMonth(curMonth);
+				console.log(_tag.name, monthCount, curMonth.id);
+				curMonth.setFromDate(curMonth.date.moveMonth(1));
+			}
+			if (monthCount !== 0) averageExpensesDuringBudget /= monthCount;
+			
 			return {
 				tag: _tag,
 				budget: curBudget.getBudgetForTag(_tag.id),
-				averageExpenses: _tag.averageExpensesLast12Months
+				averageExpenses: _tag.averageExpensesLast12Months,
+				averageExpensesDuringBudget: averageExpensesDuringBudget,
 			}
 		});
 		totalAverageExpenses = sumTags.map(tag => tag.averageExpenses).reduce((a, b) => a + b, 0);
+		totalAverageExpensesDuringBudget = sumTags.map(tag => tag.averageExpensesDuringBudget).reduce((a, b) => a + b, 0);
 	}
 </script>
 
@@ -122,12 +143,13 @@
 					<th scope='col' class='name'></th>
 					<th scope='col' class='name'>Tag</th>
 					<th scope='col' class='budget'>Budget</th>
-					<th scope='col' class='average'>Average</th>
+					<th scope='col' class='average'>Average 12 month</th>
+					<th scope='col' class='average'>During Budget</th>
 				</tr>
 				{#each sumTags as sumTag}
-					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget} averageExpenses={sumTag.averageExpenses}></TagBudgetOverviewRow>
+					<TagBudgetOverviewRow tag={sumTag.tag} budget={sumTag.budget} averageExpenses={sumTag.averageExpenses} averageExpensesDuringBudget={sumTag.averageExpensesDuringBudget}></TagBudgetOverviewRow>
 				{/each}
-				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum} averageExpenses={totalAverageExpenses}></TagBudgetOverviewRow>
+				<TagBudgetOverviewRow isSumRow={true} sum={curBudget.sum} averageExpenses={totalAverageExpenses} averageExpensesDuringBudget={totalAverageExpensesDuringBudget}></TagBudgetOverviewRow>
 			</table>
 		</div>
 	</PopupBox>

@@ -5,7 +5,6 @@ import { newId } from './polyfill';
 import Vector from './vector';
 import TransactionManager from './data/transactionManager';
 import BudgetManager from './data/budgetManager';
-import AccountManager from './data/accountManager';
 import AIManager from './data/AIManager';
 import TagManager from './data/tagManager';
 
@@ -21,9 +20,6 @@ export class Transaction {
 	bankClassification = '';
 	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
 
-	get isInternalTransfer() {
-		return !!AccountManager.getByIBAN(this.targetIBAN);
-	}
 	constructor(_params) {
 		_params.deltaMoney 	= parseFloat(_params.deltaMoney);
 		_params.balance 	= parseFloat(_params.balance);
@@ -190,14 +186,7 @@ export class SavingsTransactionTag extends TransactionTag {
 	}
 
 	get totalSavings() {
-		let budgetedMoney = 0;
-		for (let budget of BudgetManager._data)
-		{
-			let budgetPerMonth = budget.getBudgetForTag(this.id);
-			budgetedMoney += budgetPerMonth * budget.lengthInMonths;
-		}
-
-		return this.startValue + this.totalExpenses - budgetedMoney;
+		return this.getSavingsAtEndOfMonth(new MonthIdentifier().setFromDate(new Date().moveMonth(-1)));
 	}
 
 	getSavingsAtEndOfMonth(_monthId) { // Budget is added at the end of the month

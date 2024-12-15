@@ -3,17 +3,21 @@
 	import Vector from '../vector';
 
 	export let title = '';
-	export let data = [{data: []}];
+	export let data = [{
+		title: 'test',
+		data: []
+	}];
+
 	export let customClass = '';
 	export let maxWidth = Infinity;
 	export let maxheight = Infinity;
 	export let config = {};
 	$: config = {
-		drawDotsOnLine: true,
 		enablePointInfoPopup: true,
 		renderLabels: true,
 		...config
 	};
+
 
 	// Data: 
 	/*[
@@ -84,11 +88,9 @@
 		let delta = prevDragPos.copy().subtract(dragPos);
 		prevDragPos = dragPos;
 
-		Camera.position.add(delta);
+		Camera.position.add(new Vector(delta.value[0], 0));
 		if (Camera.position.value[0] < xDomain.value[0]) Camera.position.value[0] = xDomain.value[0];
 		if (Camera.position.value[0] + Camera.size.value[0] > xDomain.value[1]) Camera.position.value[0] = xDomain.value[1] - Camera.size.value[0];
-		if (Camera.position.value[1] > yDomain.value[1]) Camera.position.value[1] = yDomain.value[1];
-		if (Camera.position.value[1] - Camera.size.value[1] < yDomain.value[0]) Camera.position.value[1] = yDomain.value[0] + Camera.size.value[1];
 		render();
 	}
 
@@ -146,26 +148,25 @@
 
 
 	function calcDomains() {
-		xDomain = new Vector(Infinity, -Infinity);
 		yDomain = new Vector(0, -Infinity);
-		for (let line of data)
+		xDomain = new Vector(0, data.length);
+		for (let bar of data)
 		{
-			for (let point of line.data)
-			{
-				if (point.value[0] < xDomain.value[0]) xDomain.value[0] = point.value[0];
-				if (point.value[0] > xDomain.value[1]) xDomain.value[1] = point.value[0];
-				if (point.value[1] < yDomain.value[0]) yDomain.value[0] = point.value[1];
-				if (point.value[1] > yDomain.value[1]) yDomain.value[1] = point.value[1];
-			}
+			let sum = bar.data.map(r => r.value).reduce((a, b) => a + b, 0);
+			if (sum > yDomain.value[1]) yDomain.value[1] = sum;
 		}
+		
+		yDomain.value[1] *= 1.1; // Add some overhead margin
+
 		Camera.size.value = [
-			Math.min(xDomain.value[1] - xDomain.value[0], maxWidth),
+			Math.min(Math.floor(canvasSize.value[0] / minBarWidth), data.length),
 			Math.min(yDomain.value[1] - yDomain.value[0], maxheight)
 		];
+		console.log('size',canvasSize.value[0] / minBarWidth, minBarWidth*data.length);
 		
 		Camera.position.value = [
-			xDomain.value[1] - Camera.size.value[0],
-			yDomain.value[0] + Camera.size.value[1],
+			0,
+			Camera.size.value[1],
 		];
 	}
 
@@ -175,6 +176,8 @@
 	const axisColor = '#ccc';
 	const backgroundAxisColor = '#eee';
 	const axisThickness = 1;
+	const xMargin = 10;
+	const minBarWidth = 40;
 	
 	function render() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -182,10 +185,10 @@
 		renderYAxis();
 		renderXAxis();
 
-		for (let line of data) renderLine(line);
+		for (let i = Math.floor(Camera.position.value[0]); i < Math.min(data.length, Camera.position.value[0] + Camera.size.value[0]); i++) renderBar(data[i], i);
 
-		if (!curHoverPoint) return;
-		renderPointInfo(curHoverPoint);
+		// if (!curHoverPoint) return;
+		// renderPointInfo(curHoverPoint);
 	}
 
 
@@ -218,43 +221,22 @@
 		ctx.fill();
 	}
 
+
 	
-	function renderLine(_line) {
-		if (_line.data.length < 1) return;
-		ctx.strokeStyle = _line.color.hex;
-		ctx.strokeWidth = 2;
-		ctx.beginPath();
-
-		_line.data.sort((a, b) => a.value[0] > b.value[0]);
-	
-		let prevCoord = Camera.worldToPxCoord(_line.data[0]);
-		for (let p = 1; p < _line.data.length; p++)
+	function renderBar(_bar, _barIndex) {		
+		let prevY = 0;
+		for (let b = 0; b < _bar.data.length; b++)
 		{
-			let coord = Camera.worldToPxCoord(_line.data[p]);
+			let beginCoord = Camera.worldToPxCoord(new Vector(_barIndex, prevY + _bar.data[b].value));
+			let delta = beginCoord.difference(Camera.worldToPxCoord(new Vector(_barIndex + 1, prevY)));
 
-			ctx.moveTo(prevCoord.value[0], prevCoord.value[1]);
-			if (_line.doNotInterpolate)
-			{
-				ctx.lineTo(coord.value[0], prevCoord.value[1]);
-				ctx.moveTo(coord.value[0], prevCoord.value[1]);
-			}
-			ctx.lineTo(coord.value[0], coord.value[1]);
-			prevCoord = coord;
-		}
-		ctx.closePath();
-		ctx.stroke();
-
-		if (!config.drawDotsOnLine) return;
-		for (let p = 0; p < _line.data.length; p++)
-		{
-			let coord = Camera.worldToPxCoord(_line.data[p]);
-			ctx.fillStyle = '#fff';
-			ctx.strokeStyle = _line.color.hex;;
+			ctx.fillStyle = _bar.data[b].color;
 			ctx.beginPath();
-			ctx.drawCircle(coord.value[0], coord.value[1], 2);
+			ctx.fillRect(beginCoord.value[0] - xMargin / 2, beginCoord.value[1], delta.value[0] - xMargin, delta.value[1] - 1)
 			ctx.closePath();
 			ctx.fill();
-			ctx.stroke();
+
+			prevY += _bar.data[b].value;	
 		}
 	}
 
@@ -265,59 +247,17 @@
 		ctx.fillRect(0, canvas.height - Camera.labelMargin.value[1], canvas.width, axisThickness);
 		ctx.fill();
 		
-		const xLabelCount = canvas.width / 100;
-		let stepSize = Camera.size.value[0] / xLabelCount;
-		let stepOrder = 0.25 * 10**(String(stepSize).split('.')[0].length);
-		let startVal = Math.floor(Camera.position.value[0] / stepOrder) * stepOrder;
-
-		const isDateAxis = startVal > 10000000;
-		if (!isDateAxis) 
+		for (let x = Math.floor(Camera.position.value[0]); x < Math.min(Camera.position.value[0] + Camera.size.value[0], data.length); x++)
 		{
-			for (let x = startVal; x < Camera.position.value[0] + Camera.size.value[0] + stepOrder; x += stepOrder)
-			{
-				let coord = Camera.worldToPxCoord(new Vector(x, 0));
-				renderXLabel(x, coord);
-			}
-			return;
-		}
-
-
-		// Fix the startValue to the start of the month
-		const dayLength = 1000 * 60 * 60 * 24; 
-		const firstMonthId = new MonthIdentifier().setFromDate(new Date(startVal));
-		startVal = firstMonthId.date.getTime();
-
-		let x = startVal;
-		while (x < Camera.position.value[0] + Camera.size.value[0] + dayLength)
-		{
-			let monthId = new MonthIdentifier().setFromDate(new Date(x));
-			let coord = Camera.worldToPxCoord(new Vector(x, 0));
-
-
-			let label = monthId.date.getMonths()[monthId.date.getMonth()].name.substr(0, 3) + ' ' + monthId.date.getFullYear();
-			renderXLabel(label, coord);
-
-			x = monthId.date.moveMonth(1).getTime();
+			let coord = Camera.worldToPxCoord(new Vector(x , 0));
+			renderXLabel(data[x].title, coord);
 		}
 	}
 
 	function renderXLabel(_label, _coord) {
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'center';
-
-		// Vertical axis
-		if (_coord.value[0] >= Camera.labelMargin.value[0])
-		{
-			ctx.fillStyle = backgroundAxisColor;
-			ctx.fillRect(_coord.value[0], 0, 1, canvas.height);
-			ctx.fill();
-		}
-
 		if (!config.renderLabels) return;
-		// Little extenders
-		ctx.fillStyle = axisColor;
-		ctx.fillRect(_coord.value[0], canvas.height - Camera.labelMargin.value[1], 2, 5);
-		ctx.fill();
 
 		ctx.fillStyle = textColor;
 		ctx.fillText(_label, _coord.value[0], canvas.height - Camera.labelMargin.value[1] + 5);
@@ -369,7 +309,7 @@
 	const Camera = new class {
 		position = new Vector(0, 0);
 		size = new Vector(200, 200);
-		#labelMargin = new Vector(45, 25);
+		#labelMargin = new Vector(45, 20);
 		get labelMargin() {
 			if (config.renderLabels) return this.#labelMargin;
 			return new Vector(0, 0);
@@ -382,14 +322,14 @@
 		worldToPxCoord(_coord, _absolute = false) {
 			return new Vector(
 				(_coord.value[0] - this.position.value[0] * (!_absolute)) / this.size.value[0] * (canvas.width - this.labelMargin.value[0]) + this.labelMargin.value[0],
-				-(_coord.value[1] - this.position.value[1] * (!_absolute)) / this.size.value[1] * (canvas.height - this.labelMargin.value[1]) + this.labelMargin.value[1],
+				-(_coord.value[1] - this.position.value[1] * (!_absolute)) / this.size.value[1] * (canvas.height - this.labelMargin.value[1]),
 			);
 		}
 		
 		pxToWorldCoord(_coord, _absolute = false) {
 			return new Vector(
 				(_coord.value[0] - this.labelMargin.value[0]) / (canvas.width - this.labelMargin.value[0]) * this.size.value[0] + this.position.value[0] * (!_absolute),
-				-(_coord.value[1] - this.labelMargin.value[1]) / (canvas.height - this.labelMargin.value[1]) * this.size.value[1] - this.position.value[1] * (!_absolute)
+				-_coord.value[1] / (canvas.height - this.labelMargin.value[1]) * this.size.value[1] - this.position.value[1] * (!_absolute)
 			);
 		}
 
@@ -400,6 +340,8 @@
 			);
 		}	
 	}
+
+	window.c = Camera;
 	
 
 

@@ -5,12 +5,15 @@
 
 	import TagManager from '../data/tagManager';
 	import TransactionManager from '../data/transactionManager.js';
+	import { openPageByIndex } from "../App";
 
 	import Page from "../UI/page.svelte";
     import TagOverviewPanel from "../UI/tagOverviewPanel.svelte";
     import Button from '../UI/button.svelte';
     import BudgetManager from "../data/budgetManager";
-    import { openPageByIndex } from "../App";
+	import PieChart from '../UI/pieChart.svelte';
+    import BarGraph from "../UI/barGraph.svelte";
+    import Vector from "../vector";
 	
 
 	let lastMonthDate = new Date();
@@ -61,9 +64,82 @@
 		});
 		visibleTagsWithMetaData = visibleTagsWithMetaData;
 	}
+
+
+
+	let expensesData = [];
+	let incomeData = [];
+
+	let averageExpenses = 0;
+	let averageIncome = 0;
+	$: {
+		averageExpenses = 0;
+		averageIncome = 0;
+
+		incomeData = [];
+		expensesData = [];
+		for (let tag of tags)
+		{
+			let expenses = tag.getExpensesByMonth(curMonth);
+			if (expenses > 0)
+			{
+				averageExpenses += expenses;
+				expensesData.push({
+					value: expenses,
+					color: tag.color.hex,
+					name: moneyNameAndValueToString(tag.name, expenses)
+				});
+			} else {
+				averageIncome -= expenses;
+				incomeData.push({
+					value: -expenses,
+					color: tag.color.hex,
+					name: moneyNameAndValueToString(tag.name, -expenses)
+				});
+			}
+		}
+
+		incomeData.sort((a, b) => a.value < b.value);
+		expensesData.sort((a, b) => a.value < b.value);
+	}
+
+	let fullExpensesData = [];
+	$: {
+		fullExpensesData = [];
+		for (let m = -36; m < 0; m++) {
+
+			let month = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(m));
+			let data = [];
+			for (let tag of tags)
+			{
+				let expenses = tag.getExpensesByMonth(month);
+				if (expenses > 0)
+				{
+					data.push({
+						value: expenses,
+						color: tag.color.hex,
+						name: moneyNameAndValueToString(tag.name, expenses)
+					});
+				}
+			}
+			data.sort((a, b) => a.value < b.value);
+			fullExpensesData.push({
+				title: month.id,
+				data: data,
+			});
+		}
+	}
+ 
+
+	window.v = Vector
+
+	function moneyNameAndValueToString(_name, _value) {
+		return [_name, formatMoneyString(_value, true, true)];
+	}
+
 </script>
 
-<Page>
+<Page customClass='monthOverviewPage'>
 	<div class='infoHolder'>
 		<div class='deltaHolder' class:negative={totalDelta < 0} class:positive={totalDelta > 0}>
 			<img src={totalDelta > 0 ? 'images/arrowRisingIcon.png' : 'images/arrowFallingIcon.png'} class='deltaIcon' alt='Money change visualization.'>
@@ -101,24 +177,42 @@
 			</div>
 		</div>
 	</div>
+	
+	
+	<div class='dataHolder'>
+		<div class='section distribution'>
+			<BarGraph data={fullExpensesData} customClass='barGraph'></BarGraph>
+			<!-- <PieChart 
+				title={'Expenses ' + formatMoneyString(averageExpenses, true, true)} 
+				data={expensesData}
+				customClass='distributionGraph'
+			></PieChart>
+			<PieChart 
+				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
+				data={incomeData}
+				customClass='distributionGraph'
+			></PieChart> -->
+		</div>
+		
+		<div class='message' class:hide={visibleTagsWithMetaData.length} transit>
+			No expenses in this month, add them via the 
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-missing-attribute -->
+			<a style='color: #daf; cursor: pointer; font-style: italic' on:click={() => openPageByIndex(0)}>data manager.</a>
+		</div>
 
-	<div class='message' class:hide={visibleTagsWithMetaData.length} transit>
-		No expenses in this month, add them via the 
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-missing-attribute -->
-		<a style='color: #daf; cursor: pointer; font-style: italic' on:click={() => openPageByIndex(0)}>data manager.</a>
-	</div>
-	<div class='tagListHolder'>
-		{#each visibleTagsWithMetaData as data}
-			<TagOverviewPanel 
-				{...data.tag} 
-				income={data.in} 
-				expenses={data.out} 
-				totalSavings={data.tag.isSavingsTag ? data.tag.getSavingsAtEndOfMonth(curMonth) : -1}
-				budget={data.tag.getBudgetInMonth(curMonth)}
-				on:click={() => App.transactionViewerPopup.open(data.transactions, `${data.tag.name}'s Transactions`)}
-			></TagOverviewPanel>
-		{/each}
+		<div class='section tagListHolder'>
+			{#each visibleTagsWithMetaData as data}
+				<TagOverviewPanel 
+					{...data.tag} 
+					income={data.in} 
+					expenses={data.out} 
+					totalSavings={data.tag.isSavingsTag ? data.tag.getSavingsAtEndOfMonth(curMonth) : -1}
+					budget={data.tag.getBudgetInMonth(curMonth)}
+					on:click={() => App.transactionViewerPopup.open(data.transactions, `${data.tag.name}'s Transactions`)}
+				></TagOverviewPanel>
+			{/each}
+		</div>
 	</div>
 </Page>
 
@@ -253,7 +347,29 @@
 
 
 	/* Tag List */
+
+	.dataHolder {
+		margin-top: 30px;
+		margin-left: 20px;
+
+
+		display: grid;
+		grid-template: 
+			'distribution distribution'
+			'tags tags';
+		grid-template-columns: 50% 50%;
+	}
+
+	.dataHolder .section.distribution {
+		grid-area: distribution;
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 1px solid #eee;
+	}
+
+
 	.tagListHolder {
+		grid-area: tags;
 		position: relative;
 		margin: 20px;
 
