@@ -126,8 +126,8 @@ export class TransactionTag {
 	getAverageExpensesInLastXMonths(_months = 12) {
 		let firstDate = this.firstTransactionDate;
 		if (!firstDate) return 0;
-		
 		let firstMonthId = new MonthIdentifier().setFromDate(firstDate);
+		if (new MonthIdentifier().date.getTime() <= firstMonthId.date.getTime()) return 0;
 		let curMonthId = new MonthIdentifier().setFromDate(new Date().moveMonth(-_months));
 		if (curMonthId.date.getTime() < firstMonthId.date.getTime()) curMonthId.setFromDate(firstMonthId.date);
 
