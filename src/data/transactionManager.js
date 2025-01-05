@@ -1,11 +1,15 @@
 import DataManager from "./dataManager";
-import { Transaction, MonthIdentifier } from "../types";
+import { Transaction, MonthIdentifier, FundTransaction } from "../types";
 import { openPageByIndex } from "../App";
 import AIManager from "./AIManager";
 
 const TransactionManager = new class extends DataManager {
 	constructor() {
-		super({type: "transactions", dataToObject: (_transaction) => new Transaction(_transaction)});
+		super({type: "transactions", dataToObject: (_transaction) => {
+				if (FundTransaction.isFundTransaction(_transaction)) return new FundTransaction(_transaction);
+				return new Transaction(_transaction);
+			}
+		});
 		window.TransactionManager = this;
 	}
 

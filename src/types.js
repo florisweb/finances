@@ -64,6 +64,23 @@ export class Transaction {
 	}
 }
 
+export class FundTransaction extends Transaction {
+	static isFundTransaction(_transaction) {
+		return _transaction.description.includes('Voor u gekocht via Euronext Fund Services');
+	}
+
+	fund;
+	sharePriceAtTimeOfTransaction;
+	shares;
+
+	constructor() {
+		super(...arguments);
+		this.fund = this.description.split('Participaties ')[1].split(' a EUR')[0];
+		this.sharePriceAtTimeOfTransaction = parseFloat(this.description.split(' a EUR ')[1].split('. Valutadatum')[0].split(' ').join('.'));
+		this.shares = Math.abs(this.deltaMoney / this.sharePriceAtTimeOfTransaction);
+	}
+}
+
 
 
 export class TransactionTag {
@@ -491,6 +508,16 @@ export class BankAccount {
 	IBAN = '';
 	name = '';
 	get id() {return this.IBAN}
+
+	get isFundAccount() {
+		return !!this.transactions.find(a => a instanceof FundTransaction);
+	}
+
+	get type() {
+		if (this.isFundAccount) return 'FUND';
+		if (this.IBAN === 'Revolut') return 'REVOLUT';
+		return 'ASN';
+	}
 
 
 	get transactions() {

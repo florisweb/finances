@@ -12,6 +12,12 @@
 
 	import { getContext } from "svelte";
 	const App = getContext('App');
+
+	const AccountLogoPaths = {
+		'ASN': './images/ASNLogo.png',
+		'REVOLUT': './images/RevolutLogo.png',
+		'FUND': './images/fundLogo.png',
+	}
 </script>
 
 <div id='sideBar'>
@@ -40,7 +46,7 @@
 	{/if}
 	{#each accounts as account}
 		<div class="item account">
-			<Button name={account.name || 'Unnamed Account'} on:click={
+			<Button name={account.name || 'Unnamed Account'} icon={AccountLogoPaths[account.type]} on:click={
 				() => App.accountPage.open(account)
 			}></Button>
 		</div>

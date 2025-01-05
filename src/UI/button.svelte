@@ -4,6 +4,7 @@
 	const dispatch = createEventDispatcher();
 	
 	export let name;
+	export let icon;
 	export let filled = true;
 	export let disabled = false;
 	export let style = '';
@@ -23,6 +24,10 @@
 	bind:this={button} 
 	on:click={(_event) => {if (!disabled) dispatch('click', _event)}}
 >
+	{#if icon}
+		<!-- svelte-ignore a11y-missing-attribute -->
+		<img src={icon}>
+	{/if}
 	{name}
 </div>
 
@@ -51,5 +56,12 @@
 	}
 	.button:hover {
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
+	}
+	.button img {
+		position: relative;
+		height: 20px;
+		width: auto;
+		margin: -5px;
+		margin-right: 5px;
 	}
 </style>
