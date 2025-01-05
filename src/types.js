@@ -242,7 +242,6 @@ export class NonAssignedTag extends TransactionTag {
 		super({name: "Non Assigned", color: AvailableColors[0].color, id: 0, startValue: 0});
 	}
 }
-window.NonAssignedTag = NonAssignedTag;
 
 
 
@@ -525,9 +524,12 @@ export class BankAccount {
 	}
 	get balance() {
 		let transactions = this.transactions;
+		transactions.sort((a, b) => a.date < b.date);
 		if (transactions.length === 0) return 0;
-		let lastTrans = transactions[transactions.length - 1];
-		return lastTrans.balance + lastTrans.deltaMoney;
+		let lastTrans = transactions[0];
+		let value = lastTrans.balance + lastTrans.deltaMoney;
+		if (!this.isFundAccount) return value;
+		return value + this.getFundValue();
 	}
 
 	getBalanceAtEndOfMonth(_monthId) {
@@ -541,7 +543,9 @@ export class BankAccount {
 			break;
 		}
 
-		return lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+		let value = lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+		if (!this.isFundAccount) return value;
+		return value + this.getFundValueAtEndOfMonth(_monthId);
 	}
 
 	generateGraphData(_range = 11) {
@@ -584,8 +588,42 @@ export class BankAccount {
 			IBAN: this.IBAN,
 		}
 	}
-}
 
+	// FUND PART
+	getFunds() {
+		return this.getFundsAtEndOfMonth(new MonthIdentifier());
+	}
+	getFundValue() {
+		return this.getFundValueAtEndOfMonth(new MonthIdentifier()));
+	}
+
+	getFundsAtEndOfMonth(_monthId) {
+		let funds = {};
+		let transactions = this.transactions;
+		for (let trans of transactions)
+		{
+			if (!(trans instanceof FundTransaction)) continue;
+			if (trans.date.getTime() > _monthId.date.copy().moveMonth(1).getTime()) continue; // End of month, monthId gives date at beginning of month
+			if (!funds[trans.fund]) funds[trans.fund] = [];
+			funds[trans.fund].push(trans);
+		}
+		for (let fund in funds)
+		{
+			let lastTransaction = funds[fund].sort((a, b) => a.date < b.date)[0];
+			let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
+
+			funds[fund].shares = funds[fund].map(r => r.shares).reduce((a, b) => a + b, 0);
+			funds[fund].investment = funds[fund].map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+			funds[fund].value = funds[fund].shares * curSharePrice;
+		}
+
+		return funds;
+	}
+	getFundValueAtEndOfMonth(_monthId) {
+		let funds = this.getFundsAtEndOfMonth(_monthId);
+		return Object.keys(funds).map(r => funds[r].value).reduce((a, b) => a + b, 0);
+	}
+}
 
 
 

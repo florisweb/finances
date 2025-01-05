@@ -6,8 +6,11 @@
 	import { openPageByIndex } from '../App';
 	import { getContext } from 'svelte';
     import Graph from "../UI/graph.svelte";
+	import UIFundTransaction from "../UI/UIFundTransaction.svelte";
+
     import Color from "../color";
     import AccountManager from "../data/accountManager";
+    import { FundTransaction, Transaction } from "../types";
 
 	const App = getContext('App');
 	let curAccount;
@@ -15,6 +18,8 @@
 		open: (_account) => {
 			curAccount = _account;
 			openPageByIndex(5);
+			isFundAccount = curAccount.isFundAccount;
+			console.log('is', isFundAccount);
 		}
 	};
 
@@ -27,6 +32,30 @@
 		}];
 	}
 
+	
+	let isFundAccount = false;
+	let fundTransactions = [];
+	let funds = {};
+	let nonAllocatedFunds;
+	$: if (curAccount?.isFundAccount) 
+	{
+		fundTransactions = curAccount.transactions.filter(t => t instanceof FundTransaction);
+		fundTransactions.sort((a, b) => a.date < b.date);
+		let nonFundTransactions = curAccount.transactions.filter(t => t instanceof Transaction);
+		funds = curAccount.getFunds();
+		for (let fund in funds)
+		{
+			let lastTransaction = funds[fund].sort((a, b) => a.date < b.date)[0];
+			let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
+
+			funds[fund].shares = funds[fund].map(r => r.shares).reduce((a, b) => a + b, 0);
+			funds[fund].investment = funds[fund].map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+			console.log(funds[fund].investment);
+			funds[fund].value = funds[fund].shares * curSharePrice;
+		}
+
+		nonAllocatedFunds = nonFundTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+	}
 </script>
 
 <Page>
@@ -63,6 +92,53 @@
 
 	<div class='dataHolder'>
 		<Graph title='Balance' data={graphData}></Graph>
+
+
+		
+
+
+		{#if isFundAccount}
+			<br style='margin-top: 50px'>
+
+			<div class="fundOverviewHolder">
+				{#each Object.keys(funds) as fund}
+					<div class='fundPanel'>
+						<div class="title">{fund}</div>
+						<div class="subInformation">
+							Shares: {Math.round(funds[fund].shares * 100) / 100} - Value: {formatMoneyString(funds[fund].value)} <br>
+							Inv: {formatMoneyString(-funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value+funds[fund].investment)}
+						</div>
+					</div>
+				{/each}
+
+				<div class='fundPanel nonAllocatedFunds'>
+					<div class="title">Non-allocated funds</div>
+					<div class="subInformation">
+						Value: {formatMoneyString(nonAllocatedFunds)}
+					</div>
+				</div>
+			</div>
+
+
+
+			<table class='transactionTable'>
+				<thead>
+					<tr class='header'>
+						<th scope='col'>Date</th>
+						<th scope='col'>Money</th>
+						<th scope='col'>Shares</th>
+						<th scope='col'>Price per share</th>
+						<th scope='col'>Fund</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each fundTransactions as transaction}
+						<UIFundTransaction {transaction}></UIFundTransaction>
+					{/each}
+				</tbody>
+			</table>
+
+		{/if}
 	</div>
 </Page>
 
@@ -141,4 +217,70 @@
 			flex-direction: column;
 			margin-top: 25px;
 		}
+
+
+
+	.fundOverviewHolder {
+		display: flex;
+		margin-bottom: 30px;
+	}
+	.fundOverviewHolder .fundPanel {
+		position: relative;
+		padding: 30px;
+		padding-top: 20px;
+		margin-right: 30px;
+
+		width: 30vw;
+		max-width: 300px;
+		height: auto;
+
+		background-color: #daf;
+		box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.03);
+		border-radius: 10px;
+	}
+
+	.fundOverviewHolder .fundPanel .title {
+		position: relative;
+		font-size: 18px;
+		color: #fff;
+		margin-bottom: 15px;
+	}
+
+	.fundOverviewHolder .fundPanel .subInformation {
+		color: #fff;
+		opacity: .7;
+		font-size: 13px;
+	}
+
+	.fundPanel.nonAllocatedFunds {
+		background-color: transparent;
+		border: 2px solid #daf;
+	}
+
+	.fundPanel.nonAllocatedFunds .title, .fundPanel.nonAllocatedFunds .subInformation {
+		color: #daf;
+	}
+
+
+
+
+
+	.transactionTable {
+		position: relative;
+		overflow-y: auto;
+		overflow-x: hidden;
+		border-collapse: collapse;
+	}
+
+	th {
+		position: relative;
+		height: 20px;
+		line-height: 20px;
+		font-size: 13px;
+		color: #444;
+		text-align: left;
+	}
+
+
+	
 </style>
