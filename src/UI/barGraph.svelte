@@ -165,7 +165,7 @@
 		console.log('size',canvasSize.value[0] / minBarWidth, minBarWidth*data.length);
 		
 		Camera.position.value = [
-			0,
+			xDomain.value[1] - Camera.size.value[0],
 			Camera.size.value[1],
 		];
 	}

@@ -106,7 +106,7 @@
 	let fullExpensesData = [];
 	$: {
 		fullExpensesData = [];
-		for (let m = -36; m < 0; m++) {
+		for (let m = -36; m < 1; m++) {
 
 			let month = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(m));
 			let data = [];

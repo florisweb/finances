@@ -43,17 +43,6 @@
 		fundTransactions.sort((a, b) => a.date < b.date);
 		let nonFundTransactions = curAccount.transactions.filter(t => t instanceof Transaction);
 		funds = curAccount.getFunds();
-		for (let fund in funds)
-		{
-			let lastTransaction = funds[fund].sort((a, b) => a.date < b.date)[0];
-			let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
-
-			funds[fund].shares = funds[fund].map(r => r.shares).reduce((a, b) => a + b, 0);
-			funds[fund].investment = funds[fund].map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
-			console.log(funds[fund].investment);
-			funds[fund].value = funds[fund].shares * curSharePrice;
-		}
-
 		nonAllocatedFunds = nonFundTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
 	}
 </script>
