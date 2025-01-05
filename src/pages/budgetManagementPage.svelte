@@ -2,7 +2,6 @@
 	import Page from "../UI/page.svelte";
 	import BudgetPanel from '../UI/budgetPanel.svelte';
 	
-	// import AddTagPanel from "../UI/addTagPanel.svelte";
 	import { getContext } from 'svelte';
     import BudgetManager from "../data/budgetManager";
     import AddBudgetPanel from "../UI/addBudgetPanel.svelte";

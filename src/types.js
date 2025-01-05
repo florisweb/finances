@@ -594,7 +594,7 @@ export class BankAccount {
 		return this.getFundsAtEndOfMonth(new MonthIdentifier());
 	}
 	getFundValue() {
-		return this.getFundValueAtEndOfMonth(new MonthIdentifier()));
+		return this.getFundValueAtEndOfMonth(new MonthIdentifier());
 	}
 
 	getFundsAtEndOfMonth(_monthId) {

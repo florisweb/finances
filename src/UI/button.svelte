@@ -14,6 +14,7 @@
 	onMount(() => {
 		button.style = style;
 	});
+	console.log(icon);
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -24,7 +25,7 @@
 	bind:this={button} 
 	on:click={(_event) => {if (!disabled) dispatch('click', _event)}}
 >
-	{#if icon}
+	{#if typeof icon !== 'undefined'}
 		<!-- svelte-ignore a11y-missing-attribute -->
 		<img src={icon}>
 	{/if}

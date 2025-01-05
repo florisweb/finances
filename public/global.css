@@ -219,7 +219,7 @@ html, body {
 
 
 .budgetPage .button.removeButton {
-	position: absolute;
+	position: absolute !important;
 	float: right;
 	right: 50px;
 	top: 20px;
