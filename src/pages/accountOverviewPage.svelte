@@ -42,8 +42,10 @@
 		fundTransactions = curAccount.transactions.filter(t => t instanceof FundTransaction);
 		fundTransactions.sort((a, b) => a.date < b.date);
 		let nonFundTransactions = curAccount.transactions.filter(t => t instanceof Transaction);
-		funds = curAccount.getFunds();
 		nonAllocatedFunds = nonFundTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		(async () => {
+			funds = await curAccount.getFunds();
+		})();
 	}
 </script>
 
@@ -96,6 +98,9 @@
 						<div class="subInformation">
 							Shares: {Math.round(funds[fund].shares * 100) / 100} - Value: {formatMoneyString(funds[fund].value)} <br>
 							Inv: {formatMoneyString(-funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value+funds[fund].investment)}
+						</div>
+						<div class='lastUpdatedText'>
+							Last updated: {funds[fund].lastUpdateTime}
 						</div>
 					</div>
 				{/each}
@@ -239,6 +244,17 @@
 		color: #fff;
 		opacity: .7;
 		font-size: 13px;
+	}
+	.fundOverviewHolder .fundPanel .lastUpdatedText {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		padding: 10px;
+		padding-right: 15px;
+
+		text-align: right;
+		color: rgba(255, 255, 255, .4);
+		font-size: 10px;
 	}
 
 	.fundPanel.nonAllocatedFunds {
