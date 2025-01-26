@@ -36,7 +36,6 @@ const TransactionManager = new class extends DataManager {
 		{
 			if (!ts.date) continue;
 			let index = this._data.findIndex((_ts) => _ts.id === ts.id);
-			console.log('comp', ts.id, index);
 			if (index !== -1) continue; // Skip because no differences: would only overwrite the classificationdata
 			this._data.push(ts);
 		}

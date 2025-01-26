@@ -8,13 +8,17 @@ const StockManager = new class {
 		'ASN Duurzaam Mixfonds Defensief': 'ASND.AS',
 		'ASN Duurzaam Mixfonds Zeer Defensief': 'ASNZD.AS',
 	}
+	#cachedStocks = {};
+	#cacheTTL = 1000 * 60 * 60 * 24;
 
 	constructor() {
 		window.StockManager = this;
 	}
 
 	async fetchStockHistory(_symbolOrName) {
-		let response = await this.#fetchRequest(this.#fetchUrl + '?symbol=' + this.#symbolOrNameToSymbol(_symbolOrName));
+		let symbol = this.#symbolOrNameToSymbol(_symbolOrName);
+		if (this.#cachedStocks[symbol] && new Date() - this.#cachedStocks[symbol].cacheDate < this.#cacheTTL) return this.#cachedStocks[symbol].data;
+		let response = await this.#fetchRequest(this.#fetchUrl + '?symbol=' + symbol);
 		if (response.error) return response;
 		let rawData = response.chart.result[0];
 
@@ -25,6 +29,7 @@ const StockManager = new class {
 			}
 		).filter(r => typeof r.stockPrice === 'number');
 		data.sort((a, b) => a.time < b.time);
+		this.#cachedStocks[symbol] = {data: data, cacheDate: new Date()};
 		return data;
 	}
 

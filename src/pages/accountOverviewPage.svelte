@@ -37,38 +37,41 @@
 		if (prevAccount !== curAccount) // Prevent loops due to reactivity of async
 		{
 			prevAccount = curAccount;
+			(async () => {
+					
+				const monthRange = 11;
+				graphData = [{
+					color: new Color('#0f0'),
+					name: 'Total',
+					data: await curAccount?.generateGraphData(monthRange) || []
+				}];
 
-			const monthRange = 11;
-			graphData = [{
-				color: new Color('#0f0'),
-				data: curAccount?.generateGraphData(monthRange) || []
-			}];
-			if (isFundAccount)
-			{
-				(async () => {
+				if (isFundAccount)
+				{
 					let funds = await curAccount?.getFunds();
 					for (let fundName in funds)
 					{
 						let fund = funds[fundName];
 						let data = [];
-						for (let delta = -monthRange; delta <= 0; delta++)
+						for (let delta = -monthRange - 1; delta < 0; delta++)
 						{
 							let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(delta));
 							
 							data.push(new Vector(
-								curMonth.date.getTime(),
+								curMonth.date.copy().moveMonth(1).getTime(),
 								await fund.getValueAtEndOfMonth(curMonth)
 							));
 						}
 
 						graphData.push({
 							color: new Color('#daf'),
+							name: fund.name,
 							data: data
 						});
 					}
 					graphData = graphData;
-				})();
-			}
+				}
+			})();
 		}
 	}
 

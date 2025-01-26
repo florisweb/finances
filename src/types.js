@@ -553,28 +553,21 @@ export class BankAccount {
 		return value + await this.getFundValueAtEndOfMonth(_monthId);
 	}
 
-	generateGraphData(_range = 11) {
-		let transactions = this.transactions;
+	async generateGraphData(_range = 11) {
 		let balancePerMonth = [];
-		if (!transactions.length) return balancePerMonth;
 
-		let curMonth = new MonthIdentifier();
-		let lastTransactionInMonthIndex = transactions.length - 1;
-
-		for (let i = _range; i >= 0; i--)
+		let promises = [];
+		for (let i = -_range - 1; i < 0; i++)
 		{
-			for (let x = lastTransactionInMonthIndex; x >= 0; x--)
-			{
-				if (!curMonth.containsDate(transactions[x].date)) continue;
-				lastTransactionInMonthIndex = x;
-				break;
-			}
-			
-			let lastTransactionInMonth = transactions[lastTransactionInMonthIndex];
-			let balance = lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
-			balancePerMonth[i] = new Vector(curMonth.date.getTime(), balance || 0);
-			curMonth = new MonthIdentifier().setFromDate(curMonth.date.moveMonth(-1))
+			let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(i))
+			promises.push(
+				this.getBalanceAtEndOfMonth(curMonth).then(
+					balance => balancePerMonth.push(new Vector(curMonth.date.copy().moveMonth(1).getTime(), balance || 0))
+				)
+			);
 		}
+		await Promise.all(promises);
+		balancePerMonth.sort((a, b) => a.value[0] > b.value[0]);
 		return balancePerMonth;
 	}
 

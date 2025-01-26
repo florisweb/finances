@@ -325,6 +325,8 @@
 	}
 
 	function renderYAxis() {
+		const yLabelHeight = 50;
+
 		ctx.clearRect(0, 0, Camera.labelMargin.value[0], canvas.height);
 
 		// Y-Axis
@@ -333,9 +335,13 @@
 		ctx.fillStyle = axisColor;
 		ctx.fillRect(Camera.labelMargin.value[0], 0, axisThickness, dy);
 		
-		const yLabelCount = canvas.height / 50;
+		const yLabelCount = canvas.height / yLabelHeight;
 		let stepSize = Camera.size.value[1] / yLabelCount;
-		let stepOrder = 0.25 * 10**(String(stepSize).split('.')[0].length);
+		let stepOrder = 0.1 * 10**(String(stepSize).split('.')[0].length);
+		while (Camera.size.value[1] / stepOrder > yLabelCount)
+		{
+			stepOrder *= 2;
+		}
 
 		let startVal = Math.floor((Camera.position.value[1] - Camera.size.value[1]) / stepOrder) * stepOrder;
 		for (let y = startVal; y < Camera.position.value[1] + stepOrder; y += stepOrder)
@@ -370,6 +376,7 @@
 		position = new Vector(0, 0);
 		size = new Vector(200, 200);
 		#labelMargin = new Vector(45, 25);
+		#graphTopRightMargin = new Vector(20, 20);
 		get labelMargin() {
 			if (config.renderLabels) return this.#labelMargin;
 			return new Vector(0, 0);
@@ -381,15 +388,15 @@
 
 		worldToPxCoord(_coord, _absolute = false) {
 			return new Vector(
-				(_coord.value[0] - this.position.value[0] * (!_absolute)) / this.size.value[0] * (canvas.width - this.labelMargin.value[0]) + this.labelMargin.value[0],
-				-(_coord.value[1] - this.position.value[1] * (!_absolute)) / this.size.value[1] * (canvas.height - this.labelMargin.value[1]) + this.labelMargin.value[1],
+				(_coord.value[0] - this.position.value[0] * (!_absolute)) / this.size.value[0] * (canvas.width - this.labelMargin.value[0] - this.#graphTopRightMargin.value[0]) + this.labelMargin.value[0],
+				-(_coord.value[1] - this.position.value[1] * (!_absolute)) / this.size.value[1] * (canvas.height - this.labelMargin.value[1] - this.#graphTopRightMargin.value[1]) + this.#graphTopRightMargin.value[1],
 			);
 		}
 		
 		pxToWorldCoord(_coord, _absolute = false) {
 			return new Vector(
-				(_coord.value[0] - this.labelMargin.value[0]) / (canvas.width - this.labelMargin.value[0]) * this.size.value[0] + this.position.value[0] * (!_absolute),
-				-(_coord.value[1] - this.labelMargin.value[1]) / (canvas.height - this.labelMargin.value[1]) * this.size.value[1] - this.position.value[1] * (!_absolute)
+				(_coord.value[0] - this.labelMargin.value[0]) / (canvas.width - this.labelMargin.value[0] - this.#graphTopRightMargin.value[0]) * this.size.value[0] + this.position.value[0] * (!_absolute),
+				-(_coord.value[1] - this.#graphTopRightMargin.value[1]) / (canvas.height - this.labelMargin.value[1] - this.#graphTopRightMargin.value[1]) * this.size.value[1] - this.position.value[1] * (!_absolute)
 			);
 		}
 
@@ -401,18 +408,6 @@
 		}	
 	}
 	
-
-
-
-
-
-	function eventToCanvasCoord(_e) {
-		return new Vector(
-			_e.offsetX / canvas.offsetWidth * canvas.width,
-			_e.offsetY / canvas.offsetHeight * canvas.height,
-		);
-	}
-
 
 	window.addEventListener('resize', () => onResize())
 	function onResize() {
@@ -427,7 +422,19 @@
 </script>
 
 <div class={'GraphHolder ' + customClass || ''}>
-	<div class='titleHolder'>{title}</div>
+	<div class='headerHolder'>
+		<div class='titleHolder'>{title}</div>
+		<div class='legendHolder'>
+			{#each data as line}
+				{#if line.name}
+					<div class='legendItem'>
+						<div class="colorIndicator" style={`background: ${line.color.hex}`}></div>
+						{line.name}
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</div>
 	<canvas bind:this={canvas} width="1000" height="300"></canvas>
 </div>
 
@@ -440,15 +447,51 @@
 		height: 100%;
 		border: 1px solid #eee;
 		box-shadow: 5px 5px 20px 20px rgba(0, 0, 0, .01);
+		display: flex;
+		flex-direction: column;
 	}
-	.titleHolder {
-		position: absolute;
-		left: 0;
-		top: 0;
-		margin-left: 20px;
-		margin-top: 10px;
+
+	.headerHolder {
+		position: relative;
+		width: 100%;
+		height: 25px;
+		padding: 5px 20px;
+		display: flex;
+		flex-direction: row;
 		pointer-events: none;
 	}
+		.titleHolder {
+			position: relative;
+			left: 0;
+			top: 0;
+			line-height: 25px;
+			color: #555;
+		}
+
+		.legendHolder {
+			position: relative;
+			margin-left: auto;
+			
+			display: flex;
+			flex-direction: row;
+		}
+		.legendItem {
+			height: 25px;
+			line-height: 25px;
+			display: flex;
+			flex-direction: row;
+			font-size: 12px;
+		}
+		.legendItem .colorIndicator {
+			position: relative;
+			background-color: #f00;
+			width: 8px;
+			aspect-ratio: 1;
+			border-radius: 100%;
+			margin: calc((25px - 8px)/2);
+		}
+	
+
 	canvas {
 		position: relative;
 		width: 100%;
