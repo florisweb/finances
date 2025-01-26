@@ -140,7 +140,7 @@ export class TransactionTag {
 		return -transactions.map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 	}
 	
-	getAverageExpensesInLastXMonths(_months = 12) {
+	getAverageExpensesInLastXMonths(_months = 12, _onlyCountMonthsWithExpenses = true) {
 		let firstDate = this.firstTransactionDate;
 		if (!firstDate) return 0;
 		let firstMonthId = new MonthIdentifier().setFromDate(firstDate);
@@ -158,7 +158,9 @@ export class TransactionTag {
 			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(1));
 			addedMonths++;
 		}
-		return sum / addedMonths;
+
+		if (_onlyCountMonthsWithExpenses) return sum / addedMonths;
+		return sum / _months;
 	}
 
 	get averageExpensesLast12Months() {

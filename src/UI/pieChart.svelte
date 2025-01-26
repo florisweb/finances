@@ -1,8 +1,8 @@
 <script>	
-    import { text } from 'svelte/internal';
 	import Vector from '../vector';
 
 	export let title = '';
+	export let subTitle = false;
 	export let data = [{data: []}];
 	export let customClass = '';
 	export let config = {};
@@ -288,7 +288,12 @@
 </script>
 
 <div class={'GraphHolder ' + customClass || ''}>
-	<div class='titleHolder'>{title}</div>
+	<div class="headerHolder">
+		<div class='titleHolder'>{title}</div>
+		{#if subTitle !== false}
+			<div class='subTitleHolder'>{subTitle}</div>
+		{/if}
+	</div>
 	<canvas bind:this={canvas} width="1000" height="300"></canvas>
 </div>
 
@@ -301,18 +306,31 @@
 		height: auto;
 	}
 
-	.titleHolder {
+	.headerHolder {
 		position: absolute;
 		width: 100%;
+		height: 40px;
 		left: 0;
 		top: 0;
+		
 		pointer-events: none;
 		text-align: center;
-		font-size: 18px;
+
 		z-index: 100;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+	}
+	.titleHolder {
+		font-size: 18px;
+	}
+	.subTitleHolder {
+		color: #aaa;
+		font-size: 11px;
 	}
 	canvas {
 		position: relative;
+		padding-top: 20px;
 		width: 100%;
 		height: auto;
 	}

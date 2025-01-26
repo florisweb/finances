@@ -107,7 +107,7 @@
 		expensesData = [];
 		for (let tag of tags)
 		{
-			let expenses = tag.getAverageExpensesInLastXMonths(12);
+			let expenses = tag.getAverageExpensesInLastXMonths(12, false);
 			if (expenses > 0)
 			{
 				averageExpenses += expenses;
@@ -165,16 +165,19 @@
 		<div class='section distribution'>
 			<PieChart 
 				title={'Expenses ' + formatMoneyString(averageExpenses, true, true)} 
+				subTitle={'12 month average'} 
 				data={expensesData}
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
 				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
+				subTitle={'12 month average'} 
 				data={incomeData}
 				customClass='distributionGraph'
 			></PieChart>
 			<PieChart 
 				title={'Reserved Money ' + formatMoneyString(reservedMoney, true, true)}
+				subTitle={''} 
 				data={balanceDistributionData}
 				customClass='distributionGraph'
 			></PieChart>
