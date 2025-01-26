@@ -481,6 +481,7 @@
 			display: flex;
 			flex-direction: row;
 			font-size: 12px;
+			color: #555;
 		}
 		.legendItem .colorIndicator {
 			position: relative;
@@ -489,6 +490,8 @@
 			aspect-ratio: 1;
 			border-radius: 100%;
 			margin: calc((25px - 8px)/2);
+			margin-right: 5px;
+			margin-left: 10px;
 		}
 	
 
