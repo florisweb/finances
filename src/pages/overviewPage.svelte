@@ -27,7 +27,9 @@
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
 
 	let curBalance = 0;
-	$: if (accounts) curBalance = AccountManager.getBalanceAtEndOfMonth(curMonth);
+	$: (async () => {
+		if (accounts) curBalance = await AccountManager.getBalanceAtEndOfMonth(curMonth);
+	})();
 
 	let nonAssignedTransactions = [];
 	TransactionManager.dataStore.subscribe(() => {nonAssignedTransactions = new NonAssignedTag().transactions});

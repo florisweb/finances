@@ -10,8 +10,15 @@ const AccountManager = new class extends DataManager {
 		window.AccountManager = this;
 	}
 
-	getBalanceAtEndOfMonth(_monthId) {
-		return this._data.map((_account) => _account.getBalanceAtEndOfMonth(_monthId)).reduce((a, b) => a + b, 0);
+	async getBalanceAtEndOfMonth(_monthId) {
+		let balanceSum = 0;
+		let promises = [];
+		for (let account of this._data)
+		{
+			promises.push(account.getBalanceAtEndOfMonth(_monthId).then((value) => balanceSum += value));
+		}
+		await Promise.all(promises);
+		return balanceSum;
 	}
 
 	getByIBAN(_IBAN) {

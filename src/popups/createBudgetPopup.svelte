@@ -94,7 +94,6 @@
 			for (let i = 0; i < monthCount; i++)
 			{
 				averageExpensesDuringBudget += _tag.getExpensesByMonth(curMonth);
-				console.log(_tag.name, monthCount, curMonth.id);
 				curMonth.setFromDate(curMonth.date.moveMonth(1));
 			}
 			if (monthCount !== 0) averageExpensesDuringBudget /= monthCount;

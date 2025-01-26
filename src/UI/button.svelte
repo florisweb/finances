@@ -14,7 +14,6 @@
 	onMount(() => {
 		button.style = style;
 	});
-	console.log(icon);
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

@@ -10,7 +10,8 @@
 
     import Color from "../color";
     import AccountManager from "../data/accountManager";
-    import { FundTransaction, Transaction } from "../types";
+    import { FundTransaction, MonthIdentifier, Transaction } from "../types";
+    import Vector from "../vector";
 
 	const App = getContext('App');
 	let curAccount;
@@ -19,17 +20,56 @@
 			curAccount = _account;
 			openPageByIndex(5);
 			isFundAccount = curAccount.isFundAccount;
-			console.log('is', isFundAccount);
 		}
 	};
 
+	let curAccountBalance = 0;
+	$: {
+		(async () => {
+			curAccountBalance = await curAccount?.getBalance()
+		})();
+	}
+
 
 	let graphData = [];
+	let prevAccount;
 	$: {
-		graphData = [{
-			color: new Color('#0f0'),
-			data: curAccount?.generateGraphData(11) || []
-		}];
+		if (prevAccount !== curAccount) // Prevent loops due to reactivity of async
+		{
+			prevAccount = curAccount;
+
+			const monthRange = 11;
+			graphData = [{
+				color: new Color('#0f0'),
+				data: curAccount?.generateGraphData(monthRange) || []
+			}];
+			if (isFundAccount)
+			{
+				(async () => {
+					let funds = await curAccount?.getFunds();
+					for (let fundName in funds)
+					{
+						let fund = funds[fundName];
+						let data = [];
+						for (let delta = -monthRange; delta <= 0; delta++)
+						{
+							let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(delta));
+							
+							data.push(new Vector(
+								curMonth.date.getTime(),
+								await fund.getValueAtEndOfMonth(curMonth)
+							));
+						}
+
+						graphData.push({
+							color: new Color('#daf'),
+							data: data
+						});
+					}
+					graphData = graphData;
+				})();
+			}
+		}
 	}
 
 	
@@ -51,7 +91,7 @@
 
 <Page>
 	<div class='infoHolder'>
-		<div class='balanceHolder'>{formatMoneyString(curAccount?.balance ?? 0, true, true)}</div>
+		<div class='balanceHolder'>{formatMoneyString(curAccountBalance ?? 0, true, true)}</div>
 		
 		<div class='titleHolder'>
 			<div>{curAccount?.name || 'Unnamed'}</div>
@@ -85,7 +125,6 @@
 		<Graph title='Balance' data={graphData}></Graph>
 
 
-		
 
 
 		{#if isFundAccount}
@@ -100,7 +139,7 @@
 							Inv: {formatMoneyString(-funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value+funds[fund].investment)}
 						</div>
 						<div class='lastUpdatedText'>
-							Last updated: {funds[fund].lastUpdateTime}
+							Stock price of: {funds[fund].lastUpdateTime}
 						</div>
 					</div>
 				{/each}

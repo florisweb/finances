@@ -162,7 +162,6 @@
 			Math.min(Math.floor(canvasSize.value[0] / minBarWidth), data.length),
 			Math.min(yDomain.value[1] - yDomain.value[0], maxheight)
 		];
-		console.log('size',canvasSize.value[0] / minBarWidth, minBarWidth*data.length);
 		
 		Camera.position.value = [
 			xDomain.value[1] - Camera.size.value[0],

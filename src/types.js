@@ -509,6 +509,7 @@ export class TagFilter {
 export class BankAccount {
 	IBAN = '';
 	name = '';
+	
 	get id() {return this.IBAN}
 
 	get isFundAccount() {
@@ -525,17 +526,18 @@ export class BankAccount {
 	get transactions() {
 		return TransactionManager.getByAccount(this);
 	}
-	get balance() {
+	
+	async getBalance() {
 		let transactions = this.transactions;
 		transactions.sort((a, b) => a.date < b.date);
 		if (transactions.length === 0) return 0;
 		let lastTrans = transactions[0];
 		let value = lastTrans.balance + lastTrans.deltaMoney;
 		if (!this.isFundAccount) return value;
-		return value + this.getFundValue();
+		return value + await this.getFundValue();
 	}
 
-	getBalanceAtEndOfMonth(_monthId) {
+	async getBalanceAtEndOfMonth(_monthId) {
 		let transactions = this.transactions;
 		if (!transactions.length) return 0;
 		let lastTransactionInMonth = transactions[transactions.length - 1];
@@ -548,7 +550,7 @@ export class BankAccount {
 
 		let value = lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
 		if (!this.isFundAccount) return value;
-		return value + this.getFundValueAtEndOfMonth(_monthId);
+		return value + await this.getFundValueAtEndOfMonth(_monthId);
 	}
 
 	generateGraphData(_range = 11) {
@@ -596,30 +598,28 @@ export class BankAccount {
 	getFunds() {
 		return this.getFundsAtEndOfMonth(new MonthIdentifier());
 	}
-	getFundValue() {
-		return this.getFundValueAtEndOfMonth(new MonthIdentifier());
+	async getFundValue() {
+		return await this.getFundValueAtEndOfMonth(new MonthIdentifier());
 	}
 
 	async getFundsAtEndOfMonth(_monthId) {
-		let funds = {};
+		let fundNames = [];
 		let transactions = this.transactions;
 		for (let trans of transactions)
 		{
 			if (!(trans instanceof FundTransaction)) continue;
 			if (trans.date.getTime() > _monthId.date.copy().moveMonth(1).getTime()) continue; // End of month, monthId gives date at beginning of month
-			if (!funds[trans.fund]) funds[trans.fund] = [];
-			funds[trans.fund].push(trans);
+			if (!fundNames.includes(trans.fund)) fundNames.push(trans.fund);
 		}
 		
-		let outFunds = {};
-		for (let fund in funds) outFunds[fund] = new Fund(this, fund, funds[fund]);
-
-		await Promise.all(Object.keys(outFunds).map(r => outFunds[r].lastUpdateTime));
-
-		return outFunds;
+		let funds = {};
+		for (let fund of fundNames) funds[fund] = new Fund(this, fund);
+		await Promise.all(Object.keys(funds).map(r => funds[r].lastUpdateTime));
+		return funds;
 	}
-	getFundValueAtEndOfMonth(_monthId) {
-		let funds = this.getFundsAtEndOfMonth(_monthId);
+
+	async getFundValueAtEndOfMonth(_monthId) {
+		let funds = await this.getFundsAtEndOfMonth(_monthId);
 		return Object.keys(funds).map(r => funds[r].value).reduce((a, b) => a + b, 0);
 	}
 }
@@ -627,38 +627,102 @@ export class BankAccount {
 class Fund {
 	account;
 	name;
-	transactions;
 	value;
 	lastUpdateTime = null;
-	sharePrice = {
-		lastBought: null,
-		history: [],
-		mostRecent: null,
-	}
+	priceHistory = [];
 
-	constructor(_account, _name, _transactions) {
+	constructor(_account, _name) {
 		this.account = _account;
 		this.name = _name;
-		this.transactions = _transactions;
 
-		let lastTransaction = _transactions.sort((a, b) => a.date < b.date)[0];
-		let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
-
-		this.shares = _transactions.map(r => r.shares).reduce((a, b) => a + b, 0);
-		this.investment = _transactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
-		this.value = this.shares * curSharePrice;
-
-		this.sharePrice.lastBought = curSharePrice;
 		this.lastUpdateTime = StockManager.fetchStockHistory(this.name).then((_results) => {
 			if (_results.error) return;
-			this.sharePrice.history = _results;
-			this.sharePrice.mostRecent = _results[0]?.stockPrice;
-			this.value = this.sharePrice.mostRecent * this.shares;
+			this.priceHistory = _results;
 			this.lastUpdateTime = _results[0]?.time;
 		});
+		this.value = this.getValueAtEndOfMonth().then((result) => this.value = result);
+	}
+	
+
+	get transactions() {
+		let transactions = this.account.transactions;
+		return transactions.filter(trans => trans instanceof FundTransaction && trans.fund === this.name);
+	}
+	get shares() {
+		return this.getSharesAtEndOfMonth(new MonthIdentifier());
+	}
+	get investment() {
+		return this.getInvestmentAtEndOfMonth(new MonthIdentifier());
+	}
+	
+
+	getTransactionsAtEndOfMonth(_monthId = new MonthIdentifier()) { // Transactions before end of month
+		return this.transactions.filter(trans => trans.date.getTime() <= _monthId.date.copy().moveMonth(1).getTime());
+	}
+	getSharesAtEndOfMonth(_monthId) {
+		return this.getTransactionsAtEndOfMonth(_monthId).map(r => r.shares).reduce((a, b) => a + b, 0);
+	}
+	getInvestmentAtEndOfMonth(_monthId) {
+		return this.getTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+	}
+
+	async getValueAtEndOfMonth(_monthId = new MonthIdentifier()) {
+		let shares = this.getSharesAtEndOfMonth(_monthId);
+		return shares * (await this.getSharePriceAtEndOfMonth(_monthId));
+	}
+
+	async getSharePriceAtEndOfMonth(_monthId) {
+		if (!(this.lastUpdateTime instanceof Date)) await this.lastUpdateTime;
+		let preDate = _monthId.date.copy().moveMonth(1);
+		let sortables = this.priceHistory.map((r, i) => {return {dt: Math.abs(r.time - preDate), index: i}});
+		sortables.sort((a, b) => a.dt > b.dt);
+		let closestIndex = sortables[0]?.index;
+		return this.priceHistory[closestIndex].stockPrice;
 	}
 }
 
+// class Fund {
+// 	account;
+// 	name;
+// 	transactions;
+// 	value;
+// 	evaluationTime;
+// 	lastUpdateTime = null;
+// 	sharePrice = {
+// 		lastBought: null,
+// 		history: [],
+// 		mostRecent: null,
+// 	}
+	
+
+// 	constructor(_account, _name, _transactions, _time = new Date()) {
+// 		this.account = _account;
+// 		this.name = _name;
+// 		this.transactions = _transactions;
+// 		this.evaluationTime = _time;
+
+// 		let lastTransaction = _transactions.sort((a, b) => a.date < b.date)[0];
+// 		let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
+
+// 		this.shares = _transactions.map(r => r.shares).reduce((a, b) => a + b, 0);
+// 		this.investment = _transactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+// 		this.value = this.shares * curSharePrice;
+
+// 		this.sharePrice.lastBought = curSharePrice;
+// 		this.lastUpdateTime = StockManager.fetchStockHistory(this.name).then((_results) => {
+// 			if (_results.error) return;
+// 			this.sharePrice.history = _results;
+
+// 			let sortables = _results.map((r, i) => {return {dt: Math.abs(r.time - _time), index: i}});
+// 			sortables.sort((a, b) => a.dt > b.dt);
+// 			let closestIndex = sortables[0]?.index;
+
+// 			this.sharePrice.mostRecent = _results[closestIndex]?.stockPrice;
+// 			this.value = this.sharePrice.mostRecent * this.shares;
+// 			this.lastUpdateTime = _results[closestIndex]?.time;
+// 		});
+// 	}
+// }
 
 
 
