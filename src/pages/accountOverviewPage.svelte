@@ -24,55 +24,48 @@
 	};
 
 	let curAccountBalance = 0;
-	$: {
-		(async () => {
-			curAccountBalance = await curAccount?.getBalance()
-		})();
-	}
+	$: (async () => {
+		curAccountBalance = await curAccount?.getBalance()
+	})();
 
 	let graphData = [];
 	let prevAccount;
-	$: {
-		if (prevAccount !== curAccount) // Prevent loops due to reactivity of async
+	$: (async () => {
+		if (prevAccount === curAccount) return; // Prevent loops due to reactivity of async
+		prevAccount = curAccount;
+		const firstDate = curAccount?.transactions[0]?.date || new Date();
+		const monthRange = Math.ceil((new Date() - firstDate) / 1000 / 60 / 60 / 24 / 30); // Approx. 30 days per month
+
+		graphData = [{
+			color: new Color('#0f0'),
+			name: 'Total',
+			data: await curAccount?.generateGraphData(monthRange) || []
+		}];
+
+		if (!isFundAccount) return;
+		let funds = await curAccount?.getFunds();
+		for (let fundName in funds)
 		{
-			prevAccount = curAccount;
-			(async () => {
-				const monthRange = 11;
-				graphData = [{
-					color: new Color('#0f0'),
-					name: 'Total',
-					data: await curAccount?.generateGraphData(monthRange) || []
-				}];
+			let fund = funds[fundName];
+			let data = [];
+			for (let delta = -monthRange - 1; delta < 0; delta++)
+			{
+				let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(delta));
+				
+				data.push(new Vector(
+					curMonth.date.copy().moveMonth(1).getTime(),
+					await fund.getValueAtEndOfMonth(curMonth)
+				));
+			}
 
-				if (isFundAccount)
-				{
-					let funds = await curAccount?.getFunds();
-					for (let fundName in funds)
-					{
-						let fund = funds[fundName];
-						let data = [];
-						for (let delta = -monthRange - 1; delta < 0; delta++)
-						{
-							let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(delta));
-							
-							data.push(new Vector(
-								curMonth.date.copy().moveMonth(1).getTime(),
-								await fund.getValueAtEndOfMonth(curMonth)
-							));
-						}
-
-						graphData.push({
-							// color: new Color('#daf'),
-							color: stringToColor(fund.name),
-							name: fund.name,
-							data: data
-						});
-					}
-					graphData = graphData;
-				}
-			})();
+			graphData.push({
+				color: stringToColor(fund.name),
+				name: fund.name,
+				data: data
+			});
 		}
-	}
+		graphData = graphData;
+	})();
 
 	
 	let isFundAccount = false;
@@ -136,7 +129,7 @@
 	</div>
 
 	<div class='dataHolder'>
-		<Graph title='Balance' data={graphData}></Graph>
+		<Graph title='Balance' data={graphData} maxWidth={365 * 24 * 60 * 60 * 1000}></Graph>
 
 
 		{#if isFundAccount}
