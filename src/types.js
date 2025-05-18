@@ -613,7 +613,13 @@ export class BankAccount {
 
 	async getFundValueAtEndOfMonth(_monthId) {
 		let funds = await this.getFundsAtEndOfMonth(_monthId);
-		return Object.keys(funds).map(r => funds[r].value).reduce((a, b) => a + b, 0);
+		let sum = 0;
+		let promises = [];
+		for (let fundName in funds) {
+			promises.push(funds[fundName].getValueAtEndOfMonth(_monthId).then(a => sum += a));
+		}
+		await Promise.all(promises);
+		return sum
 	}
 }
 
