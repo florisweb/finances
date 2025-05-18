@@ -15,6 +15,7 @@ export default class Color {
   #setColorValue(_str) {
     if (!_str || typeof _str !== "string") return this.#InvalidStr_responseValue;
     if (_str.substr(0, 1) == "#") return this.#hexToValue(_str)
+    if (_str.substr(0, 3) == "hsl") return this.#HSLToValue(_str)
    
     let prefix = _str.split("rgba(");
   
@@ -43,7 +44,16 @@ export default class Color {
       1
     ] : this.#InvalidStr_responseValue;
   }
+  #HSLToValue(_string) { // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+    let parts = _string.split(',');
+    let h = parseFloat(parts[0].split('hsl(')[1]);
+    let s = parseFloat(parts[1]) / 100;
+    let v = parseFloat(parts[2]) / 100;
 
+    // input: h in [0,360] and s,v in [0,1] - output: r,g,b in [0,1]
+    let f = (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);     
+    return [f(5)*255,f(3)*255,f(1)*255];
+  }
 
 
   get RGB() {

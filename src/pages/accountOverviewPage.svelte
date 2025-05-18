@@ -30,7 +30,6 @@
 		})();
 	}
 
-
 	let graphData = [];
 	let prevAccount;
 	$: {
@@ -63,7 +62,8 @@
 						}
 
 						graphData.push({
-							color: new Color('#daf'),
+							// color: new Color('#daf'),
+							color: stringToColor(fund.name),
 							name: fund.name,
 							data: data
 						});
@@ -89,6 +89,18 @@
 			funds = await curAccount.getFunds();
 		})();
 	}
+
+
+
+	function stringToColor(_string) {
+		let hash = 0;
+		for (let i = 0; i < _string.length; i++) {
+			hash = _string.charCodeAt(i) + ((hash << 4) - hash);
+		}
+		let col = new Color(`hsl(${hash % 360}, 40, 100)`);
+		return col;
+	}
+
 </script>
 
 <Page>
@@ -127,14 +139,12 @@
 		<Graph title='Balance' data={graphData}></Graph>
 
 
-
-
 		{#if isFundAccount}
 			<br style='margin-top: 50px'>
 
 			<div class="fundOverviewHolder">
 				{#each Object.keys(funds) as fund}
-					<div class='fundPanel'>
+					<div class='fundPanel' style={`background: ` + stringToColor(fund).hex}>
 						<div class="title">{fund}</div>
 						<div class="subInformation">
 							Shares: {Math.round(funds[fund].shares * 100) / 100} - Value: {formatMoneyString(funds[fund].value)} <br>
@@ -263,7 +273,7 @@
 		position: relative;
 		padding: 30px;
 		padding-top: 20px;
-		margin-right: 30px;
+		margin-right: 20px;
 
 		width: 30vw;
 		max-width: 300px;
