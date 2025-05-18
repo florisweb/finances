@@ -118,7 +118,8 @@
 
 <Page title="Data Management">
 	<div class='message'>
-		Download your transactions as .csv on your banks' website and upload them here. <br>Alternatively, upload a previously downloaded .finance-file.
+		Download your transactions as .csv on your bank's website and upload them here. <br>Alternatively, upload a previously downloaded .finance-file.
+		Your financial information is only stored on your device, and thus never leaves your device.
 	</div>
 
 	<input type='file' class='CSVInputField' accept='text/csv, text/finance' on:input={handleUpload}>

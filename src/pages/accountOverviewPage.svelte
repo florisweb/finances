@@ -38,7 +38,6 @@
 		{
 			prevAccount = curAccount;
 			(async () => {
-					
 				const monthRange = 11;
 				graphData = [{
 					color: new Color('#0f0'),

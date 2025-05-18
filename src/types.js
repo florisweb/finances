@@ -67,7 +67,7 @@ export class Transaction {
 
 export class FundTransaction extends Transaction {
 	static isFundTransaction(_transaction) {
-		return _transaction.description.includes('Voor u gekocht via Euronext Fund Services');
+		return _transaction.description.includes('kocht via Euronext Fund Services');
 	}
 
 	fund;
@@ -78,7 +78,7 @@ export class FundTransaction extends Transaction {
 		super(...arguments);
 		this.fund = this.description.split('Participaties ')[1].split(' a EUR')[0];
 		this.sharePriceAtTimeOfTransaction = parseFloat(this.description.split(' a EUR ')[1].split('. Valutadatum')[0].split(' ').join('.'));
-		this.shares = Math.abs(this.deltaMoney / this.sharePriceAtTimeOfTransaction);
+		this.shares = -this.deltaMoney / this.sharePriceAtTimeOfTransaction;
 	}
 }
 
@@ -673,50 +673,6 @@ class Fund {
 		return this.priceHistory[closestIndex].stockPrice;
 	}
 }
-
-// class Fund {
-// 	account;
-// 	name;
-// 	transactions;
-// 	value;
-// 	evaluationTime;
-// 	lastUpdateTime = null;
-// 	sharePrice = {
-// 		lastBought: null,
-// 		history: [],
-// 		mostRecent: null,
-// 	}
-	
-
-// 	constructor(_account, _name, _transactions, _time = new Date()) {
-// 		this.account = _account;
-// 		this.name = _name;
-// 		this.transactions = _transactions;
-// 		this.evaluationTime = _time;
-
-// 		let lastTransaction = _transactions.sort((a, b) => a.date < b.date)[0];
-// 		let curSharePrice = lastTransaction?.sharePriceAtTimeOfTransaction || 0;
-
-// 		this.shares = _transactions.map(r => r.shares).reduce((a, b) => a + b, 0);
-// 		this.investment = _transactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
-// 		this.value = this.shares * curSharePrice;
-
-// 		this.sharePrice.lastBought = curSharePrice;
-// 		this.lastUpdateTime = StockManager.fetchStockHistory(this.name).then((_results) => {
-// 			if (_results.error) return;
-// 			this.sharePrice.history = _results;
-
-// 			let sortables = _results.map((r, i) => {return {dt: Math.abs(r.time - _time), index: i}});
-// 			sortables.sort((a, b) => a.dt > b.dt);
-// 			let closestIndex = sortables[0]?.index;
-
-// 			this.sharePrice.mostRecent = _results[closestIndex]?.stockPrice;
-// 			this.value = this.sharePrice.mostRecent * this.shares;
-// 			this.lastUpdateTime = _results[closestIndex]?.time;
-// 		});
-// 	}
-// }
-
 
 
 
