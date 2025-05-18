@@ -47,6 +47,18 @@ const AccountManager = new class extends DataManager {
 			this.add(new BankAccount({IBAN: IBAN}));
 		}
 	}
+
+
+	async getFunds() { 
+		let funds = [];
+		for (let account of this._data) 
+		{
+			if (!account.isFundAccount) continue;
+			let fundsInAccount = await account.getFunds();
+			for (let fundName in fundsInAccount) funds.push(fundsInAccount[fundName])
+		}
+		return funds;
+	}
 }
 
 export default AccountManager;

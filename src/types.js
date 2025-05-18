@@ -526,18 +526,21 @@ export class BankAccount {
 	get transactions() {
 		return TransactionManager.getByAccount(this);
 	}
-	
-	async getBalance() {
+
+	getCashValue() {
 		let transactions = this.transactions;
 		transactions.sort((a, b) => a.date < b.date);
 		if (transactions.length === 0) return 0;
 		let lastTrans = transactions[0];
-		let value = lastTrans.balance + lastTrans.deltaMoney;
-		if (!this.isFundAccount) return value;
-		return value + await this.getFundValue();
+		return lastTrans.balance + lastTrans.deltaMoney;
+	}
+	
+	async getBalance() {
+		if (!this.isFundAccount) return this.getCashValue();
+		return this.getCashValue() + await this.getFundValue();
 	}
 
-	async getBalanceAtEndOfMonth(_monthId) {
+	getCashValueAtEndOfMonth(_monthId) {
 		let transactions = this.transactions;
 		if (!transactions.length) return 0;
 		let lastTransactionInMonth = transactions[transactions.length - 1];
@@ -548,9 +551,12 @@ export class BankAccount {
 			break;
 		}
 
-		let value = lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
-		if (!this.isFundAccount) return value;
-		return value + await this.getFundValueAtEndOfMonth(_monthId);
+		return lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+	}
+
+	async getBalanceAtEndOfMonth(_monthId) {
+		if (!this.isFundAccount) return this.getCashValueAtEndOfMonth(_monthId);
+		return this.getCashValueAtEndOfMonth(_monthId) + await this.getFundValueAtEndOfMonth(_monthId);
 	}
 
 	async generateGraphData(_range = 11) {
