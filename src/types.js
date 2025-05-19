@@ -721,8 +721,18 @@ export class MonthIdentifier {
 
 	containsDate(_date) {
 		let date = new Date().setDateFromStr(typeof _date === 'string' ? _date : _date.toString());
+		date.setHours(0);
+		date.setMinutes(0);
+
 		let ownDate = this.date;
-		return date.dateIsBetween(ownDate, ownDate.copy().moveMonth(1));
+		ownDate.setHours(0);
+		ownDate.setMinutes(0);
+		
+		let endDate = this.date.copy().moveMonth(1);
+		endDate.setHours(0);
+		endDate.setMinutes(0);
+
+		return ownDate.getTime() <= date.getTime() && endDate.getTime() >= date.getTime();
 	}
 
 

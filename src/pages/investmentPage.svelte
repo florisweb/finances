@@ -21,7 +21,7 @@
 	});
 
 	let graphData = [];
-	$: if (isOpen && !graphData.length) generateGraphData();
+	$: if (isOpen) generateGraphData();
 
 
 
@@ -50,7 +50,6 @@
 			let time = curMonth.date.copy().moveMonth(1).getTime();
 			cashData.push(new Vector(time, curCash || 0))
 			let totalMoney = curCash;
-
 			for (let i = 0; i < funds.length; i++)
 			{
 				if (!fundData[i]) fundData[i] = [];
