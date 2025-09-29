@@ -550,17 +550,12 @@ export class BankAccount {
 	}
 
 	getCashValueAtEndOfMonth(_monthId) {
-		let transactions = this.transactions;
-		if (!transactions.length) return 0;
-		let lastTransactionInMonth = transactions[transactions.length - 1];
-		for (let i = transactions.length - 1; i >= 0; i--)
-		{
-			if (!_monthId.containsDate(transactions[i].date)) continue;
-			lastTransactionInMonth = transactions[i];
-			break;
-		}
-
-		return lastTransactionInMonth.balance + lastTransactionInMonth.deltaMoney;
+		let transactions = this.transactions;		
+		let endDate = _monthId.date.copy().moveMonth(1);
+		let transactionsBeforeEndOfMonth = transactions.filter(t => t.date.getTime() < endDate.getTime());
+		if (!transactionsBeforeEndOfMonth.length) return 0;
+		let lastTrans = transactionsBeforeEndOfMonth[transactionsBeforeEndOfMonth.length - 1];
+		return lastTrans.balance + lastTrans.deltaMoney;
 	}
 
 	async getBalanceAtEndOfMonth(_monthId) {
