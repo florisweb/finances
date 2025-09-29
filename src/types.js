@@ -131,6 +131,7 @@ export class TransactionTag {
 	}
 
 
+
 	get transactions() {
 		return TransactionManager.getByTag(this.id);
 	}
@@ -143,6 +144,9 @@ export class TransactionTag {
 
 	getTransactionsByMonth(_monthId) {
 		return TransactionManager.getByMonthAndTag(_monthId, this.id);
+	}
+	getTransactionsByYear(_monthId) {
+		return TransactionManager.getByYearAndTag(_monthId, this.id);
 	}
 
 	getExpensesByMonth(_monthId) {

@@ -68,9 +68,21 @@ const TransactionManager = new class extends DataManager {
 	getByMonth(_monthId) {
 		return this.#transactionsPerMonth[_monthId.id] || [];
 	}
+	getByYear(_year) {
+		let transactions = [];
+		for (let m = 0; m < 12; m++)
+		{
+			let monthId = (m + 1) + '/' + _year; 
+			transactions = transactions.concat(this.#transactionsPerMonth[monthId] || [])
+		}
+		return transactions;
+	}
 
 	getByMonthAndTag(_monthId, _tagId) {
 		return this.getByTag(_tagId, this.getByMonth(_monthId));
+	}
+	getByYearAndTag(_year, _tagId) {
+		return this.getByTag(_tagId, this.getByYear(_year));
 	}
 	getByMonthAndAccount(_monthId, _account) {
 		return this.getByAccount(_account, this.getByMonth(_monthId));
