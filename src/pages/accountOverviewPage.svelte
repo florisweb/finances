@@ -141,7 +141,7 @@
 						<div class="title">{fund}</div>
 						<div class="subInformation">
 							Shares: {Math.round(funds[fund].shares * 100) / 100} - Value: {formatMoneyString(funds[fund].value)} <br>
-							Inv: {formatMoneyString(-funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value+funds[fund].investment)}
+							Inv: {formatMoneyString(funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value-funds[fund].investment)}
 						</div>
 						<div class='lastUpdatedText'>
 							Stock price of: {funds[fund].lastUpdateTime}

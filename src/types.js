@@ -67,7 +67,7 @@ export class Transaction {
 
 export class FundTransaction extends Transaction {
 	static isFundTransaction(_transaction) {
-		return _transaction.description.includes('kocht via Euronext Fund Services');
+		return _transaction.description.includes('kocht via Euronext Fund Services'); 
 	}
 
 	fund;
@@ -79,6 +79,15 @@ export class FundTransaction extends Transaction {
 		this.fund = this.description.split('Participaties ')[1].split(' a EUR')[0];
 		this.sharePriceAtTimeOfTransaction = parseFloat(this.description.split(' a EUR ')[1].split('. Valutadatum')[0].split(' ').join('.'));
 		this.shares = -this.deltaMoney / this.sharePriceAtTimeOfTransaction;
+	}
+}
+export class FundDividendTransaction extends Transaction {
+	static isFundDividend(_transaction) {
+		return _transaction.description.includes('Uitkering cash dividend'); 
+	}
+	constructor() {
+		super(...arguments);
+		this.fund = this.description.split("'Uitkering cash dividend ")[1].split(' van EUR')[0];
 	}
 }
 
@@ -653,6 +662,11 @@ class Fund {
 		let transactions = this.account.transactions;
 		return transactions.filter(trans => trans instanceof FundTransaction && trans.fund === this.name);
 	}
+	get dividendTransactions() {
+		let transactions = this.account.transactions;
+		return transactions.filter(trans => trans instanceof FundDividendTransaction && trans.fund === this.name);
+	}
+
 	get shares() {
 		return this.getSharesAtEndOfMonth(new MonthIdentifier());
 	}
@@ -664,11 +678,16 @@ class Fund {
 	getTransactionsAtEndOfMonth(_monthId = new MonthIdentifier()) { // Transactions before end of month
 		return this.transactions.filter(trans => trans.date.getTime() <= _monthId.date.copy().moveMonth(1).getTime());
 	}
+	getDividendTransactionsAtEndOfMonth(_monthId = new MonthIdentifier()) { // Transactions before end of month
+		return this.dividendTransactions.filter(trans => trans.date.getTime() <= _monthId.date.copy().moveMonth(1).getTime());
+	}
 	getSharesAtEndOfMonth(_monthId) {
 		return this.getTransactionsAtEndOfMonth(_monthId).map(r => r.shares).reduce((a, b) => a + b, 0);
 	}
 	getInvestmentAtEndOfMonth(_monthId) {
-		return this.getTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		let boughtShareWorth = -this.getTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		let dividendsWorth = this.getDividendTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		return boughtShareWorth - dividendsWorth;
 	}
 
 	async getValueAtEndOfMonth(_monthId = new MonthIdentifier()) {

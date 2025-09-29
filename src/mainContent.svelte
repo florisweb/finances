@@ -6,7 +6,7 @@
 	import TagPage from './pages/tagPage.svelte';
     import OverviewPage from "./pages/overviewPage.svelte";
 	import AccountOverviewPage from "./pages/accountOverviewPage.svelte";
-	import InvestmentPage from "./pages/investmentPage.svelte";
+	import PortFolioPage from "./pages/portfolioPage.svelte";
 </script>
 
 <div id='mainContent'>
@@ -17,7 +17,7 @@
 	<OverviewPage></OverviewPage>
 	<AccountOverviewPage></AccountOverviewPage>
 	<TagPage></TagPage>
-	<InvestmentPage></InvestmentPage>
+	<PortFolioPage></PortFolioPage>
 </div>
 <style>
 	#mainContent {

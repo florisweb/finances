@@ -96,7 +96,7 @@
 	<div class='infoHolder'>
 		<div class='balanceHolder'>{formatMoneyString(totalValue ?? 0, true, true)}</div>
 		<div class='titleHolder'>
-			<div>Investments</div>
+			<div>Portfolio</div>
 			<!-- <div class="subInfoHolder">{curAccount?.IBAN}</div> -->
 		</div>
 
@@ -145,7 +145,7 @@
 					
 					<div class="title">{fund.name}</div>
 					<div class="subInformation">
-						Inv: {formatMoneyString(-fund.investment)} - Profit: {formatMoneyString(fund.value + fund.investment)}
+						Inv: {formatMoneyString(fund.investment)} - Profit: {formatMoneyString(fund.value - fund.investment)}
 					</div>
 					<div class='lastUpdatedText'>
 						Stock price of: { fund.lastUpdateTime}

@@ -30,7 +30,7 @@
 		<Button name='Overview' on:click={() => openPageByIndex(4)}></Button>
 	</div>
 	<div class="item">
-		<Button name='Investments' on:click={() => openPageByIndex(7)}></Button>
+		<Button name='Portfolio' on:click={() => openPageByIndex(7)}></Button>
 	</div>
 	<div class="item">
 		<Button name='Month Overview' on:click={() => openPageByIndex(2)}></Button>
