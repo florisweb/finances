@@ -125,7 +125,10 @@
 	<input type='file' class='CSVInputField' accept='text/csv, text/finance' on:input={handleUpload}>
 
 	<Button	name="Clear Transactions" on:click={() => TransactionManager.clear()}></Button>
-	<Button	name="Download Package" on:click={() => downloadFile(Packager.export(), 'output.finance', 'text/finance')}></Button>
+	<Button	name="Download Package" on:click={() => downloadFile(Packager.export(), (
+		(new Date().getFullYear()) + '-' + (new Date().getMonth() > 8 ? '' : '0') + (new Date().getMonth() + 1) + '-' + (new Date().getDate() > 9 ? '' : '0') + new Date().getDate()) + '.finance', 
+		'text/finance')
+		}></Button>
 	<div class='transactionCountHolder textHolder'>
 		Transactions: {transactions.length}
 	</div>
