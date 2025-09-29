@@ -17,6 +17,8 @@
 	]
 	*/
 
+	const pxScalar = 2;
+
 
 	let canvas;
 	let ctx;
@@ -67,7 +69,7 @@
 			return;
 		}; 
 
-		let pos = new Vector(_e.offsetX, _e.offsetY);
+		let pos = new Vector(_e.offsetX, _e.offsetY).scale(pxScalar);
 		let delta = canvasCentre.copy().difference(pos);
 		if (delta.getLength() > pieRadius) {curHoverPiece = false; render(); return;}
 		let angle = delta.getAngle();
@@ -103,18 +105,20 @@
 	function render() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		let curAngle = 0;
+		let curAngle = 2 * Math.PI;
 		
 		let hoverStartAngle = 0;
 		let hoverDAngle = 0;
 
 		let validPieces = 0;
-		for (let piece of data) 
+		for (let p = data.length - 1; p >= 0; p--) 
 		{
+			let piece = data[p];
 			let perc = piece.value / data.map(a => a.value).reduce((a, b) => a + b, 0);
 			if (isNaN(perc)) continue;
 			validPieces++;
 			let dAngle = perc * 2 * Math.PI;
+			curAngle -= dAngle;
 			renderPiece(piece, curAngle - Math.PI / 2, curAngle + dAngle - Math.PI / 2);
 			
 			if (curHoverPiece === piece)
@@ -122,7 +126,6 @@
 				hoverStartAngle = curAngle;
 				hoverDAngle = dAngle;
 			}
-			curAngle += dAngle;
 		}
 
 		if (validPieces === 0) renderPiece({name: '', value: 1, color: "#f7f7f7"}, 0, Math.PI * 2);
@@ -133,31 +136,33 @@
 
 
 
-	const padding = 6;
-	const height = 18;
-	const circlePadding = 5;
+	const padding = 6 * pxScalar;
+	const height = 18 * pxScalar;
+	const circlePadding = 5 * pxScalar;
 	function renderPiece(_piece, _startAngle, _stopAngle, _hoveredOn) {
 		let nameArr = _piece.name;
 		if (typeof nameArr === 'string') nameArr = [nameArr];
 
 		let deltaAngle = _stopAngle - _startAngle;
 
+		const lineWidthDAngle = Math.PI * 2 * 0.005 * 0;
+
 		ctx.strokeStyle = '#fff';
 		ctx.fillStyle = _piece.color;
-		ctx.lineWidth = 4;
+		ctx.lineWidth = 3 * pxScalar;
 
-		let radius = pieRadius + (_hoveredOn ? 5 : 0);
+		let radius = pieRadius + (_hoveredOn ? 5 : 0) * pxScalar;
 
 		ctx.shadowBlur = 0;
 		if (_hoveredOn)
 		{
 			ctx.shadowColor = "rgba(0, 0, 0, .3)";
-			ctx.shadowBlur = 15;
+			ctx.shadowBlur = 15 * pxScalar;
 		}
 
 		ctx.beginPath();
 		ctx.moveTo(canvasCentre.value[0], canvasCentre.value[1]);
-		ctx.arc(canvasCentre.value[0], canvasCentre.value[1], radius, _startAngle, _stopAngle);
+		ctx.arc(canvasCentre.value[0], canvasCentre.value[1], radius, _startAngle, _stopAngle - lineWidthDAngle);
 		ctx.lineTo(canvasCentre.value[0], canvasCentre.value[1]);
 		ctx.closePath();
 		ctx.stroke();
@@ -166,7 +171,7 @@
 		
 		let textPos = canvasCentre.copy().add(new Vector().setAngle(_startAngle + deltaAngle / 2, radius * .6));
 		ctx.fillStyle = '#fff';
-		ctx.font = '15px arial';
+		ctx.font = Math.round(15 * pxScalar) + 'px arial';
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
 		
@@ -271,11 +276,11 @@
 
 	window.addEventListener('resize', () => onResize())
 	function onResize() {
-		const padding = 20;
-		const extraTopPadding = 10;
+		const padding = 20 * pxScalar;
+		const extraTopPadding = 10 * pxScalar;
 
-		canvas.width = canvas.offsetWidth;
-		canvas.height = canvas.width + extraTopPadding;
+		canvas.width = canvas.offsetWidth * pxScalar;
+		canvas.height = (canvas.offsetWidth) * pxScalar + extraTopPadding;
 
 		canvasSize = new Vector(
 			canvas.width,
