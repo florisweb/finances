@@ -2,6 +2,7 @@
 	import Popup from "./popup.svelte";
 	import Header from "../UI/header.svelte";
 	import TransactionTable from '../UI/transactionTable.svelte';
+	import SearchField from '../UI/searchField.svelte';
     import Button from "../UI/button.svelte";
 	import { wait } from "../polyfill";
 
@@ -28,7 +29,8 @@
 
 	export function open(_transactions, _customTitle) {
 		isOpen = true;
-		transactions = _transactions;
+		transactions = Object.assign([], _transactions); // Keep references to the items intact, but destroy the reference to the array so it can be resorted without affecting the rest of the application
+		transactions.sort((a, b) => a.date.getTime() < b.date.getTime());
 		title = _customTitle ?? 'Transaction Viewer';
 		curPageIndex = 0;
 	}
@@ -41,6 +43,9 @@
 
 <Popup {isOpen} customClass='TransactionViewerPopup' on:passiveClose={() => isOpen = false}>
 	<Header slot='header' title={title}></Header>
+	<div class="searchFieldHolder">
+		<SearchField></SearchField>
+	</div>
 	<div class='transactionHolder'>
 		{#if (curPageTransactions.length === 0)}
 			<div class='noTransactionsText'>No Transactions to show</div>
@@ -85,5 +90,12 @@
 		width: 100%;
 		padding: 50px;
 		font-size: 20px;
+	}
+
+	.searchFieldHolder {
+		position: absolute;
+		right: 30px;
+		top: 20px;
+		width: 20%;
 	}
 </style>

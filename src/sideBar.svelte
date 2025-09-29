@@ -1,16 +1,18 @@
 <script>
 	import { openPageByIndex } from './App.js';
 	import Button from './UI/button.svelte';
+	import { getContext } from "svelte";
 
+	import TransactionManager from './data/transactionManager.js';
 	import BudgetManager from './data/budgetManager.js';
+	import AccountManager from './data/accountManager.js';
+
 	let activeBudget;
 	BudgetManager.dataStore.subscribe((_budgets) => activeBudget = BudgetManager.activeBudget);
 
-	import AccountManager from './data/accountManager.js';
 	let accounts = [];
 	AccountManager.dataStore.subscribe((_accounts) => accounts = _accounts);
 
-	import { getContext } from "svelte";
 	const App = getContext('App');
 
 	const AccountLogoPaths = {
@@ -18,6 +20,8 @@
 		'REVOLUT': './images/RevolutLogo.png',
 		'FUND': './images/fundLogo.png',
 	}
+
+	const openAllTransactionsPopup = () => App.transactionViewerPopup.open(TransactionManager.data);
 </script>
 
 <div id='sideBar'>
@@ -31,6 +35,9 @@
 	</div>
 	<div class="item">
 		<Button name='Portfolio' on:click={() => openPageByIndex(7)}></Button>
+	</div>
+	<div class="item">
+		<Button name='Transactions' on:click={() => openAllTransactionsPopup()}></Button>
 	</div>
 	<div class="item">
 		<Button name='Month Overview' on:click={() => openPageByIndex(2)}></Button>

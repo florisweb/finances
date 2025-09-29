@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 	
-	export let name;
+	export let name = '';
 	export let icon;
 	export let filled = true;
 	export let disabled = false;
