@@ -19,7 +19,8 @@
 	function addBudgetRow(_tagId) {
 		let tagSet = {
 			tagId: _tagId,
-			budget: null
+			budget: null,
+			contributions: [],
 		};
 		section.tagBudgetSets = [...section.tagBudgetSets, tagSet];
 	}
