@@ -8,6 +8,8 @@
     import DropDown from '../dropDown.svelte';
 	import Tag from '../tag.svelte';
 
+	import { TagBudgetSet } from '../../types.js';
+
 	export let section;
 
 	let tags = [];
@@ -17,11 +19,12 @@
 	$: availableTags = tags.filter((_tag) => !section.tagBudgetSets.find((_set) => _set.tagId === _tag.id) && !_tag.isNonAssignedTag);
 
 	function addBudgetRow(_tagId) {
-		let tagSet = {
+		console.log('sectoin', section)
+		let tagSet = new TagBudgetSet({
 			tagId: _tagId,
 			budget: null,
 			contributions: [],
-		};
+		});
 		section.tagBudgetSets = [...section.tagBudgetSets, tagSet];
 	}
 	function removeBudgetRow(_tagId) {
