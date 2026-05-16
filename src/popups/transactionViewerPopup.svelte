@@ -14,6 +14,8 @@
 	let transactions = [];
 	let title = 'Transaction viewer';
 
+	let searchQuery = null;
+
 	let pages = [];
 	let curPageTransactions = [];
 	let curPageIndex = 0;
@@ -35,6 +37,7 @@
 		transactions.sort((a, b) => a.date.getTime() < b.date.getTime());
 		title = _customTitle ?? 'Transaction Viewer';
 		curPageIndex = 0;
+		searchQuery = null
 	}
 	export async function close() {
 		isOpen = false;
@@ -130,7 +133,7 @@
 <Popup {isOpen} customClass='TransactionViewerPopup' on:passiveClose={() => isOpen = false}>
 	<Header slot='header' title={title}></Header>
 	<div class="searchFieldHolder">
-		<SearchField on:input={(e) => filterTransactions(e.detail)} on:click={(e) => filterTransactions(e.detail)}></SearchField>
+		<SearchField bind:value={searchQuery} on:input={(e) => filterTransactions(e.detail)} on:click={(e) => filterTransactions(e.detail)}></SearchField>
 	</div>
 	<div class='transactionHolder'>
 		{#if (curPageTransactions.length === 0)}
