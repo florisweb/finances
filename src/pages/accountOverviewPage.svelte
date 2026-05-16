@@ -10,7 +10,7 @@
 
     import Color from "../color";
     import AccountManager from "../data/accountManager";
-    import { FundTransaction, MonthIdentifier, Transaction } from "../types";
+    import { FundDividendTransaction, FundTransaction, MonthIdentifier, Transaction } from "../types";
     import Vector from "../vector";
 
 	const App = getContext('App');
@@ -72,12 +72,14 @@
 	let fundTransactions = [];
 	let funds = {};
 	let nonAllocatedFunds;
+	let serviceCosts = 0;
 	$: if (curAccount?.isFundAccount) 
 	{
 		fundTransactions = curAccount.transactions.filter(t => t instanceof FundTransaction);
 		fundTransactions.sort((a, b) => a.date < b.date);
-		let nonFundTransactions = curAccount.transactions.filter(t => t instanceof Transaction);
-		nonAllocatedFunds = nonFundTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		nonAllocatedFunds = curAccount.getCashValue();
+		serviceCosts = curAccount.serviceCostTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		
 		(async () => {
 			funds = await curAccount.getFunds();
 		})();
@@ -152,7 +154,8 @@
 				<div class='fundPanel nonAllocatedFunds'>
 					<div class="title">Non-allocated funds</div>
 					<div class="subInformation">
-						Value: {formatMoneyString(nonAllocatedFunds)}
+						Value: {formatMoneyString(nonAllocatedFunds)} <br>
+						Service costs: {formatMoneyString(-serviceCosts)}
 					</div>
 				</div>
 			</div>

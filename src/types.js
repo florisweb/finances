@@ -123,13 +123,14 @@ export class TransactionTag {
 	get averageExpenses() {
 		let transactions = this.transactions;
 		let curMonth = new MonthIdentifier().setFromDate(new Date());
-		let startMonth = curMonth.date.moveMonth(-3);
+		const monthRange = 3;
+		let startMonth = curMonth.date.moveMonth(-monthRange); // Averaged over last three months
 		curMonth = curMonth.date;
 
 		return -transactions.filter((t) => {
 			let date = new Date().setFromStr(t.date);
 			return date.getTime() > startMonth.getTime() && date.getTime() < curMonth.getTime();
-		}).map(t => t.deltaMoney).reduce((a, b) => a + b, 0) / 3;
+		}).map(t => t.deltaMoney).reduce((a, b) => a + b, 0) / monthRange;
 	}
 
 
@@ -139,9 +140,10 @@ export class TransactionTag {
 	}
 	get firstTransactionDate() {
 		let transactions = this.transactions;
+		this.transactions.sort((a, b) => a.date > b.date);
 		let first = transactions[0];
 		if (!first) return false;
-		return new Date().setDateFromStr(first.date);
+		return first.date;
 	}
 
 	getTransactionsByMonth(_monthId) {
@@ -180,14 +182,7 @@ export class TransactionTag {
 	}
 
 	get averageExpensesLast12Months() {
-		let sum = 0;
-		let curMonthId = new MonthIdentifier();
-		for (let i = 0; i < 12; i++)
-		{
-			curMonthId = new MonthIdentifier().setFromDate(curMonthId.date.moveMonth(-1));
-			sum += this.getExpensesByMonth(curMonthId);
-		}
-		return sum / 12;
+		return this.getAverageExpensesInLastXMonths(12, true);
 	}
 
 	get totalExpenses() {
@@ -517,7 +512,9 @@ export class TagFilter {
 
 
 
-
+window.Transaction = Transaction;
+window.FundTransaction = FundTransaction;
+window.FundDividendTransaction = FundDividendTransaction;
 
 
 
@@ -541,6 +538,10 @@ export class BankAccount {
 	get transactions() {
 		return TransactionManager.getByAccount(this);
 	}
+	get serviceCostTransactions() {
+		let transactions = this.transactions;
+		return transactions.filter(trans => trans.description.includes('Servicekosten'));
+	}
 
 	getCashValue() {
 		let transactions = this.transactions;
@@ -556,7 +557,8 @@ export class BankAccount {
 	}
 
 	getCashValueAtEndOfMonth(_monthId) {
-		let transactions = this.transactions;		
+		let transactions = this.transactions;
+		transactions.sort((a, b) => a.date > b.date);
 		let endDate = _monthId.date.copy().moveMonth(1);
 		let transactionsBeforeEndOfMonth = transactions.filter(t => t.date.getTime() < endDate.getTime());
 		if (!transactionsBeforeEndOfMonth.length) return 0;
@@ -675,7 +677,6 @@ class Fund {
 		return this.getInvestmentAtEndOfMonth(new MonthIdentifier());
 	}
 	
-
 	getTransactionsAtEndOfMonth(_monthId = new MonthIdentifier()) { // Transactions before end of month
 		return this.transactions.filter(trans => trans.date.getTime() <= _monthId.date.copy().moveMonth(1).getTime());
 	}
@@ -686,8 +687,9 @@ class Fund {
 		return this.getTransactionsAtEndOfMonth(_monthId).map(r => r.shares).reduce((a, b) => a + b, 0);
 	}
 	getInvestmentAtEndOfMonth(_monthId) {
-		let boughtShareWorth = -this.getTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
-		let dividendsWorth = this.getDividendTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		const boughtShareWorth = -this.getTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+		const dividendsWorth = this.getDividendTransactionsAtEndOfMonth(_monthId).map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
+				
 		return boughtShareWorth - dividendsWorth;
 	}
 
