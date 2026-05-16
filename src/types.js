@@ -140,7 +140,7 @@ export class TransactionTag {
 	}
 	get firstTransactionDate() {
 		let transactions = this.transactions;
-		this.transactions.sort((a, b) => a.date > b.date);
+		transactions.sort((a, b) => a.date > b.date);
 		let first = transactions[0];
 		if (!first) return false;
 		return first.date;
@@ -508,13 +508,6 @@ export class TagFilter {
 					
 			
 
-
-
-
-
-window.Transaction = Transaction;
-window.FundTransaction = FundTransaction;
-window.FundDividendTransaction = FundDividendTransaction;
 
 
 

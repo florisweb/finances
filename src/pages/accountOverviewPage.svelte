@@ -33,7 +33,9 @@
 	$: (async () => {
 		if (prevAccount === curAccount) return; // Prevent loops due to reactivity of async
 		prevAccount = curAccount;
-		const firstDate = curAccount?.transactions[0]?.date || new Date();
+		let transactions = curAccount?.transactions || [];
+		transactions.sort((a, b) => a.date > b.date);
+		const firstDate = transactions[0]?.date || new Date();
 		const monthRange = Math.ceil((new Date() - firstDate) / 1000 / 60 / 60 / 24 / 30); // Approx. 30 days per month
 
 		graphData = [{
