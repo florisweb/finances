@@ -17,11 +17,13 @@
 	let pages = [];
 	let curPageTransactions = [];
 	let curPageIndex = 0;
-	$: {
+	$: if (transactions) filterTransactions(false);
+
+	function updatePages(_transactions) {
 		pages = [];
-		for (let i = 0; i < transactions.length; i += transactionsPerPage)
+		for (let i = 0; i < _transactions.length; i += transactionsPerPage)
 		{
-			pages = [...pages, transactions.slice(i, i + transactionsPerPage)];
+			pages = [...pages, _transactions.slice(i, i + transactionsPerPage)];
 		}
 	}
 
@@ -39,12 +41,102 @@
 		await wait(300);
 		curPageTransactions = [];
 	}
+
+	function filterTransactions(_filterString) {
+		if (!_filterString) {
+			transactions.sort((a, b) => a.date < b.date);
+			updatePages(transactions);
+			curPageIndex = 0;
+			return;
+		}
+		const tagParts = _filterString.split('#');
+		let tagSearchParts = tagParts.map(r => r.split(' ')[0]).slice(1)
+		const targetParts = _filterString.split('@');
+		let targetSearchParts = targetParts.map(r => r.split(' ')[0]).slice(1)
+
+		let desciptionString = _filterString;
+		for (let part of [...tagSearchParts.map(r => '#' + r), ...targetSearchParts.map(r => '@' + r)])
+		{
+			desciptionString = desciptionString.replaceAll(part, '');
+		}
+
+		transactions.forEach((trans) => {
+			let tagScore = 0;
+			if (trans.tag) for (let tagPart of tagSearchParts) tagScore += similarity(tagPart, trans.tag?.name);
+			let targetScore = 0;
+			for (let targetPart of targetSearchParts) targetScore += similarity(targetPart, trans.targetName + trans.targetIBAN);
+
+			const descriptionScore = similarity(trans.description, desciptionString);
+			trans.searchScore = tagScore * 0.5 + targetScore * 0.5 + descriptionScore;
+		})
+
+		transactions.sort((a, b) => a.searchScore < b.searchScore);
+
+		let filteredTransactions = transactions.filter((trans) => {
+			let pass = trans.searchScore > 0.2
+			delete trans.searchScore;
+			return pass;
+		});
+		console.log(filteredTransactions.length);
+
+		updatePages(filteredTransactions);
+		curPageIndex = 0;
+	}
+
+
+
+	// https://stackoverflow.com/questions/10473745/compare-strings-javascript-return-of-likely
+	function similarity(s1, s2) {
+		var longer = s1;
+		var shorter = s2;
+
+		if (s1.length < s2.length) {
+			longer = s2;
+			shorter = s1;
+		}
+
+		var longerLength = longer.length;
+		if (longerLength == 0) {return 1.0;}
+
+		// return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+		return (longerLength - editDistance(longer, shorter)) * parseFloat(longerLength)**(-0.5);
+
+
+		function editDistance(s1, s2) {
+			s1 = s1.toLowerCase();
+			s2 = s2.toLowerCase();
+
+			var costs = new Array();
+			for (var i = 0; i <= s1.length; i++) {
+			var lastValue = i;
+			for (var j = 0; j <= s2.length; j++) {
+				if (i == 0)
+				{
+				costs[j] = j;
+				} else {
+				if (j > 0) {
+					var newValue = costs[j - 1];
+					if (s1.charAt(i - 1) != s2.charAt(j - 1))
+					newValue = Math.min(Math.min(newValue, lastValue),
+					costs[j]) + 1;
+					costs[j - 1] = lastValue;
+					lastValue = newValue;
+				}
+				}
+			}
+			if (i > 0)
+			costs[s2.length] = lastValue;
+			}
+
+			return costs[s2.length];
+		}
+	}
 </script>
 
 <Popup {isOpen} customClass='TransactionViewerPopup' on:passiveClose={() => isOpen = false}>
 	<Header slot='header' title={title}></Header>
 	<div class="searchFieldHolder">
-		<SearchField></SearchField>
+		<SearchField on:input={(e) => filterTransactions(e.detail)} on:click={(e) => filterTransactions(e.detail)}></SearchField>
 	</div>
 	<div class='transactionHolder'>
 		{#if (curPageTransactions.length === 0)}
@@ -52,7 +144,6 @@
 		{:else}
 			<TransactionTable transactions={curPageTransactions}></TransactionTable>
 		{/if}
-		
 	</div>
 	<div class='buttonHolder'>
 		{#if pages.length > 1}

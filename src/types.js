@@ -700,6 +700,7 @@ class Fund {
 		let sortables = this.priceHistory.map((r, i) => {return {dt: Math.abs(r.time - preDate), index: i}});
 		sortables.sort((a, b) => a.dt > b.dt);
 		let closestIndex = sortables[0]?.index;
+		if (!this.priceHistory.length) return 0;
 		return this.priceHistory[closestIndex].stockPrice;
 	}
 }

@@ -21,8 +21,12 @@
 			{tagPrediction ? ((tagPrediction.tag.id === transaction.typeCode ? '✓ ' : '★ ') + tagPrediction.tag.name) : ''}
 		</div>
 	</td>
-	<td>{transaction.targetName + (transaction.targetIBAN ? ` (${transaction.targetIBAN})` : '')}</td>
-	<td>{transaction.description}</td>
+	<td><div class="textContainer">
+		{transaction.targetName + (transaction.targetIBAN ? ` (${transaction.targetIBAN})` : '')}
+	</div></td>
+	<td><div class="textContainer">
+		{transaction.description}
+	</div></td>
 </tr>
 
 
@@ -40,7 +44,13 @@
 		
 		padding-top: 10px;
 		padding-bottom: 10px;
+		
 	}
+	td .textContainer {
+		max-height: 40px;
+		overflow: auto;
+	}
+	
 	td:not(:last-child) {
 		padding-right: 10px;
 	}

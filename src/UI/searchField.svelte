@@ -3,13 +3,13 @@
     import Button from './button.svelte';
 	const dispatch = createEventDispatcher();
 	
-	export let value;
+	export let value = null;
 	export let element;
 	export let isInvisibleInput;
 	export let customClass;
 </script>
 
-<div>	
+<div class='searchInput'>	
 	<input 
 		on:input={(_event) => {value = _event.target.value; dispatch('input', value)}}
 		on:change={(_event) => {value = _event.target.value; dispatch('change', value)}}
@@ -19,21 +19,26 @@
 		class:isInvisibleInput={isInvisibleInput}
 		class={customClass ?? ''}
 	>
-	<Button icon='images/RevolutLogo.png'></Button>
+	<Button icon='images/RevolutLogo.png' on:click={(_event) => {value = element.value; dispatch('click', value)}}></Button>
  </div>
 
 <style>
+	.searchInput {
+		display: flex;
+		flex-direction: row;	
+	}
 	input {
 		position: relative;
 		
 		width: 100%;
-		height: 35px;
+		height: 37px;
 		padding: 7.5px;
 
 		font-size: 14px;
 		background: #fff;
 		box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, .02);
 		border: 1px solid #eee;
+		border-right: none;
 	}
 	input.isInvisibleInput {
 		border: none;
