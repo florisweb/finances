@@ -11,6 +11,7 @@
 			<th scope='col'>Type</th>
 			<th scope='col'>Target</th>
 			<th scope='col'>Description</th>
+			<th scope='col'>Note</th>
 		</tr>
 	</thead>
 	<tbody>

@@ -27,6 +27,12 @@
 	<td><div class="textContainer">
 		{transaction.description}
 	</div></td>
+	<td>
+		<input value={transaction.userNote || null} on:change={(e) => {
+			transaction.userNote = e.target.value;
+			transaction.update();
+		}}>
+	</td>
 </tr>
 
 
@@ -45,6 +51,12 @@
 		padding-top: 10px;
 		padding-bottom: 10px;
 		
+	}
+	input {
+		height: 25px;
+		border: none;
+		font-size: 13px;
+		color: #444;
 	}
 	td .textContainer {
 		max-height: 40px;

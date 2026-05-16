@@ -17,6 +17,7 @@ export class Transaction {
 	targetName = '';
 	deltaMoney;
 	description = '';
+	userNote = '';
 	balance = 0;
 	bankClassification = '';
 	classificationState = 0; // 0: not classified, 1: autoclassified, 2: manually classified
@@ -58,6 +59,7 @@ export class Transaction {
 			targetName: this.targetName,
 			deltaMoney: this.deltaMoney,
 			description: this.description,
+			userNote: this.userNote,
 			balance: this.balance,
 			bankClassification: this.bankClassification,
 			classificationState: this.classificationState

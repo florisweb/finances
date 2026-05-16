@@ -66,20 +66,14 @@
 			let targetScore = 0;
 			for (let targetPart of targetSearchParts) targetScore += similarity(targetPart, trans.targetName + trans.targetIBAN);
 
-			const descriptionScore = similarity(trans.description, desciptionString);
+			const descriptionScore = desciptionString ? similarity(trans.description + ' ' + trans.userNote, desciptionString) : 0;
 			trans.searchScore = tagScore * 0.5 + targetScore * 0.5 + descriptionScore;
 		})
 
+		transactions.sort((a, b) => a.date > b.date);
 		transactions.sort((a, b) => a.searchScore < b.searchScore);
 
-		let filteredTransactions = transactions.filter((trans) => {
-			let pass = trans.searchScore > 0.2
-			delete trans.searchScore;
-			return pass;
-		});
-		console.log(filteredTransactions.length);
-
-		updatePages(filteredTransactions);
+		updatePages(transactions);
 		curPageIndex = 0;
 	}
 
@@ -112,16 +106,16 @@
 			for (var j = 0; j <= s2.length; j++) {
 				if (i == 0)
 				{
-				costs[j] = j;
+					costs[j] = j;
 				} else {
-				if (j > 0) {
-					var newValue = costs[j - 1];
-					if (s1.charAt(i - 1) != s2.charAt(j - 1))
-					newValue = Math.min(Math.min(newValue, lastValue),
-					costs[j]) + 1;
-					costs[j - 1] = lastValue;
-					lastValue = newValue;
-				}
+					if (j > 0) {
+						var newValue = costs[j - 1];
+						if (s1.charAt(i - 1) != s2.charAt(j - 1))
+						newValue = Math.min(Math.min(newValue, lastValue),
+						costs[j]) + 1;
+						costs[j - 1] = lastValue;
+						lastValue = newValue;
+					}
 				}
 			}
 			if (i > 0)
