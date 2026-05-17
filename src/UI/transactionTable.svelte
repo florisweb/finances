@@ -6,6 +6,7 @@
 <table class='transactionTable'>
 	<thead>
 		<tr class='header'>
+			<th scope='col'></th>
 			<th scope='col'>Date</th>
 			<th scope='col'>Money</th>
 			<th scope='col'>Type</th>

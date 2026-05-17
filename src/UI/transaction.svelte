@@ -12,6 +12,17 @@
 </script>
 
 <tr class={'transaction' + (' classificationState_' + transaction.classificationState)}>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<td class='userFlag' class:flagged={transaction.userFlagged} on:click={() => {
+		transaction.userFlagged = !transaction.userFlagged;
+		transaction.update();
+	}}>
+		{ #if transaction.userFlagged}
+			⚑
+		{:else}
+			⚐
+		{/if}
+	</td>
 	<td><div class='dateHolder'>{transaction.date}</div></td>
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
 	<td class='tagSelector'>
@@ -40,6 +51,10 @@
 	.transaction:not(:last-child) {
 		border-bottom: 1px solid #ddd;
 	}
+	.transaction:not(:last-child) > .userFlag {
+		border-bottom: 1px solid #fff;
+	}
+	
 
 	td {
 		position: relative;
@@ -49,8 +64,7 @@
 		color: #444;
 		
 		padding-top: 10px;
-		padding-bottom: 10px;
-		
+		padding-bottom: 10px;	
 	}
 	input {
 		height: 25px;
@@ -87,6 +101,14 @@
 		max-width: 140px;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	td.userFlag {
+		font-size: 20px;
+		cursor: pointer;
+		transition: 0.3s opacity;
+	}
+	tr.transaction:not(:hover) td.userFlag:not(.flagged) {
+		opacity: 0;
 	}
 
 

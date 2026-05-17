@@ -52,6 +52,7 @@
 			curPageIndex = 0;
 			return;
 		}
+		const filterFlagged = _filterString.split(':flag').length > 1;
 		const tagParts = _filterString.split('#');
 		let tagSearchParts = tagParts.map(r => r.split(' ')[0]).slice(1)
 		const targetParts = _filterString.split('@');
@@ -64,6 +65,8 @@
 		}
 
 		transactions.forEach((trans) => {
+			if (filterFlagged && !trans.userFlagged) return trans.searchScore = -1;
+
 			let tagScore = 0;
 			if (trans.tag) for (let tagPart of tagSearchParts) tagScore += similarity(tagPart, trans.tag?.name);
 			let targetScore = 0;
@@ -73,10 +76,11 @@
 			trans.searchScore = tagScore * 0.5 + targetScore * 0.5 + descriptionScore;
 		})
 
-		transactions.sort((a, b) => a.date > b.date);
-		transactions.sort((a, b) => a.searchScore < b.searchScore);
+		let filteredTransactions = transactions.filter(t => t.searchScore >= 0);
+		filteredTransactions.sort((a, b) => a.date > b.date);
+		filteredTransactions.sort((a, b) => a.searchScore < b.searchScore);
 
-		updatePages(transactions);
+		updatePages(filteredTransactions);
 		curPageIndex = 0;
 	}
 
@@ -135,7 +139,7 @@
 	<div class="searchFieldHolder">
 		<SearchField bind:value={searchQuery} on:input={(e) => filterTransactions(e.detail)} on:click={(e) => filterTransactions(e.detail)}></SearchField>
 	</div>
-	<div class='transactionHolder'>
+	<div class='transactionHolder' class:noTransactions={curPageTransactions.length === 0}>
 		{#if (curPageTransactions.length === 0)}
 			<div class='noTransactionsText'>No Transactions to show</div>
 		{:else}
@@ -173,6 +177,10 @@
 		max-height: calc(90vh - 100px);
 		overflow: auto;
 	}
+	.transactionHolder:not(.noTransactions) {
+		margin-left: -20px;
+	}
+
 	.noTransactionsText {
 		text-align: center;
 		width: 100%;
