@@ -87,7 +87,9 @@
 				{#if (typeof option.contentHTML === 'object')}
 					<svelte:component this={option.contentHTML.component} {...option.contentHTML.config}/>
 				{:else}
-					{option.contentHTML}
+					<div class="textContentHTML">
+						{option.contentHTML}
+					</div>
 				{/if}
 			</div>
 		{/each}
@@ -187,5 +189,12 @@
 	}
 	.option:not(:first-child) {
 		margin-top: 10px;
+	}
+	
+	.textContentHTML {
+		height: 16px;
+		line-height: 16px;
+		font-size: 13px;
+		color: #333;
 	}
 </style>
