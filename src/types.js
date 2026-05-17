@@ -45,6 +45,9 @@ export class Transaction {
 		return AIManager.predictTag(this);
 	}
 
+	get isInterestTransaction() {
+		return this.description.includes('Rente over') && this.deltaMoney > 0;
+	}
 
 	update() {
 		TransactionManager.add(this);

@@ -31,6 +31,13 @@
 	let totalValue = 0;
 	$: totalValue = cashValue + funds.map(r => r.value).reduce((a, b) => a + b, 0);
 
+	let interestValue = 0;
+	$: interestValue = accounts.map(
+		r => r.transactions.filter(t => t.isInterestTransaction)
+		.map(t => t.deltaMoney)
+		.reduce((a, b) => a + b, 0))
+	.reduce((a, b) => a + b, 0);
+
 
 	function getCashAtEndOfMonth(_monthId) {
 		return accounts.map(r => r.getCashValueAtEndOfMonth(_monthId)).reduce((a, b) => a + b, 0);
@@ -132,7 +139,7 @@
 				</div>
 				<div class="title">Cash</div>
 				<div class="subInformation">
-					Value: {formatMoneyString(cashValue)}
+					Interest: {formatMoneyString(interestValue)}
 				</div>
 			</div>
 
@@ -275,9 +282,11 @@
 	}
 
 	.fundOverviewHolder .fundPanel .subInformation {
-		color: #fff;
 		opacity: .7;
 		font-size: 13px;
+	}
+	.fundOverviewHolder .fundPanel:not(.nonAllocatedFunds) .subInformation {
+		color: #fff;
 	}
 	.fundOverviewHolder .fundPanel .lastUpdatedText {
 		position: absolute;
