@@ -559,7 +559,7 @@ export class BankAccount {
 		let transactionsBeforeEndOfMonth = transactions.filter(t => t.date.getTime() < endDate.getTime());
 		if (!transactionsBeforeEndOfMonth.length) return 0;
 		let newestTrans = TransactionManager.getNewestTransaction(transactionsBeforeEndOfMonth);
-		return lastTrans.balance + lastTrans.deltaMoney;
+		return newestTrans.balance + newestTrans.deltaMoney;
 	}
 
 	async getBalanceAtEndOfMonth(_monthId) {
@@ -763,6 +763,7 @@ export class MonthIdentifier {
 		date.setMonth(parseInt(parts[0]) - 1);
 		date.setHours(0);
 		date.setMinutes(0);
+		date.setSeconds(0);
 		date.setMilliseconds(0);
 		return date;
 	}
