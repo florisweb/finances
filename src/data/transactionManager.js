@@ -88,6 +88,78 @@ const TransactionManager = new class extends DataManager {
 		return this.getByAccount(_account, this.getByMonth(_monthId));
 	}
 
+
+	getOldestTransaction(_transactions) {
+		if (_transactions.length === 0 || !_transactions) return false;
+		_transactions.sort((a, b) => a.date > b.date);
+		let oldestTrans = _transactions[0];
+		let possibleLastTransactions = _transactions.filter(t => t.date.toString() === oldestTrans.date.toString());
+		let properOrder = this.orderTransactionsWithSameDate(possibleLastTransactions);
+		return properOrder[0];
+	}
+	getNewestTransaction(_transactions) {
+		if (_transactions.length === 0 || !_transactions) return false;
+		_transactions.sort((a, b) => a.date < b.date);
+		let newestTrans = _transactions[0];
+		let possibleLastTransactions = _transactions.filter(t => t.date.toString() === newestTrans.date.toString());
+		let properOrder = this.orderTransactionsWithSameDate(possibleLastTransactions);
+		return properOrder[properOrder.length - 1];
+	}
+	
+
+	orderTransactionsWithSameDate(_transactions) { 
+		// Assuming on the same date
+		// Assumes that the balance of a transaction is unique
+		let accounts = {};
+		for (let trans of _transactions)
+		{
+			if (!accounts[trans.ownIBAN]) accounts[trans.ownIBAN] = [];
+			accounts[trans.ownIBAN].push(trans);
+		}
+
+		// Order of transactions from differing accounts does not matter, as they are independent
+		let properOrder = [];
+		for (let IBAN in accounts)
+		{
+			const transactions = accounts[IBAN];
+			let order = this.#orderTransactionsWithSameDateWithinAccount(transactions);
+			properOrder = order.concat(properOrder);
+		}
+
+		return properOrder;
+	}
+	#orderTransactionsWithSameDateWithinAccount(_transactions) { 
+		// Sorts from oldest to newest transactions 
+		if (_transactions.length <= 1) return _transactions;
+
+		for (let i = 0; i < _transactions.length; i++)
+		{
+			let balanceAfterTrans = _transactions[i].deltaMoney + _transactions[i].balance;
+			for (let t = 0; t < _transactions.length; t++)
+			{
+				if (t === i) continue;
+				if (balanceAfterTrans !== _transactions[t].balance) continue;
+				_transactions[i].followingTransaction = _transactions[t];
+				_transactions[t].precedingTransaction = _transactions[i];
+			}
+		}
+
+		const oldestTransactions = _transactions.filter(t => !t.precedingTransaction)
+		if (oldestTransactions.length !== 1) return _transactions; // Could not order them
+		let properOrder = [oldestTransactions[0]];
+		let curTransaction = oldestTransactions[0].followingTransaction;
+		while (curTransaction)
+		{
+			properOrder.push(curTransaction);
+			curTransaction = curTransaction.followingTransaction;
+		}
+		properOrder.forEach((trans) => {
+			delete trans.followingTransaction;
+			delete trans.precedingTransaction;
+		})
+		return properOrder;
+	}
+
 	
 
 	async autoClassifyTransactions() {

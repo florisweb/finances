@@ -542,11 +542,9 @@ export class BankAccount {
 	}
 
 	getCashValue() {
-		let transactions = this.transactions;
-		transactions.sort((a, b) => a.date < b.date);
-		if (transactions.length === 0) return 0;
-		let lastTrans = transactions[0];
-		return lastTrans.balance + lastTrans.deltaMoney;
+		let newestTrans = TransactionManager.getNewestTransaction(this.transactions);
+		if (!newestTrans) return 0;
+		return newestTrans.balance + newestTrans.deltaMoney;
 	}
 	
 	async getBalance() {
@@ -560,7 +558,7 @@ export class BankAccount {
 		let endDate = _monthId.date.copy().moveMonth(1);
 		let transactionsBeforeEndOfMonth = transactions.filter(t => t.date.getTime() < endDate.getTime());
 		if (!transactionsBeforeEndOfMonth.length) return 0;
-		let lastTrans = transactionsBeforeEndOfMonth[transactionsBeforeEndOfMonth.length - 1];
+		let newestTrans = TransactionManager.getNewestTransaction(transactionsBeforeEndOfMonth);
 		return lastTrans.balance + lastTrans.deltaMoney;
 	}
 
