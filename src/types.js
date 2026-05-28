@@ -8,6 +8,7 @@ import BudgetManager from './data/budgetManager';
 import AIManager from './data/AIManager';
 import TagManager from './data/tagManager';
 import StockManager from './data/stockManager';
+import AccountManager from './data/accountManager';
 
 export class Transaction {
 	date;
@@ -48,6 +49,10 @@ export class Transaction {
 	get isInterestTransaction() {
 		return this.description.includes('Rente over') && this.deltaMoney > 0;
 	}
+	get account() {
+		return AccountManager.getByIBAN(this.ownIBAN);
+	}
+
 
 	update() {
 		TransactionManager.add(this);
@@ -80,6 +85,18 @@ export class FundTransaction extends Transaction {
 	fund;
 	sharePriceAtTimeOfTransaction;
 	shares;
+
+	async getFund() {
+		const account = this.account;
+		if (!account) return;
+		return (await account.getFunds())[this.fund];
+	}
+
+	async calcAnnualYield() {
+		const curSharePrice = await (await this.getFund()).getSharePriceAtEndOfMonth(new MonthIdentifier()); // Most recent shareprice
+		const ellapsedYears = new MonthIdentifier().setFromDate(this.date).monthsBetween(new MonthIdentifier()) / 12;
+		return (curSharePrice * this.shares / -this.deltaMoney - 1) / ellapsedYears;
+	}
 
 	constructor() {
 		super(...arguments);
@@ -672,6 +689,34 @@ class Fund {
 	get investment() {
 		return this.getInvestmentAtEndOfMonth(new MonthIdentifier());
 	}
+
+	async calcAnnualYield() { 
+		// TODO what about sold shares?
+		const investment = this.investment;
+		const normalizedYields = await Promise.all(this.transactions.map(async t => await t.calcAnnualYield() * -t.deltaMoney / investment));
+		return normalizedYields.reduce((a, b) => a + b, 0);
+	}
+
+	async calcStableAnnualYield() { 
+		// TODO
+		const minPassTime = 6; // months;
+		
+		const elligableTransactions = [];
+		let investment = this.investment;
+		for (let trans of this.transactions)
+		{
+			let ellapsedMonths = new MonthIdentifier().setFromDate(trans.date).monthsBetween(new MonthIdentifier());
+			if (ellapsedMonths < minPassTime) {
+				investment -= trans.deltaMoney;
+				continue;
+			}
+			elligableTransactions.push(trans);
+		}
+
+		const normalizedYields = await Promise.all(elligableTransactions.map(async t => await t.calcAnnualYield() * -t.deltaMoney / investment));
+		return normalizedYields.reduce((a, b) => a + b, 0);
+	}
+	
 	
 	getTransactionsAtEndOfMonth(_monthId = new MonthIdentifier()) { // Transactions before end of month
 		return this.transactions.filter(trans => trans.date.getTime() <= _monthId.date.copy().moveMonth(1).getTime());
@@ -752,6 +797,13 @@ export class MonthIdentifier {
 		endDate.setMinutes(0);
 
 		return ownDate.getTime() <= date.getTime() && endDate.getTime() >= date.getTime();
+	}
+
+	monthsBetween(_monthId) { // Includes first month
+		if (_monthId.date.getTime() < this.date.getTime()) return _monthId.monthsBetween(this);
+		let deltaYears = Math.floor(_monthId.date.getFullYear() - this.date.getFullYear());
+		let deltaMonths = Math.floor(_monthId.date.getMonth() - this.date.getMonth());
+		return 12 * deltaYears + deltaMonths;
 	}
 
 

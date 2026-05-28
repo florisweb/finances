@@ -1,7 +1,16 @@
 <script>
 	import { formatMoneyString } from '../polyfill';
+    import { MonthIdentifier } from '../types';
 	export let transaction;
 	
+	let yieldPerYear = 0;
+	let ellapsedYears = 0;
+
+
+	$: (async () => {
+		ellapsedYears = new MonthIdentifier().setFromDate(transaction.date).monthsBetween(new MonthIdentifier()) / 12;
+		yieldPerYear = await transaction.calcAnnualYield();
+	})();
 </script>
 
 <tr class={'transaction' + (' classificationState_' + transaction.classificationState)}>
@@ -9,6 +18,14 @@
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
 	<td>{Math.round(transaction.shares * 100) / 100}</td>
 	<td>{formatMoneyString(transaction.sharePriceAtTimeOfTransaction)}</td>
+	<td>{transaction.deltaMoney >= 0 ? '' : (
+			(
+				ellapsedYears < 0.5 ? 
+				('~' + Math.round(yieldPerYear * 1000/12) / 10 + '%/m') :
+				(Math.round(yieldPerYear * 1000) / 10 + '%/y')
+			)
+		)
+	}</td>
 	<td>{transaction.fund}</td>
 </tr>
 

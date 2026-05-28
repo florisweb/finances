@@ -74,17 +74,24 @@
 	let fundTransactions = [];
 	let funds = {};
 	let nonAllocatedFunds;
+	let interest = 0;
 	let serviceCosts = 0;
 	$: if (curAccount?.isFundAccount) 
 	{
 		fundTransactions = curAccount.transactions.filter(t => t instanceof FundTransaction);
 		fundTransactions.sort((a, b) => a.date < b.date);
 		nonAllocatedFunds = curAccount.getCashValue();
+		interest = curAccount.transactions.filter(t => t.isInterestTransaction).map(t => t.deltaMoney).reduce((a, b) => a + b, 0);
 		serviceCosts = curAccount.serviceCostTransactions.map(r => r.deltaMoney).reduce((a, b) => a + b, 0);
-		
-		(async () => {
-			funds = await curAccount.getFunds();
-		})();
+		updateFunds();
+	}
+
+	async function updateFunds() {
+		funds = await curAccount.getFunds()
+		for (let fundName in funds)
+		{
+			funds[fundName].annualYield = await funds[fundName].calcAnnualYield();
+		}
 	}
 
 
@@ -142,10 +149,14 @@
 			<div class="fundOverviewHolder">
 				{#each Object.keys(funds) as fund}
 					<div class='fundPanel' style={`background: ` + stringToColor(fund).hex}>
+						<div class="valueHolder">
+							{formatMoneyString(funds[fund].value, true, true)}
+							<div class="percHolder">{Math.round(funds[fund].annualYield * 1000) / 10}%/y</div>
+						</div>
 						<div class="title">{fund}</div>
 						<div class="subInformation">
-							Shares: {Math.round(funds[fund].shares * 100) / 100} - Value: {formatMoneyString(funds[fund].value)} <br>
-							Inv: {formatMoneyString(funds[fund].investment)} - Profit: {formatMoneyString(funds[fund].value-funds[fund].investment)}
+							Inv: {formatMoneyString(funds[fund].investment)} - Shares: {Math.round(funds[fund].shares * 100) / 100}<br>
+							Profit: {formatMoneyString(funds[fund].value-funds[fund].investment)}
 						</div>
 						<div class='lastUpdatedText'>
 							Stock price of: {funds[fund].lastUpdateTime}
@@ -154,10 +165,13 @@
 				{/each}
 
 				<div class='fundPanel nonAllocatedFunds'>
+					<div class="valueHolder">
+						{formatMoneyString(nonAllocatedFunds, true, true)}
+					</div>
 					<div class="title">Non-allocated funds</div>
 					<div class="subInformation">
-						Value: {formatMoneyString(nonAllocatedFunds)} <br>
-						Service costs: {formatMoneyString(-serviceCosts)}
+						Service costs: {formatMoneyString(-serviceCosts)}<br>
+						Interest: {formatMoneyString(interest)}
 					</div>
 				</div>
 			</div>
@@ -170,7 +184,8 @@
 						<th scope='col'>Date</th>
 						<th scope='col'>Money</th>
 						<th scope='col'>Shares</th>
-						<th scope='col'>Price per share</th>
+						<th scope='col'>Price/share</th>
+						<th scope='col'>Yield</th>
 						<th scope='col'>Fund</th>
 					</tr>
 				</thead>
@@ -282,6 +297,21 @@
 		border-radius: 10px;
 	}
 
+	.fundOverviewHolder .fundPanel .valueHolder {
+		color: #fff;
+		position: relative;
+		font-size: 16px;
+		margin-bottom: 5px;
+	}
+
+	.fundOverviewHolder .fundPanel .valueHolder .percHolder {
+		opacity: .5;
+		font-size: 14px;
+		line-height: 18px;
+		float: right;
+		margin-right: -10px;
+	}
+
 	.fundOverviewHolder .fundPanel .title {
 		position: relative;
 		font-size: 18px;
@@ -311,7 +341,7 @@
 		border: 2px solid #daf;
 	}
 
-	.fundPanel.nonAllocatedFunds .title, .fundPanel.nonAllocatedFunds .subInformation {
+	.fundPanel.nonAllocatedFunds .title, .fundPanel.nonAllocatedFunds .subInformation, .fundPanel.nonAllocatedFunds .valueHolder {
 		color: #daf;
 	}
 
