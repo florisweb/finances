@@ -223,6 +223,7 @@
 		if (_line.data.length < 1) return;
 		ctx.strokeStyle = _line.color.hex;
 		ctx.strokeWidth = 2;
+		ctx.setLineDash(_line.dashStyle || []);
 		ctx.beginPath();
 
 		_line.data.sort((a, b) => a.value[0] > b.value[0]);
