@@ -738,6 +738,23 @@ class Fund {
 		let shares = this.getSharesAtEndOfMonth(_monthId);
 		return shares * (await this.getSharePriceAtEndOfMonth(_monthId));
 	}
+	async getValueHistory() {
+		if (!(this.lastUpdateTime instanceof Date)) await this.lastUpdateTime;
+		let transactions = this.transactions;
+		transactions.sort((a, b) => a.date > b.date);
+		if (transactions.length === 0) return [];
+		
+		let getSharesAtDate = (_date) => {
+			return transactions.filter(trans => trans.date.getTime() <= _date.getTime() + 1000 * 60 * 60 * 24);
+		}
+		let fundStartDate = transactions[0].date;
+		return this.priceHistory.filter(p => p.time >= fundStartDate).map(p => {
+			return [
+				p.time,
+				getSharesAtDate(p.time).map(r => r.shares).reduce((a, b) => a + b, 0) * p.stockPrice,
+			];
+		});
+	}
 
 	async getSharePriceAtEndOfMonth(_monthId) {
 		if (!(this.lastUpdateTime instanceof Date)) await this.lastUpdateTime;

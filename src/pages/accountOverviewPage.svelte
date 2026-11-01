@@ -49,16 +49,11 @@
 		for (let fundName in funds)
 		{
 			let fund = funds[fundName];
-			let valueData = [];
 			let investmentData = [];
 			for (let delta = -monthRange - 1; delta < 0; delta++)
 			{
 				let curMonth = new MonthIdentifier().setFromDate(new Date().moveMonth(delta));
 				
-				valueData.push(new Vector(
-					curMonth.date.copy().moveMonth(1).getTime(),
-					await fund.getValueAtEndOfMonth(curMonth)
-				));
 				investmentData.push(new Vector(
 					curMonth.date.copy().moveMonth(1).getTime(),
 					await fund.getInvestmentAtEndOfMonth(curMonth)
@@ -68,7 +63,7 @@
 			graphData.push({
 				color: stringToColor(fund.name),
 				name: fund.name,
-				data: valueData
+				data: (await fund.getValueHistory()).map(r => new Vector(...r))
 			});
 			graphData.push({
 				color: stringToColor(fund.name),
