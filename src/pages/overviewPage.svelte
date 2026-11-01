@@ -116,14 +116,16 @@
 				expensesData.push({
 					value: expenses,
 					color: tag.color.hex,
-					name: moneyNameAndValueToString(tag.name, expenses)
+					name: moneyNameAndValueToString(tag.name, expenses),
+					tag: tag,
 				});
 			} else {
 				averageIncome -= expenses;
 				incomeData.push({
 					value: -expenses,
 					color: tag.color.hex,
-					name: moneyNameAndValueToString(tag.name, -expenses)
+					name: moneyNameAndValueToString(tag.name, -expenses),
+					tag: tag,
 				});
 			}
 		}
@@ -170,12 +172,14 @@
 				subTitle={'12 month average'} 
 				data={expensesData}
 				customClass='distributionGraph'
+				on:clickPiece={(_e) => App.tagPage.open(_e.detail.tag)}
 			></PieChart>
 			<PieChart 
 				title={'Income ' + formatMoneyString(averageIncome, true, true)} 
 				subTitle={'12 month average'} 
 				data={incomeData}
 				customClass='distributionGraph'
+				on:clickPiece={(_e) => App.tagPage.open(_e.detail.tag)}
 			></PieChart>
 			<PieChart 
 				title={'Reserved Money ' + formatMoneyString(reservedMoney, true, true)}

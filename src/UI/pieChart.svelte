@@ -1,11 +1,12 @@
 <script>	
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 	import Vector from '../vector';
 
 	export let title = '';
 	export let subTitle = false;
 	export let data = [{data: []}];
 	export let customClass = '';
-	export let config = {};
 
 	// Data: 
 	/*[
@@ -47,6 +48,7 @@
 		if (canvas) {
 			onResize();
 			window.addEventListener('mousemove', handleMouseMove);
+			canvas.addEventListener('click', handleClick);
 		}
 	}
 
@@ -55,7 +57,11 @@
 
 	let curHoverPiece = false;
 
-	
+	function handleClick(_e) {
+		if (!curHoverPiece) return;
+		dispatch("clickPiece", curHoverPiece);
+		console.log(_e.target, curHoverPiece);
+	}
 	
 	function handleMouseMove(_e) {
 		let bounds = canvas.getBoundingClientRect();
