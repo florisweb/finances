@@ -9,14 +9,18 @@
 
 	export let isSumRow = false;
 	export let sum = 0;
+
+	let budgetFulfilled = true;
+	$: budgetFulfilled = budget <= -averageExpenses * 1.1; // Budget acceptable if it covers the expenses within 10%
+	$: budgetDangerous = budget !== 0 && -averageExpenses / budget > 1.25 && averageExpenses > 0; // Budget unacceptable if it deviates from the actual expenses by 25%
 </script>
 
 
 
 {#if (!isSumRow)}
 	<tr class='row'>
-		<td class='budgetFulfilled'>
-			{budget < -averageExpenses ? '✓' : ''}
+		<td class='budgetFulfilled' class:budgetDangerous={budgetDangerous}>
+			{budgetFulfilled ? '✓' : (budgetDangerous ? '!' : '')}
 		</td>
 		<td class='tag'><Tag {...tag}></Tag></td>
 		<td class='moneyHolder budget' class:isNegative={budget < 0} class:isNull={budget === 0}>{formatMoneyString(budget)}</td>
@@ -58,6 +62,12 @@
 		display: inline;
 		line-height: 35px;
 		color: #999;
+		text-align: center;
+	}
+	td.budgetFulfilled.budgetDangerous {
+		margin-left: 3.5px;
+		color: #d99;
+		font-weight: bold;
 	}
 	td.tag {
 		margin-top: 2px;
