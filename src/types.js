@@ -850,14 +850,23 @@ window.MonthIdentifier = MonthIdentifier;
 export class Asset {
 	name = '';
 	transactions = [];
+	customInitialValue = 0;
+	customStartDate = false;
 
-	startDate = new Date();
 	id = newId();
 
 	depreciationMode = "fixed";
 	fixedDepreciationRate = 50; // euros/month
+	percentageDepreciationRate = 0.05;
 
-	get initialValue() { // TODO cache
+	get startDate() {
+		if (this.customStartDate) return this.customStartDate;
+		this.transactions.sort((a, b) => a.date > b.date);
+		return this.transactions[0]?.date || new Date();
+	}
+
+	get initialValue() {
+		if (this.customInitialValue) return this.customInitialValue;
 		return -this.transactions
 				.map(trans => trans.deltaMoney)
 				.reduce((a, b) => a + b, 0);
@@ -867,7 +876,7 @@ export class Asset {
 	}
 
 	get isDepreciated() {
-		return this.currentValue <= 0;
+		return this.currentValue <= 1;
 	}
 
 	get expectedDepreciationMonth() {
@@ -875,18 +884,24 @@ export class Asset {
 		switch (this.depreciationMode) 
 		{
 			case "fixed":
-				monthsToDeprecation = Math.ceil(this.initialValue / this.fixedDepreciationRate);
+				monthsToDeprecation = this.initialValue / this.fixedDepreciationRate;
+			break;
+			case "percentage": // Depreciation defined as when the value hits <= 1 euro - TODO make a fixed percentage? ie, 1% left?
+				monthsToDeprecation = Math.log(1/this.initialValue)/Math.log(1 - this.percentageDepreciationRate);
 			break;
 		}
 
-		return new MonthIdentifier().setFromDate(this.startDate.copy().moveMonth(monthsToDeprecation));
+		return new MonthIdentifier().setFromDate(this.startDate.copy().moveMonth(Math.ceil(monthsToDeprecation)));
 	}
 
 	constructor(_params) {
 		this.name = _params.name;
 		this.id = _params.id || this.id;
 		
-		this.startDate = new Date().setDateFromStr(_params.startDate);
+		this.customStartDate = _params.customStartDate ? new Date().setDateFromStr(_params.customStartDate) : false;
+		this.fixedDepreciationRate = _params.fixedDepreciationRate ?? this.fixedDepreciationRate;
+		this.depreciationMode = _params.depreciationMode ?? this.depreciationMode;
+		this.customInitialValue = _params.customInitialValue ?? 0;
 		this.#loadTransactions(_params.transactionIds || []);
 	}
 
@@ -901,6 +916,8 @@ export class Asset {
 		{
 			case "fixed":
 				return Math.max(this.initialValue - monthsSinceAcquire * this.fixedDepreciationRate, 0);
+			case "percentage":
+				return this.initialValue * Math.pow(1 - this.percentageDepreciationRate, monthsSinceAcquire);
 		}
 		return 0;
 	}
@@ -915,8 +932,11 @@ export class Asset {
 		return {
 			name: this.name,
 			id: this.id,
-			startDate: this.startDate.toString(),
-			transactionIds: this.transactions.map(t => t.id)
+			customStartDate: this.customStartDate ? this.customStartDate.toString() : false,
+			transactionIds: this.transactions.map(t => t.id),
+			customInitialValue: this.customInitialValue,
+			depreciationMode: this.depreciationMode,
+			fixedDepreciationRate: this.fixedDepreciationRate
 		}
 	}
 }

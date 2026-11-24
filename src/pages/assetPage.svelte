@@ -10,7 +10,11 @@
 
 
 	let assets = [];
-	AssetManager.dataStore.subscribe((_assets) => assets = _assets);
+	AssetManager.dataStore.subscribe((_assets) => assets = _assets.sort((a, b) => {
+		if (a.isDepreciated) return true;
+		if (b.isDepreciated) return false;
+		return a.startDate < b.startDate;
+	}));
 </script>
 
 <Page title="Assets" customClass='assetPage'>
@@ -28,5 +32,6 @@
 	.dataHolder {
 		display: flex;
 		gap: 20px;
+		flex-wrap: wrap;
 	}
 </style>
