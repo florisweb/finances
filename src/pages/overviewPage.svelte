@@ -83,6 +83,7 @@
 			reservedMoney += balance;			
 			balanceDistributionData.push(
 				{
+					tag: savingTags[i],
 					value: balance,
 					color: savingTags[i].color.hex,
 					name: moneyNameAndValueToString(savingTags[i].name, balance)
@@ -186,6 +187,7 @@
 				subTitle={''} 
 				data={balanceDistributionData}
 				customClass='distributionGraph'
+				on:clickPiece={(_e) => App.tagPage.open(_e.detail.tag)}
 			></PieChart>
 		</div>
 
