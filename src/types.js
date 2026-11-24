@@ -939,5 +939,8 @@ export class Asset {
 			fixedDepreciationRate: this.fixedDepreciationRate
 		}
 	}
+	clone() {
+		return new Asset(this.export());
+	}
 }
 window.Asset = Asset;

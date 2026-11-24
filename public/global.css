@@ -134,7 +134,9 @@ html, body {
 
 
 
-
+.popupHolder.TransactionViewerPopup {
+	z-index: 1001 !important;
+}
 .popupHolder.TransactionViewerPopup .popup {
 	top: 50vh !important;
 	max-width: unset !important;

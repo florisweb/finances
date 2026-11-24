@@ -7,6 +7,7 @@
     import CreateBudgetPopup from "./popups/createBudgetPopup.svelte";
     import StatusMessage from "./UI/statusMessage.svelte";
     import CreateAccountPopup from "./popups/createAccountPopup.svelte";
+    import CreateAssetPopup from "./popups/createAssetPopup.svelte";
 
 	let App = {}
 	window.App = App;
@@ -15,12 +16,14 @@
 	$: App.transactionViewerPopup = transactionViewerPopup;
 	$: App.createBudgetPopup = createBudgetPopup;
 	$: App.createAccountPopup = createAccountPopup;
+	$: App.createAssetPopup = createAssetPopup;
 	$: App.statusMessage = statusMessage;
 	
 	let createTagPopup;
 	let transactionViewerPopup;
 	let createBudgetPopup;
 	let createAccountPopup;
+	let createAssetPopup;
 	let statusMessage;
 </script>
 <main>
@@ -32,7 +35,8 @@
 	<TransactionViewerPopup bind:this={transactionViewerPopup}></TransactionViewerPopup>
 	<CreateBudgetPopup bind:this={createBudgetPopup}></CreateBudgetPopup>
 	<CreateAccountPopup bind:this={createAccountPopup}></CreateAccountPopup>
-
+	<CreateAssetPopup bind:this={createAssetPopup}></CreateAssetPopup>
+	
 	<div class='loaderScreen'>
 		<div class='logoHolder'>
 			<img src='images/logo.png'>

@@ -1,12 +1,16 @@
 <script>
 	import Transaction from "./transaction.svelte";
 	export let transactions = [];
+	export let transactionsSelectable = false;
 </script>
 
 <table class='transactionTable'>
 	<thead>
 		<tr class='header'>
 			<th scope='col'></th>
+			{ #if transactionsSelectable }
+				<th scope='col'></th>
+			{ /if}
 			<th scope='col'>Date</th>
 			<th scope='col'>Money</th>
 			<th scope='col'>Type</th>
@@ -17,7 +21,7 @@
 	</thead>
 	<tbody>
 		{#each transactions as transaction}
-			<Transaction {transaction}></Transaction>
+			<Transaction {transaction} selectable={transactionsSelectable}></Transaction>
 		{/each}
 	</tbody>
 </table>

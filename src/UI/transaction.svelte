@@ -2,6 +2,7 @@
 	import { formatMoneyString } from '../polyfill';
 	import TagSelectDropDown from './tagSelectDropDown.svelte';
 	export let transaction;
+	export let selectable = false;
 	let tagPrediction;
 	$: tagPrediction = transaction.predictedTag;
 	function selectTag(_typeCode) {
@@ -23,6 +24,17 @@
 			⚐
 		{/if}
 	</td>
+	{ #if selectable}
+		<td class='selectionHolder' class:selected={transaction._isSelected} on:click={() => {
+			transaction._isSelected = !transaction._isSelected;
+		}}>
+			{ #if transaction._isSelected}
+				☑
+			{:else}
+				☐
+			{/if}
+		</td>
+	{/if}
 	<td><div class='dateHolder'>{transaction.date}</div></td>
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
 	<td class='tagSelector'>
@@ -109,6 +121,16 @@
 	}
 	tr.transaction:not(:hover) td.userFlag:not(.flagged) {
 		opacity: 0;
+	}
+	
+	td.selectionHolder {
+		font-size: 24px;
+		color: #999;
+		cursor: pointer;
+		transition: 0.3s color;
+	}
+	td.selectionHolder.selected {
+		color: #777;
 	}
 
 

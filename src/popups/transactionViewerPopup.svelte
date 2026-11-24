@@ -11,8 +11,12 @@
 
 
 	let isOpen = false;
+	let onOpenPromiseResolver;
 	let transactions = [];
 	let title = 'Transaction viewer';
+	let config = {
+		transactionsSelectable: false
+	};
 
 	let searchQuery = null;
 
@@ -31,19 +35,38 @@
 
 	$: curPageTransactions = pages[curPageIndex] || [];
 
+
+
 	export function open(_transactions, _customTitle) {
+		config.transactionsSelectable = false;
 		isOpen = true;
 		transactions = Object.assign([], _transactions); // Keep references to the items intact, but destroy the reference to the array so it can be resorted without affecting the rest of the application
 		transactions.sort((a, b) => a.date.getTime() < b.date.getTime());
 		title = _customTitle ?? 'Transaction Viewer';
 		curPageIndex = 0;
-		searchQuery = null
+		searchQuery = null;
+		return new Promise((resolve) => onOpenPromiseResolver = resolve);
 	}
+	
+	export function openInSelectMode(_transactions, _customTitle) {
+		let promise = open(_transactions, _customTitle);
+		config.transactionsSelectable = true;
+		return promise;
+	}
+
 	export async function close() {
+		let resolveState = false;
+		if (config.transactionsSelectable)
+		{
+			resolveState = transactions.filter(trans => trans._isSelected);
+		}
+		
+		onOpenPromiseResolver(resolveState);
 		isOpen = false;
 		await wait(300);
 		curPageTransactions = [];
 	}
+
 
 	function filterTransactions(_filterString) {
 		if (!_filterString) {
@@ -143,7 +166,7 @@
 		{#if (curPageTransactions.length === 0)}
 			<div class='noTransactionsText'>No Transactions to show</div>
 		{:else}
-			<TransactionTable transactions={curPageTransactions}></TransactionTable>
+			<TransactionTable transactions={curPageTransactions} transactionsSelectable={config.transactionsSelectable}></TransactionTable>
 		{/if}
 	</div>
 	<div class='buttonHolder'>
@@ -154,7 +177,8 @@
 				<Button name='>' on:click={() => curPageIndex < pages.length - 1 ? curPageIndex++ : false} disabled={curPageIndex === pages.length - 1}></Button>
 			</div>
 		{/if}
-		<Button name='Close' filled={true} on:click={close}></Button>
+		
+		<Button name={config.transactionsSelectable ? 'Select' : 'Close'} filled={true} on:click={close}></Button>
 	</div>
 </Popup>
 
