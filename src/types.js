@@ -870,6 +870,18 @@ export class Asset {
 		return this.currentValue <= 0;
 	}
 
+	get expectedDepreciationMonth() {
+		let monthsToDeprecation = 0;
+		switch (this.depreciationMode) 
+		{
+			case "fixed":
+				monthsToDeprecation = Math.ceil(this.initialValue / this.fixedDepreciationRate);
+			break;
+		}
+
+		return new MonthIdentifier().setFromDate(this.startDate.copy().moveMonth(monthsToDeprecation));
+	}
+
 	constructor(_params) {
 		this.name = _params.name;
 		this.id = _params.id || this.id;
@@ -891,9 +903,7 @@ export class Asset {
 				return Math.max(this.initialValue - monthsSinceAcquire * this.fixedDepreciationRate, 0);
 		}
 		return 0;
-
 	}
-	
 
 
 	update() {
