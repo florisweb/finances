@@ -842,3 +842,72 @@ export class MonthIdentifier {
 	}
 }
 window.MonthIdentifier = MonthIdentifier;
+
+
+
+
+
+export class Asset {
+	name = '';
+	transactions = [];
+
+	startDate = new Date();
+	id = newId();
+
+	depreciationMode = "fixed";
+	fixedDepreciationRate = 50; // euros/month
+
+	get initialValue() { // TODO cache
+		return -this.transactions
+				.map(trans => trans.deltaMoney)
+				.reduce((a, b) => a + b, 0);
+	}
+	get currentValue() {
+		return this.getValueInMonth(new MonthIdentifier());
+	}
+
+	get isDepreciated() {
+		return this.currentValue <= 0;
+	}
+
+	constructor(_params) {
+		this.name = _params.name;
+		this.id = _params.id || this.id;
+		
+		this.startDate = new Date().setDateFromStr(_params.startDate);
+		this.#loadTransactions(_params.transactionIds || []);
+	}
+
+	#loadTransactions(_transactionIds) {
+		this.transactions = _transactionIds.map(tId => TransactionManager.data.find(t => t.id === tId)).filter(trans => trans);
+	}
+
+
+	getValueInMonth(_monthId) {
+		let monthsSinceAcquire = new MonthIdentifier().setFromDate(this.startDate).monthsBetween(_monthId);
+		switch (this.depreciationMode)
+		{
+			case "fixed":
+				return Math.max(this.initialValue - monthsSinceAcquire * this.fixedDepreciationRate, 0);
+		}
+		return 0;
+
+	}
+	
+
+
+	update() {
+		AssetManager.add(this);
+	}
+
+
+	export() {
+		return {
+			name: this.name,
+			id: this.id,
+			startDate: this.startDate.toString(),
+			transactionIds: this.transactions.map(t => t.id)
+		}
+	}
+}
+window.Asset = Asset;

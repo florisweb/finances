@@ -37,6 +37,9 @@
 		<Button name='Portfolio' on:click={() => openPageByIndex(7)}></Button>
 	</div>
 	<div class="item">
+		<Button name='Assets' on:click={() => openPageByIndex(8)}></Button>
+	</div>
+	<div class="item">
 		<Button name='Transactions' on:click={() => openAllTransactionsPopup()}></Button>
 	</div>
 	<div class="item">
