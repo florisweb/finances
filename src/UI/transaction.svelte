@@ -26,7 +26,7 @@
 	<td><div class='dateHolder'>{transaction.date}</div></td>
 	<td class='moneyTD'>{formatMoneyString(transaction.deltaMoney)}</td>
 	<td class='tagSelector'>
-		<TagSelectDropDown value={transaction.typeCode} on:change={(_event) => selectTag(_event.detail || transaction.typeCode)}></TagSelectDropDown>
+		<TagSelectDropDown value={transaction.typeCode} on:change={(_event) => selectTag(_event.detail)}></TagSelectDropDown>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class='predictedTagButton' style={'color: ' + tagPrediction?.tag.color.hex} on:click={() => selectTag(tagPrediction?.tag.id)}>
 			{tagPrediction ? ((tagPrediction.tag.id === transaction.typeCode ? '✓ ' : '★ ') + tagPrediction.tag.name) : ''}
