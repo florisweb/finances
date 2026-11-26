@@ -54,7 +54,7 @@
 		grid-template: repeat(10, auto) / repeat(3, calc((100% - 40px * 2) / 3));
 		grid-gap: 40px;
 	}
-
+	
 	.message {
 		width: 100%;
 		text-align: center;

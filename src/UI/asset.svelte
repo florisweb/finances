@@ -8,6 +8,7 @@
 </script>
 
 <!-- panel isRow -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class='asset isRow' class:depreciated={asset.isDepreciated} on:click={() => App.createAssetPopup.openEdit(asset)}>
 	<div class='title'>{asset.name}</div>
 	<div class='dateRange'>{new MonthIdentifier().setFromDate(asset.startDate).shortName} - {asset.expectedDepreciationMonth.shortName}</div>

@@ -26,9 +26,17 @@
 		isOpen = false;
 		App.transactionViewerPopup.close();
 	}
+	export function open() {
+		curAsset = new Asset({name: null});
+		onOpen();
+	}
 	export function openEdit(_asset) {
-		isOpen = true;
 		curAsset = _asset.clone();
+		onOpen();
+	}
+	
+	function onOpen() {
+		isOpen = true;
 		usingManualInitialValues = curAsset.customInitialValue || curAsset.customStartDate;
 		manualStartMonthIdentifier = curAsset.customStartDate ? new MonthIdentifier().setFromDate(curAsset.customStartDate) : null;
 		manualInitialValue = curAsset.customInitialValue;
