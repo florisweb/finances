@@ -61,7 +61,7 @@
 			resolveState = transactions.filter(trans => trans._isSelected);
 		}
 		
-		onOpenPromiseResolver(resolveState);
+		if (onOpenPromiseResolver) onOpenPromiseResolver(resolveState);
 		isOpen = false;
 		await wait(300);
 		curPageTransactions = [];

@@ -24,10 +24,12 @@
 		height: 30px;
 		line-height: 30px;
 		margin-left: 8px;
+		cursor: pointer;
 	}
 
 	input[type="checkbox"] {
 		visibility: hidden;
+		cursor: pointer;
 	}
 
 	label::after {
