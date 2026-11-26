@@ -14,6 +14,7 @@
 	import { Asset, MonthIdentifier } from "../types";
     import TransactionManager from "../data/transactionManager";
     import { formatMoneyString } from "../polyfill";
+    import { validate_component } from 'svelte/internal';
 
 
 	let isOpen = false;
@@ -29,8 +30,7 @@
 		isOpen = true;
 		curAsset = _asset.clone();
 		usingManualInitialValues = curAsset.customInitialValue || curAsset.customStartDate;
-		manualStartMonthIdentifier = curAsset.customStartDate ? new MonthIdentifier().setFromDate(curAsset.
-		customStartDate) : null;
+		manualStartMonthIdentifier = curAsset.customStartDate ? new MonthIdentifier().setFromDate(curAsset.customStartDate) : null;
 		manualInitialValue = curAsset.customInitialValue;
 	}
 
@@ -85,6 +85,12 @@
 
 	let autoDetectedInitialStartMonthIdentifier;
 	$: autoDetectedInitialStartMonthIdentifier = curAsset.startDate ? new MonthIdentifier().setFromDate(curAsset.startDate) : null;
+
+	let percentageDepreciationRate;
+	$: percentageDepreciationRate = curAsset.percentageDepreciationRate * 100;
+
+	let monthsUntilDepreciation;
+	$: monthsUntilDepreciation = new MonthIdentifier().setFromDate(curAsset.startDate).monthsBetween(curAsset.expectedDepreciationMonth)
 </script>
 
 <Popup {isOpen} on:passiveClose={() => isOpen = false} customClass='CreateAssetPopup'>
@@ -98,7 +104,7 @@
 		<div class="panel leftPanel">
 			<div class="panelHeader">Asset data</div>
 			<Button name={"Select transactions (" + curAsset.transactions?.length + ")"} on:click={openTransactionSelector}></Button>
-			<br>
+			<div style='margin-top: 5px'></div>
 			<CheckBox 
 				title="Manual initial values" 
 				bind:checked={usingManualInitialValues}
@@ -119,12 +125,34 @@
 		<div class="seperator"></div>
 		<div class="panel rightPanel">
 			<div class="panelHeader">Asset depreciation</div>
-			<DropDown options={depreciationModeOptions} value={curAsset.depreciationMode || "none"}></DropDown>
+			<DropDown options={depreciationModeOptions} value={curAsset.depreciationMode || "none"} on:change={(event) => curAsset.depreciationMode = event.detail}></DropDown>
+			<div style='margin-top: 5px'></div>
+			{ #if curAsset.depreciationMode == "fixed" }
+				<MoneyInput 
+					value={curAsset.fixedDepreciationRate} 
+					on:input={(event) => curAsset.fixedDepreciationRate = event.detail}
+				></MoneyInput>
+			{ :else if curAsset.depreciationMode == "percentage" }
+				<Input 
+					placeholder='% / month' 
+					value={percentageDepreciationRate}
+					on:input={(event) => curAsset.percentageDepreciationRate = event.detail / 100} 
+				></Input>
+			{/if}
 
-			<div class="depreciationDuration">
-				10 months
-				<!-- LITTLE GRAPH? -->
-			</div>
+			{ #if curAsset.depreciationMode != "none" }
+
+				<div class="depreciationDuration">
+					Time until fully depreciated: {
+						isNaN(monthsUntilDepreciation) ? 'Infinite' : (
+							monthsUntilDepreciation > 12 
+								? Math.floor(monthsUntilDepreciation / 12) + ' years ' + monthsUntilDepreciation % 12 
+								: monthsUntilDepreciation
+						)
+					} months
+					<!-- LITTLE GRAPH? -->
+				</div>
+			{ /if }
 		</div>	
 	</div>
 	
@@ -170,7 +198,8 @@
 		color: #333;
 		margin-bottom: 10px;
 	}
-	.autoDetectedValueHolder {
+	.autoDetectedValueHolder, 
+	.depreciationDuration {
 		font-size: 12px;
 		color: #555;
 		margin-top: 10px;
